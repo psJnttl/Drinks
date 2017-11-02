@@ -1,0 +1,11 @@
+node_modules/
+src/main/resources/static/built/
+target/
+
+# NetBeans : https://github.com/github/gitignore/blob/master/Global/NetBeans.gitignore
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
