@@ -1,4 +1,4 @@
-package base;
+package base.config;
 
 import java.io.IOException;
 import java.util.Arrays;
