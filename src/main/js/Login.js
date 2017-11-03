@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 import {Button, Col, FormGroup, Nav, NavItem, Row, Tab} from 'react-bootstrap';
 import App from './App';
 import LoginForm from './components/LoginForm';
@@ -9,9 +10,29 @@ class Login extends React.Component {
   constructor(props) {
     super(props);
     this.state = {authenticated: false, account: {}}
-    this.method = this.method.bind(this);
+    this.setAccountData = this.setAccountData.bind(this);
   }
-  method() {}
+
+  setAccountData(data) {
+    // copy contents, not reference
+    console.log(data);
+  }
+
+  componentDidMount() {
+    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
+    const self = this;
+    axios.get('api/account', config)
+         .then(function (response) {
+              self.setAccountData(response.data);
+              this.setState({authenticated: true});
+         })
+        .catch(function (response) {
+            if (401 == response.response.status) {
+              this.setState({authenticated: false});
+            }
+        });
+  }
+
   render() {
     const element =
       <Tab.Container id="tabs-with-dropdown" defaultActiveKey="loginTab">
