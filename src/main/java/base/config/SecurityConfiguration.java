@@ -1,4 +1,4 @@
-package base;
+package base.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -14,12 +14,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
+        http.httpBasic().and()
+        .authorizeRequests()
+        .antMatchers("/").permitAll()
         .anyRequest().authenticated().and()
-        .formLogin().permitAll().and()
         .logout().permitAll();
     }
-   
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+      web
+        .ignoring()
+           .antMatchers("/built/**", "/css/**");
+    }
+
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
