@@ -5,13 +5,15 @@ import {Button, Col, FormGroup, Nav, NavItem, Row, Tab} from 'react-bootstrap';
 import App from './App';
 import LoginForm from './components/LoginForm';
 import SignupForm from './components/SignupForm';
+import ModalLoginFail from './components/ModalLoginFail';
 
 class Login extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {authenticated: false, account: {}}
+    this.state = {authenticated: false, account: {}, loginFail: false, username: ""}
     this.setAccountData = this.setAccountData.bind(this);
     this.sendLogin = this.sendLogin.bind(this);
+    this.closeLoginFailModal = this.closeLoginFailModal.bind(this);
   }
 
   setAccountData(data) {
@@ -20,6 +22,7 @@ class Login extends React.Component {
   }
 
   sendLogin(username, password) {
+    this.setState({username: username});
     const creds = "Basic " + btoa(username + ":" + password);
     const config = {
       headers: {
@@ -35,28 +38,31 @@ class Login extends React.Component {
          })
         .catch(function (response) {
             if (401 == response.response.status) {
-              self.setState({authenticated: false});
+              self.setState({authenticated: false, loginFail: true});
             }
         });
   }
-
+  closeLoginFailModal() {
+    this.setState({loginFail: false});
+  }
   componentDidMount() {
     const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
     axios.get('api/account', config)
          .then(function (response) {
               self.setAccountData(response.data);
-              this.setState({authenticated: true});
+              self.setState({authenticated: true});
          })
         .catch(function (response) {
             if (401 == response.response.status) {
-              this.setState({authenticated: false});
+              self.setState({authenticated: false});
             }
         });
   }
 
   render() {
     const element =
+    <div>
       <Tab.Container id="tabs-with-dropdown" defaultActiveKey="loginTab">
         <Row className="clearfix">
           <Col sm={6}>
@@ -80,7 +86,14 @@ class Login extends React.Component {
             </Tab.Content>
           </Col>
         </Row>
-      </Tab.Container>;
+      </Tab.Container>
+      <ModalLoginFail
+        modalOpen={this.state.loginFail}
+        title="LOGIN FAILED!"
+        notification = "Failed to log in user "
+        name={this.state.username}
+        reply={this.closeLoginFailModal} />
+    </div>;
 
     // alkaa kysymyksellä käyttäjälle Buttonit Login, Signup
     // oikeasti serveriltä pitää kysyä mitä näytetään

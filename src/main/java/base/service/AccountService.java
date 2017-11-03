@@ -21,7 +21,6 @@ public class AccountService {
         if (null == authentication) {
             return Optional.empty();
         }
-        System.out.println("authentication.getName(): " + authentication.getName());
         Account account = accountRepository.findByUsername(authentication.getName());
         AccountDto dto = new AccountDto(account.getUsername());
         dto.setRoles(account.getRoles());
