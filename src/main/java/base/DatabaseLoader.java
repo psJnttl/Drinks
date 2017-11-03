@@ -1,6 +1,7 @@
 package base;
 
 import base.domain.Manager;
+import base.domain.Role;
 import base.domain.Account;
 import base.domain.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import base.repository.AccountRepository;
 import base.repository.EmployeeRepo;
 import base.repository.ManagerRepository;
+import base.repository.RoleRepository;
 
 /**
  *
@@ -29,6 +31,9 @@ public class DatabaseLoader implements CommandLineRunner {
     private AccountRepository accountRepository;
     
     @Autowired
+    private RoleRepository roleRepository;
+    
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
@@ -42,11 +47,32 @@ public class DatabaseLoader implements CommandLineRunner {
         if (null != accountRepository.findByUsername("user")) {
             return;
         }
-        Account account = new Account();
-        account.setUsername("user");
-        account.setRole("USER");
-        account.setPassword(passwordEncoder.encode("password"));
-        account = accountRepository.saveAndFlush(account);
+        if (null == roleRepository.findByName("USER")) {
+            Role role = new Role("USER");
+            role = roleRepository.saveAndFlush(role);
+        }
+        if (null == accountRepository.findByUsername("user")) {
+            Account userAccount = new Account();
+            userAccount.setUsername("user");
+            userAccount.setPassword(passwordEncoder.encode("password"));
+            Role role = roleRepository.findByName("USER");
+            userAccount.addRole(role);
+            userAccount = accountRepository.saveAndFlush(userAccount);
+        }
+        if (null == roleRepository.findByName("ADMIN")) {
+            Role admin = new Role("ADMIN");
+            admin = roleRepository.saveAndFlush(admin);
+        }
+        if (null == accountRepository.findByUsername("admin")) {
+            Account adminAccount = new Account();
+            adminAccount.setUsername("admin");
+            adminAccount.setPassword(passwordEncoder.encode(("admin")));
+            Role user = roleRepository.findByName("USER");
+            adminAccount.addRole(user);
+            Role admin = roleRepository.findByName("ADMIN");
+            adminAccount.addRole(admin);
+            adminAccount = accountRepository.saveAndFlush(adminAccount);
+        }
     }
 
 }
