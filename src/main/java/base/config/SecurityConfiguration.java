@@ -21,11 +21,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.httpBasic().and()
+        http.csrf().disable();
+        http.httpBasic().realmName("SEC 1 test").authenticationEntryPoint(getBasicAuthEntryPoint()).and()
         .authorizeRequests()
         .antMatchers("/").permitAll()
         .anyRequest().authenticated().and()
-        .logout().permitAll();
+        .logout().permitAll().logoutSuccessUrl("/");
     }
 
     @Override
@@ -43,5 +44,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+    
+    @Bean
+    public CustomBasicAuthenticationEntryPoint getBasicAuthEntryPoint() {
+        return new CustomBasicAuthenticationEntryPoint();
     }
 }
