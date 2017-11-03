@@ -13,7 +13,6 @@ import org.springframework.web.servlet.resource.ResourceResolverChain;
 /**
  * package private on purpose
  *
- * @author Pasi
  */
 class StaticPathResolver implements ResourceResolver {
 
@@ -63,21 +62,6 @@ class StaticPathResolver implements ResourceResolver {
         return indexHtml;
     }
 
-    private Resource resolve2(String requestPath, List<? extends Resource> locations) {
-        if (isIgnored(requestPath)) {
-            return null;
-        }
-        if (isHandled(requestPath)) { // tuettu tiedostopääte löytyy
-            for (Resource location: locations) { // mutta löytyykö annetusta sijannista?
-                Resource relative = createRelative(location, requestPath);
-                if (relative != null && relative.exists()) {
-                    return relative;
-                }
-            }
-        }
-        return indexHtml;
-    }
-
     private Resource createRelative(Resource resource, String relativePath) {
         try {
             Resource relative = resource.createRelative(relativePath);
@@ -95,7 +79,5 @@ class StaticPathResolver implements ResourceResolver {
         String extension = StringUtils.getFilenameExtension(path);
         return handledExtensions.stream().anyMatch(ext -> ext.equals(extension));
     }
-
-
 
 }
