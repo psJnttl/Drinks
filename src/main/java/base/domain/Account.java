@@ -1,6 +1,11 @@
 package base.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToMany;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
@@ -8,7 +13,9 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 public class Account extends AbstractPersistable<Long> {
     private String username;
     private String password;
-    private String role;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<Role> roles;
 
     public String getUsername() {
         return username;
@@ -26,12 +33,26 @@ public class Account extends AbstractPersistable<Long> {
         this.password = password;
     }
 
-    public String getRole() {
-        return role;
+    public List<Role> getRoles() {
+        return roles;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void addRole(Role role) {
+        if (null == this.roles) {
+            roles = new ArrayList<>();
+        }
+        roles.add(role);
+    }
+    
+    public void removeRole(Role role) {
+        if (null != this.roles) {
+            roles.remove(role);
+        }
     }
 
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+    
+    
 }
