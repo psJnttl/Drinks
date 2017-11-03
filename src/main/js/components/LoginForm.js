@@ -20,6 +20,7 @@ class LoginForm extends React.Component {
   }
   submit() {
     console.log("login/password: " + this.state.name + "/" + this.state.password);
+    this.props.loginFn(this.state.name, this.state.password);
   }
   render() {
     return (
@@ -50,6 +51,8 @@ class LoginForm extends React.Component {
     );
   }
 }
-LoginForm.PropTypes = {}
+LoginForm.PropTypes = {
+  loginFn: PropTypes.func.isRequired,
+}
 LoginForm.defaultProps = {}
 export default LoginForm;
