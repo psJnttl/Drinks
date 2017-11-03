@@ -19,7 +19,8 @@ class SignupForm extends React.Component {
     this.setState({password: value});
   }
   submit() {
-    console.log("login/password: " + this.state.name + "/" + this.state.password);
+    console.log("signup with login/password: " + this.state.name + "/" + this.state.password);
+    this.props.signupFn(this.state.name, this.state.password);
   }
   render() {
     return (
@@ -50,6 +51,8 @@ class SignupForm extends React.Component {
     );
   }
 }
-SignupForm.PropTypes = {}
+SignupForm.PropTypes = {
+  signupFn: PropTypes.func.isRequired,
+}
 SignupForm.defaultProps = {}
 export default SignupForm;

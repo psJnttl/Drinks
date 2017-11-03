@@ -13,6 +13,7 @@ class Login extends React.Component {
     this.state = {authenticated: false, account: {}, loginFail: false, username: ""}
     this.setAccountData = this.setAccountData.bind(this);
     this.sendLogin = this.sendLogin.bind(this);
+    this.sendSignup = this.sendSignup.bind(this);
     this.closeLoginFailModal = this.closeLoginFailModal.bind(this);
   }
 
@@ -44,6 +45,27 @@ class Login extends React.Component {
   }
   closeLoginFailModal() {
     this.setState({loginFail: false});
+  }
+  sendSignup(username, password) {
+    const command = {username: username, password: password, roles: [{"id":1,"name":"USER"}]};
+    console.log("sendSignup, command: ");
+    console.log(command);
+    const config = {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    }
+    const self = this;
+    axios.post('api/account/signup', command, config)
+         .then(function (response) {
+           console.log(respose.data);
+         })
+        .catch(function (response) {
+            if (401 == response.response.status) {
+              console.log("401 !!");
+            }
+        });
+
   }
   componentDidMount() {
     const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
@@ -81,7 +103,7 @@ class Login extends React.Component {
                 <LoginForm loginFn={this.sendLogin}/>
               </Tab.Pane>
               <Tab.Pane eventKey="signupTab">
-                <SignupForm />
+                <SignupForm signupFn={this.sendSignup}/>
               </Tab.Pane>
             </Tab.Content>
           </Col>
