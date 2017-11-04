@@ -11,7 +11,7 @@ class ModalLoginFail extends React.Component {
     return (
       <div>
         <Modal bsSize="small" show={this.props.modalOpen} onHide={() => this.props.reply(false)}>
-          <Modal.Header closeButton bsClass="loginFailedHeader">
+          <Modal.Header closeButton bsClass={this.props.header}>
             <Modal.Title>{this.props.title}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
@@ -19,7 +19,7 @@ class ModalLoginFail extends React.Component {
             {this.props.notification2}
           </Modal.Body>
           <Modal.Footer bsClass="modalFooter">
-            <Button bsStyle="danger" onClick={ () => this.props.reply(true) }>OK</Button>
+            <Button bsStyle="success" onClick={ () => this.props.reply(true) }>OK</Button>
           </Modal.Footer>
         </Modal>
       </div>
@@ -33,11 +33,13 @@ ModalLoginFail.PropTypes = {
   notification2: PropTypes.string,
   name: PropTypes.string,
   reply: PropTypes.func.isRequired,
+  header: PropTypes.string,
 }
 ModalLoginFail.defaultProps = {
   title: "Login has failed",
   notification: "Failed to login user: ",
   notification2: "",
   name: "username",
+  header: "failedModalHeader",
 }
 export default ModalLoginFail;

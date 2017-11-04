@@ -5,9 +5,16 @@
   background: #f8f8f8;
 }
 
-.loginFailedHeader {
+.failedModalHeader {
   padding: 15px;
   border-bottom: 1px solid #e5e5e5;
   background: #CC0000;
+  color: white;
+}
+
+.successModalHeader {
+  padding: 15px;
+  border-bottom: 1px solid #e5e5e5;
+  background: #007E33;
   color: white;
 }
