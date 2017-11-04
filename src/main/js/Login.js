@@ -11,8 +11,8 @@ class Login extends React.Component {
   constructor(props) {
     super(props);
     this.state = {authenticated: false, account: {}, loginFail: false,
-                  username: "", signupFail: false, notification2:"",
-                  signupSuccess: false}
+                  username: "", password: "",signupFail: false,
+                  notification2:"", signupSuccess: false}
     this.setAccountData = this.setAccountData.bind(this);
     this.sendLogin = this.sendLogin.bind(this);
     this.sendSignup = this.sendSignup.bind(this);
@@ -27,6 +27,7 @@ class Login extends React.Component {
   }
 
   sendLogin(username, password) {
+    console.log("username/password: " + username + " / " + password);
     this.setState({username: username});
     const creds = "Basic " + btoa(username + ":" + password);
     const config = {
@@ -54,10 +55,11 @@ class Login extends React.Component {
     this.setState({signupFail: false});
   }
   closeSignupSuccessModal() {
-    this.setState({authenticated: true, signupSuccess: false});
+    this.setState({signupSuccess: false});
+    this.sendLogin(this.state.username, this.state.password);
   }
   sendSignup(username, password) {
-    this.setState({username: username});
+    this.setState({username: username, password: password});
     const command = {username: username, password: password, roles: [{"id":1,"name":"USER"}]};
     console.log("sendSignup, command: ");
     console.log(command);
@@ -71,9 +73,11 @@ class Login extends React.Component {
          .then(function (response) {
            self.setState({authenticated: false, signupFail: false,
              notification2: "Click OK to proceed to site.", signupSuccess: true});
+
          })
         .catch(function (response) {
             if (409 == response.response.status) {
+              debugger;
               self.setState({authenticated: false, signupFail: true, notification2: "Username already taken."});
             }
         });
@@ -144,8 +148,6 @@ class Login extends React.Component {
         reply={this.closeSignupSuccessModal} />
     </div>;
 
-    // alkaa kysymyksellä käyttäjälle Buttonit Login, Signup
-    // oikeasti serveriltä pitää kysyä mitä näytetään
     return (
       this.state.authenticated ? <App /> : element
     );
