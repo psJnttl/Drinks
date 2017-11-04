@@ -5,7 +5,7 @@ import {Button, Col, FormGroup, Nav, NavItem, Row, Tab} from 'react-bootstrap';
 import App from './App';
 import LoginForm from './components/LoginForm';
 import SignupForm from './components/SignupForm';
-import ModalLoginFail from './components/ModalLoginFail';
+import SimpleConfirmationModal from './components/SimpleConfirmationModal';
 
 class Login extends React.Component {
   constructor(props) {
@@ -121,20 +121,20 @@ class Login extends React.Component {
           </Col>
         </Row>
       </Tab.Container>
-      <ModalLoginFail
+      <SimpleConfirmationModal
         modalOpen={this.state.loginFail}
         title="LOGIN FAILED!"
         notification = "Failed to log in user "
         name={this.state.username}
         reply={this.closeLoginFailModal} />
-      <ModalLoginFail
+      <SimpleConfirmationModal
         modalOpen={this.state.signupFail}
         title="SIGNUP FAILED!"
         notification = "Failed to create account with username "
         notification2 = {this.state.notification2}
         name={this.state.username}
         reply={this.closeSignupFailModal} />
-      <ModalLoginFail
+      <SimpleConfirmationModal
         modalOpen={this.state.signupSuccess}
         header="successModalHeader"
         title="SIGNUP SUCCESS!"
