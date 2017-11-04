@@ -10,11 +10,13 @@ import ModalLoginFail from './components/ModalLoginFail';
 class Login extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {authenticated: false, account: {}, loginFail: false, username: ""}
+    this.state = {authenticated: false, account: {}, loginFail: false,
+                  username: "", signupFail: false, notification2:""}
     this.setAccountData = this.setAccountData.bind(this);
     this.sendLogin = this.sendLogin.bind(this);
     this.sendSignup = this.sendSignup.bind(this);
     this.closeLoginFailModal = this.closeLoginFailModal.bind(this);
+    this.closeSignupFailModal = this.closeSignupFailModal.bind(this);
   }
 
   setAccountData(data) {
@@ -46,7 +48,11 @@ class Login extends React.Component {
   closeLoginFailModal() {
     this.setState({loginFail: false});
   }
+  closeSignupFailModal() {
+    this.setState({signupFail: false});
+  }
   sendSignup(username, password) {
+    this.setState({username: username});
     const command = {username: username, password: password, roles: [{"id":1,"name":"USER"}]};
     console.log("sendSignup, command: ");
     console.log(command);
@@ -58,11 +64,13 @@ class Login extends React.Component {
     const self = this;
     axios.post('api/account/signup', command, config)
          .then(function (response) {
+           self.setState({authenticated: true, signupFail: false, notification2: ""});
            console.log(respose.data);
          })
         .catch(function (response) {
-            if (401 == response.response.status) {
-              console.log("401 !!");
+            if (409 == response.response.status) {
+              self.setState({authenticated: false, signupFail: true, notification2: "Username already taken."});
+              console.log("409: account with given username already exists!");
             }
         });
 
@@ -115,6 +123,13 @@ class Login extends React.Component {
         notification = "Failed to log in user "
         name={this.state.username}
         reply={this.closeLoginFailModal} />
+      <ModalLoginFail
+        modalOpen={this.state.signupFail}
+        title="SIGNUP FAILED!"
+        notification = "Failed to create account with username "
+        notification2 = {this.state.notification2}
+        name={this.state.username}
+        reply={this.closeSignupFailModal} />
     </div>;
 
     // alkaa kysymyksellä käyttäjälle Buttonit Login, Signup

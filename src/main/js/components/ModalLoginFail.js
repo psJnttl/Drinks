@@ -15,7 +15,8 @@ class ModalLoginFail extends React.Component {
             <Modal.Title>{this.props.title}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <strong>{this.props.notification} '{this.props.name}' !</strong>
+            <strong>{this.props.notification} '{this.props.name}' !</strong><br />
+            {this.props.notification2}
           </Modal.Body>
           <Modal.Footer bsClass="modalFooter">
             <Button bsStyle="danger" onClick={ () => this.props.reply(true) }>OK</Button>
@@ -29,12 +30,14 @@ ModalLoginFail.PropTypes = {
   modalOpen: PropTypes.bool.isRequired,
   title: PropTypes.string,
   notification: PropTypes.string,
+  notification2: PropTypes.string,
   name: PropTypes.string,
   reply: PropTypes.func.isRequired,
 }
 ModalLoginFail.defaultProps = {
   title: "Login has failed",
   notification: "Failed to login user: ",
+  notification2: "",
   name: "username",
 }
 export default ModalLoginFail;
