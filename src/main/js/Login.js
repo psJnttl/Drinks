@@ -19,7 +19,7 @@ class Login extends React.Component {
     this.closeLoginFailModal = this.closeLoginFailModal.bind(this);
     this.closeSignupFailModal = this.closeSignupFailModal.bind(this);
     this.closeSignupSuccessModal = this.closeSignupSuccessModal.bind(this);
-    this.handleAuthenticationState = this.handleAuthenticationState
+    this.handleAuthenticationState = this.handleAuthenticationState.bind(this);
   }
 
   setAccountData(data) {
