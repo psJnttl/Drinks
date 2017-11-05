@@ -2,35 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {NavLink, BrowserRouter as Router, Route,  Link, Switch} from 'react-router-dom';
 import Employees from './Employees';
-
-class Nav extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {}
-  }
-  render() {
-    return (
-      <ul className="nav">
-        <li>
-          <NavLink exact activeClassName="active" to="/">
-            Home
-          </NavLink>
-        </li>
-        <li>
-          <NavLink activeClassName="active" to="/employees" >
-            Employees
-          </NavLink>
-        </li>
-        <li>
-          <NavLink activeClassName="active" to="/about">
-            About
-          </NavLink>
-        </li>
-
-      </ul>
-    );
-  }
-}
+import Navi from './components/Navi';
 
 const Home = () => (
   <div>
@@ -52,7 +24,7 @@ class App extends React.Component {
     return (
       <Router>
         <div >
-          <Nav />
+          <Navi />
           <Switch>
             <Route exact path="/" component={Home} />
             <Route path="/employees" component={Employees} />
