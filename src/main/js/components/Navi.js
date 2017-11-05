@@ -58,6 +58,9 @@ class Navi extends React.Component {
     );
   }
 }
-Navi.PropTypes = {}
+Navi.PropTypes = {
+  authenticated: PropTypes.bool.isRequired,
+  changeAuthState: PropTypes.func.isRequired,
+}
 Navi.defaultProps = {}
 export default Navi;

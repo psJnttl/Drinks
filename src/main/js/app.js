@@ -12,7 +12,7 @@ const Home = () => (
 
 const About = () => (
   <div>
-    This is a base project for Routing.
+    This is the Drinks archive app.
   </div>
 );
 
@@ -24,7 +24,10 @@ class App extends React.Component {
     return (
       <Router>
         <div >
-          <Navi />
+          <Navi
+            authenticated={this.props.authenticated}
+            changeAuthState={this.props.changeAuthState}
+          />
           <Switch>
             <Route exact path="/" component={Home} />
             <Route path="/employees" component={Employees} />
@@ -36,7 +39,10 @@ class App extends React.Component {
     );
   }
 }
-App.PropTypes = {}
+App.PropTypes = {
+  authenticated: PropTypes.bool.isRequired,
+  changeAuthState: PropTypes.func.isRequired,
+}
 App.defaultProps = {}
 
 export default App;

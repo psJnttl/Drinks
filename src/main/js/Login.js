@@ -19,6 +19,7 @@ class Login extends React.Component {
     this.closeLoginFailModal = this.closeLoginFailModal.bind(this);
     this.closeSignupFailModal = this.closeSignupFailModal.bind(this);
     this.closeSignupSuccessModal = this.closeSignupSuccessModal.bind(this);
+    this.handleAuthenticationState = this.handleAuthenticationState
   }
 
   setAccountData(data) {
@@ -97,6 +98,10 @@ class Login extends React.Component {
             }
         });
   }
+  handleAuthenticationState(state) {
+    const value = state;
+    this.setState({authenticated: value});
+  }
 
   render() {
     const element =
@@ -149,7 +154,12 @@ class Login extends React.Component {
     </div>;
 
     return (
-      this.state.authenticated ? <App /> : element
+      this.state.authenticated ?
+        <App
+          authenticated={this.state.authenticated}
+          changeAuthState={this.handleAuthenticationState}
+        /> :
+        element
     );
   }
 }
