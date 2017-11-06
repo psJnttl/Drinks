@@ -1,8 +1,11 @@
 package base.controller;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.Before;
@@ -18,8 +21,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import base.domain.Ingredient;
 import base.repository.IngredientRepository;
+import base.service.IngredientDto;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -29,6 +35,7 @@ public class IngredientControllerTest {
     private static final String PATH = "/api/ingredients";
     private static final String INGREDIENT1 = "Tonic vesi";
     private static final String INGREDIENT2 = "Vodka";
+    private static final String INGREDIENT3 = "Bourbon";
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -63,4 +70,55 @@ public class IngredientControllerTest {
         String content = res.getResponse().getContentAsString();
         assertFalse("Project list must not be empty.", content.equals("[]"));
     }
+
+    @Test
+    public void addingIngredientReturnsLocationHeaderAndDto() throws Exception {
+        IngredientAdd ingredient = new IngredientAdd(INGREDIENT3);
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(ingredient);
+        MvcResult result = mockMvc
+                .perform(
+                        post(PATH)
+                            .contentType(MediaType.APPLICATION_JSON_UTF8)
+                            .content(content))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", containsString(PATH + "/")))
+                .andReturn();
+        IngredientDto dto = mapper.readValue(result.getResponse().getContentAsString(), IngredientDto.class);
+        assertTrue("ingredient name not correct", dto.getName().equals(INGREDIENT3));
+    }
+    
+    @Test
+    public void addingIngredientWithoutNameFails() throws Exception {
+        IngredientAdd ingredient = new IngredientAdd("");
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(ingredient);
+         mockMvc
+                .perform(
+                        post(PATH)
+                            .contentType(MediaType.APPLICATION_JSON_UTF8)
+                            .content(content))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void fetchSingleIngredient() throws Exception {
+        MvcResult result = mockMvc
+                .perform(get(PATH + "/" + 1))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+        assertFalse("Contents cannot be empty!", result.getResponse().getContentAsString().isEmpty());
+        ObjectMapper mapper = new ObjectMapper();
+        IngredientDto dto = mapper.readValue(result.getResponse().getContentAsString(), IngredientDto.class);
+        assertTrue(dto.getName().equals(INGREDIENT1));
+    }
+    
+    @Test
+    public void fetchSingleIngredientWithWrongIdFails() throws Exception {
+        mockMvc
+                .perform(get(PATH + "/" + 751130))
+                .andExpect(status().isNotFound());
+    }
+    
 }
