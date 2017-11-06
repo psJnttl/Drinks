@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Col, Form, FormControl, FormGroup, Modal} from 'react-bootstrap';
 
-class SimpleConfirmationModal extends React.Component {
+class SimpleInformationModal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {}
@@ -26,7 +26,7 @@ class SimpleConfirmationModal extends React.Component {
     );
   }
 }
-SimpleConfirmationModal.PropTypes = {
+SimpleInformationModal.PropTypes = {
   modalOpen: PropTypes.bool.isRequired,
   title: PropTypes.string,
   notification: PropTypes.string,
@@ -35,11 +35,11 @@ SimpleConfirmationModal.PropTypes = {
   reply: PropTypes.func.isRequired,
   header: PropTypes.string,
 }
-SimpleConfirmationModal.defaultProps = {
+SimpleInformationModal.defaultProps = {
   title: "Login has failed",
   notification: "Failed to login user: ",
   notification2: "",
   name: "username",
   header: "failedModalHeader",
 }
-export default SimpleConfirmationModal;
+export default SimpleInformationModal;
