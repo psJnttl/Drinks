@@ -14,6 +14,7 @@ class Logout extends React.Component {
     if (this.props.authenticated) {
       axios.get('/logout')
            .then(function (response) {
+             self.props.history.push("/");
              self.props.changeAuthState(false);
            })
           .catch(function (response) {
