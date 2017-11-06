@@ -2,8 +2,10 @@ package base.controller;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -21,6 +23,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import base.domain.Ingredient;
@@ -115,10 +118,66 @@ public class IngredientControllerTest {
     }
     
     @Test
-    public void fetchSingleIngredientWithWrongIdFails() throws Exception {
+    public void fetchSingleIngredientWithWrongIdFails404() throws Exception {
         mockMvc
                 .perform(get(PATH + "/" + 751130))
                 .andExpect(status().isNotFound());
     }
     
+    @Test
+    public void deleteIngredientOK() throws Exception {
+        mockMvc.perform(
+                delete(PATH + "/" + 2))
+                .andExpect(status().isOk());
+    }
+    
+    @Test
+    public void deleteIngredientWithWrongIdFails404() throws Exception {
+        mockMvc.perform(
+                delete(PATH + "/" + 751130))
+                .andExpect(status().isNotFound());
+    }
+    
+    @Test
+    public void modifyIngredientOKandReturnsChangedContent() throws Exception {
+        IngredientAdd ingAdd = new IngredientAdd("Spring water");
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(ingAdd);
+        MvcResult result = mockMvc
+                .perform(
+                        put(PATH + "/" + 1)
+                                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                                .content(content))
+                .andExpect(status().isOk())
+                .andReturn();
+        IngredientDto dto = mapper.readValue(result.getResponse().getContentAsString(), IngredientDto.class);
+        assertTrue(dto.getName().equals("Spring water"));
+    }
+    
+    @Test
+    public void modifyingIngredientWithWrongIdFails404() throws Exception {
+        IngredientAdd ingAdd = new IngredientAdd("Spring water");
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(ingAdd);
+        mockMvc
+            .perform(
+                put(PATH + "/" + 751130)
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .content(content))
+            .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void modifyingIngredientWithEmptyContentsFails() throws Exception {
+        IngredientAdd ingAdd = new IngredientAdd("");
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(ingAdd);
+        mockMvc
+            .perform(
+                put(PATH + "/" + 1)
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .content(content))
+            .andExpect(status().isBadRequest());
+    }
 }

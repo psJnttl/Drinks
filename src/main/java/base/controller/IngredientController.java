@@ -49,4 +49,25 @@ public class IngredientController {
         }
         return new ResponseEntity<>(iDto.get(), HttpStatus.OK);
     }
+    
+    @RequestMapping(value = "/api/ingredients/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<IngredientDto> deleteIngredient(@PathVariable long id) {
+        if (! ingredientService.deleteIngredient((long) id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
+    @RequestMapping(value = "/api/ingredients/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<IngredientDto> modifyIngredient(@PathVariable long id, @RequestBody IngredientAdd ingredient) {
+        Optional<IngredientDto> iDto  = ingredientService.findIngredient(id);
+        if (! iDto.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (null == ingredient || ingredient.getName().isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        IngredientDto dto = ingredientService.modifyIngredient(id, ingredient);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
 }

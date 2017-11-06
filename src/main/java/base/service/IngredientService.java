@@ -42,4 +42,21 @@ public class IngredientService {
         IngredientDto dto = new IngredientDto(ingredient.getId(), ingredient.getName());
         return Optional.of(dto);
     }
+
+    public boolean deleteIngredient(long id) {
+        Ingredient ingredient = ingredientRepository.findOne(id);
+        if (null == ingredient) {
+            return false;
+        }
+        ingredientRepository.delete(id);
+        return true;
+    }
+
+    public IngredientDto modifyIngredient(long id, IngredientAdd ingredient) {
+        Ingredient ing = ingredientRepository.findOne(id);
+        ing.setName(ingredient.getName());
+        ing = ingredientRepository.saveAndFlush(ing);
+        IngredientDto dto = new IngredientDto(ing.getId(), ing.getName());
+        return dto;
+    }
 }
