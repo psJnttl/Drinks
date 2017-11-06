@@ -18,3 +18,10 @@
   background: #007E33;
   color: white;
 }
+
+.warningModalHeader {
+  padding: 15px;
+  border-bottom: 1px solid #e5e5e5;
+  background: #ffc107;
+  color: black;
+}

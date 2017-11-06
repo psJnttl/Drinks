@@ -1,17 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import SimpleConfirmationModal from './components/SimpleConfirmationModal';
 
 class Logout extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {}
-    this.method = this.method.bind(this);
+    this.state = {modalOpen: true, logout:false}
+    this.toggleModal = this.toggleModal.bind(this);
   }
-  method() {}
+  toggleModal(answer) {
+    this.setState({modalOpen: !this.state.modalOpen, logout: answer});
+  }
   render() {
     const self = this;
-    if (this.props.authenticated) {
+    if (this.props.authenticated && this.state.logout) {
       axios.get('/logout')
            .then(function (response) {
              self.props.history.push("/");
@@ -21,8 +24,17 @@ class Logout extends React.Component {
             self.props.changeAuthState(true);
           });
     }
+    else if (!this.state.modalOpen && !this.state.logout) {
+      self.props.history.goBack();
+    }
     return (
-      null
+      <SimpleConfirmationModal
+        modalOpen={this.state.modalOpen}
+        reply={this.toggleModal}
+        title="Logout"
+        question="Are you sure you want to log out"
+        header="warningModalHeader"
+      />
     );
   }
 }
