@@ -22,11 +22,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
-        http.httpBasic().realmName("SEC 1 test").authenticationEntryPoint(getBasicAuthEntryPoint()).and()
+        http.httpBasic().realmName("Drinks").authenticationEntryPoint(getBasicAuthEntryPoint()).and()
         .authorizeRequests()
         .antMatchers("/").permitAll()
+        .antMatchers("/api/account/signup").permitAll()
         .anyRequest().authenticated().and()
-        .logout().permitAll().logoutSuccessUrl("/");
+        .logout().permitAll().logoutSuccessUrl("/").deleteCookies("JSESSIONID");
     }
 
     @Override
