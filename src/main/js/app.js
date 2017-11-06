@@ -4,6 +4,7 @@ import {NavLink, BrowserRouter as Router, Route,  Link, Switch} from 'react-rout
 import Employees from './Employees';
 import Navi from './components/Navi';
 import Logout from './Logout';
+import Ingredients from './components/Ingredients';
 
 const Home = () => (
   <div>
@@ -34,6 +35,7 @@ class App extends React.Component {
             <Route exact path="/" component={Home} />
             <Route path="/employees" component={Employees} />
             <Route path="/about" component={About} />
+            <Route path="/ingredients" component={Ingredients} />
             <Route path="/logout" render={(props) => (
               <Logout authenticated={authValue} changeAuthState={this.props.changeAuthState} {...props}  />
             )}/>

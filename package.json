@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.16.2",
+    "lodash": "^4.17.4",
     "react": "^15.3.2",
     "react-bootstrap": "^0.31.5",
     "react-dom": "^15.3.2",
