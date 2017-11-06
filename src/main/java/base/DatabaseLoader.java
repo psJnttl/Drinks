@@ -6,6 +6,7 @@ import base.domain.Account;
 import base.domain.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,7 @@ import base.repository.RoleRepository;
  *
  * @author Pasi
  */
+@Profile("test")
 @Component
 public class DatabaseLoader implements CommandLineRunner {
 
