@@ -9,6 +9,7 @@ public class IngredientDto {
     }
 
     public IngredientDto(long id, String name) {
+        this.id = id;
         this.name = name;
     }
 
