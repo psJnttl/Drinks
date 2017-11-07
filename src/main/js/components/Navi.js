@@ -50,6 +50,7 @@ class Navi extends React.Component {
           <Nav>
             <RouteNavItem href="/">Home</RouteNavItem>
             <RouteNavItem href="/ingredients">Ingredients</RouteNavItem>
+            <RouteNavItem href="/glasses">Glasses</RouteNavItem>
             <RouteNavItem href="/about">About</RouteNavItem>
             {this.props.authenticated &&
               <RouteNavItem href="/logout">logout</RouteNavItem>
