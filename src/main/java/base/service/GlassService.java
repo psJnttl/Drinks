@@ -1,11 +1,15 @@
 package base.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import base.command.GlassAdd;
 import base.domain.Glass;
 import base.dto.GlassDto;
 import base.repository.GlassRepository;
@@ -21,5 +25,16 @@ public class GlassService {
         return list.stream()
                 .map(i -> new GlassDto(i.getId(), i.getName()))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public Optional<GlassDto> addGlass(GlassAdd glass) {
+        if (null == glass || null == glass.getName() || glass.getName().isEmpty()) {
+            return Optional.empty();
+        }
+        Glass g = new Glass(glass.getName());
+        g = glassRepository.save(g);
+        GlassDto dto = new GlassDto(g.getId(), g.getName());
+        return Optional.of(dto);
     }
 }
