@@ -23,6 +23,7 @@ class Ingredients extends React.Component {
     this.openEditModal = this.openEditModal.bind(this);
     this.closeEditModal = this.closeEditModal.bind(this);
     this.modifyIngredient = this.modifyIngredient.bind(this);
+    this.fetchIngredients = this.fetchIngredients.bind(this);
   }
 
   setIngredientList(data) {
@@ -64,7 +65,7 @@ class Ingredients extends React.Component {
     this.setState({editModalVisible: false, ingredient: {} });
   }
 
-  componentDidMount() {
+  fetchIngredients() {
     const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
     axios.get('api/ingredients', config)
@@ -74,6 +75,9 @@ class Ingredients extends React.Component {
         .catch(function (response) {
           this.setState({infoModalVisible: true});
         });
+  }
+  componentDidMount() {
+    this.fetchIngredients();
   }
 
   render() {
@@ -154,7 +158,7 @@ class Ingredients extends React.Component {
     const url = 'api/ingredients/' + ingredient.id;
     axios.delete(url, config)
          .then(function (response) {
-              console.log("delete ingredient ok");
+              self.fetchIngredients();
          })
         .catch(function (response) {
           console.log("delete ingredient failed");
@@ -169,6 +173,8 @@ class Ingredients extends React.Component {
     axios.post('api/ingredients', command, config)
          .then(function (response) {
               console.log("add ingredient ok");
+              const ings = _.concat(self.state.ingredients, response.data);
+              self.setState({ingredients: ings});
          })
         .catch(function (response) {
           console.log("add ingredient failed");
@@ -183,7 +189,7 @@ class Ingredients extends React.Component {
     const url = 'api/ingredients/' + ingredient.id;
     axios.put(url, command, config)
          .then(function (response) {
-              console.log("modify ingredient ok");
+              self.fetchIngredients();
          })
         .catch(function (response) {
           console.log("modify ingredient failed");
