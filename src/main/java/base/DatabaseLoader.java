@@ -1,9 +1,8 @@
 package base;
 
-import base.domain.Manager;
 import base.domain.Role;
 import base.domain.Account;
-import base.domain.Employee;
+import base.domain.Glass;
 import base.domain.Ingredient;
 
 import java.util.Arrays;
@@ -16,9 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import base.repository.AccountRepository;
-import base.repository.EmployeeRepo;
+import base.repository.GlassRepository;
 import base.repository.IngredientRepository;
-import base.repository.ManagerRepository;
 import base.repository.RoleRepository;
 
 /**
@@ -29,16 +27,17 @@ import base.repository.RoleRepository;
 @Component
 public class DatabaseLoader implements CommandLineRunner {
 
-
-    
     @Autowired
     private AccountRepository accountRepository;
-    
+
     @Autowired
     private RoleRepository roleRepository;
-    
+
     @Autowired
     private IngredientRepository ingredientRepository;
+
+    @Autowired
+    GlassRepository glassRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -75,20 +74,30 @@ public class DatabaseLoader implements CommandLineRunner {
             adminAccount = accountRepository.saveAndFlush(adminAccount);
         }
         if (ingredientRepository.findAll().isEmpty()) {
-            String [] ings = {"Vodka", "Mustikkalikööri", "Schweppes russian", "Kuohuviini", "Appelsiinimehu",
-                    "Omenaviini", "Puolukkalikööri", "Sitruunalimonadi", "Vadelmalikööri", "Valkoviini", 
-                    "Kuohuviini (Rosee)", "Mansikkalikööri", "Viski (Scotch)", "Kirsikkalikööri", "Campari"};
+            String[] ings = { "Vodka", "Mustikkalikööri", "Schweppes russian", "Kuohuviini", "Appelsiinimehu",
+                    "Omenaviini", "Puolukkalikööri", "Sitruunalimonadi", "Vadelmalikööri", "Valkoviini",
+                    "Kuohuviini (Rosee)", "Mansikkalikööri", "Viski (Scotch)", "Kirsikkalikööri", "Campari" };
             insertIngredients(Arrays.asList(ings));
-            
+        }
+        if (glassRepository.findAll().isEmpty()) {
+            String[] glss = { "Boolimalja", "Cocktail", "Highball", "Hurricane", "Irish Coffee", "Kuohuviini",
+                    "Margarita", "On the Rocks", "Shotti", "Valkoviini", "Punaviini" };
+            insertGlassware(Arrays.asList(glss));
         }
     }
 
     private void insertIngredients(List<String> ingredients) {
-        for (String name: ingredients) {
+        for (String name : ingredients) {
             Ingredient ing = new Ingredient(name);
             ingredientRepository.saveAndFlush(ing);
         }
-            
+    }
+
+    private void insertGlassware(List<String> glasses) {
+        for (String name : glasses) {
+            Glass glass = new Glass(name);
+            glassRepository.saveAndFlush(glass);
+        }
     }
 
 }
