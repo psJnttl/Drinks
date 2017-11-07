@@ -58,5 +58,17 @@ public class GlassController {
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    
+
+    @RequestMapping(value = "/api/glasses/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<GlassDto> modifyGlass(@PathVariable long id, @RequestBody GlassAdd glass) {
+        Optional<GlassDto> gDto = glassService.findGlass(id);
+        if (! gDto.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (null == glass || null == glass.getName() || glass.getName().isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        GlassDto dto = glassService.modifyGlass(id, glass);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
 }

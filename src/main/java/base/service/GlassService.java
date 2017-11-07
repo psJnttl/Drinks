@@ -17,14 +17,12 @@ import base.repository.GlassRepository;
 @Service
 public class GlassService {
 
-    @Autowired 
+    @Autowired
     private GlassRepository glassRepository;
-    
+
     public List<GlassDto> listAll() {
         List<Glass> list = glassRepository.findAll();
-        return list.stream()
-                .map(i -> new GlassDto(i.getId(), i.getName()))
-                .collect(Collectors.toList());
+        return list.stream().map(i -> new GlassDto(i.getId(), i.getName())).collect(Collectors.toList());
     }
 
     @Transactional
@@ -55,5 +53,14 @@ public class GlassService {
         }
         glassRepository.delete(glass);
         return true;
+    }
+
+    @Transactional
+    public GlassDto modifyGlass(long id, GlassAdd glass) {
+        Glass g = glassRepository.findOne(id);
+        g.setName(glass.getName());
+        g = glassRepository.save(g);
+        GlassDto dto = new GlassDto(g.getId(), g.getName());
+        return dto;
     }
 }

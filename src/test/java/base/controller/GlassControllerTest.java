@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -23,8 +24,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import base.command.GlassAdd;
+import base.command.IngredientAdd;
 import base.domain.Glass;
 import base.dto.GlassDto;
 import base.repository.GlassRepository;
@@ -35,9 +36,10 @@ import base.repository.GlassRepository;
 public class GlassControllerTest {
 
     private static final String PATH = "/api/glasses";
-    private static final String GLASS1 = "Tonic vesi";
-    private static final String GLASS2 = "Vodka";
-    private static final String GLASS3 = "Bourbon";
+    private static final String GLASS1 = "Wheat beer glass";
+    private static final String GLASS2 = "Stout glass";
+    private static final String GLASS3 = "Spring water glass";
+    private static final String EMPTY_STRING = "";
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -46,48 +48,39 @@ public class GlassControllerTest {
     private GlassRepository glassRepository;
 
     private MockMvc mockMvc;
-    private long id1=0, id2=0;
+    private long id1 = 0, id2 = 0;
 
     @Before
     public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-        Glass g1 = new Glass("Wheat beer glass");
+        Glass g1 = new Glass(GLASS1);
         g1 = glassRepository.save(g1);
         this.id1 = g1.getId();
-        Glass g2 = new Glass("Stout glass");
+        Glass g2 = new Glass(GLASS2);
         g2 = glassRepository.save(g2);
         this.id2 = g2.getId();
     }
 
     @Test
     public void listProjectsResponseStatusOKandContentTypeJsonUtf8() throws Exception {
-        mockMvc
-            .perform(get(PATH))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+        mockMvc.perform(get(PATH)).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
     }
 
     @Test
     public void listMustNotBeEmpty() throws Exception {
-        MvcResult res = mockMvc
-                .perform(get(PATH))
-                .andReturn();
+        MvcResult res = mockMvc.perform(get(PATH)).andReturn();
         String content = res.getResponse().getContentAsString();
         assertFalse("Project list must not be empty.", content.equals("[]"));
     }
-    
+
     @Test
     public void addingGlassReturnsLocationHeaderAndDto() throws Exception {
         GlassAdd glass = new GlassAdd(GLASS3);
         ObjectMapper mapper = new ObjectMapper();
         String content = mapper.writeValueAsString(glass);
-        MvcResult result = mockMvc
-                .perform(
-                        post(PATH)
-                            .contentType(MediaType.APPLICATION_JSON_UTF8)
-                            .content(content))
-                .andExpect(status().isCreated())
-                .andExpect(header().string("Location", containsString(PATH + "/")))
+        MvcResult result = mockMvc.perform(post(PATH).contentType(MediaType.APPLICATION_JSON_UTF8).content(content))
+                .andExpect(status().isCreated()).andExpect(header().string("Location", containsString(PATH + "/")))
                 .andReturn();
         GlassDto dto = mapper.readValue(result.getResponse().getContentAsString(), GlassDto.class);
         assertTrue("glass name not correct", dto.getName().equals(GLASS3));
@@ -98,49 +91,65 @@ public class GlassControllerTest {
         GlassAdd glass = new GlassAdd("");
         ObjectMapper mapper = new ObjectMapper();
         String content = mapper.writeValueAsString(glass);
-         mockMvc
-                .perform(
-                        post(PATH)
-                            .contentType(MediaType.APPLICATION_JSON_UTF8)
-                            .content(content))
+        mockMvc.perform(post(PATH).contentType(MediaType.APPLICATION_JSON_UTF8).content(content))
                 .andExpect(status().isBadRequest());
     }
-    
+
     @Test
     public void fetchSingleGlassOK() throws Exception {
-        Glass glass = glassRepository.findOne(1L);
+        Glass glass = glassRepository.findOne(this.id2);
         String name = glass.getName();
-        MvcResult result = mockMvc
-                .perform(get(PATH + "/" + 1))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
+        MvcResult result = mockMvc.perform(get(PATH + "/" + this.id2)).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8)).andReturn();
         assertFalse("Contents cannot be empty!", result.getResponse().getContentAsString().isEmpty());
         ObjectMapper mapper = new ObjectMapper();
         GlassDto dto = mapper.readValue(result.getResponse().getContentAsString(), GlassDto.class);
         assertTrue(dto.getName().equals(name));
     }
-    
+
     @Test
     public void fetchSingleGlassWithWrongIdFails404() throws Exception {
-        mockMvc
-                .perform(get(PATH + "/" + 751130))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get(PATH + "/" + 751130)).andExpect(status().isNotFound());
     }
-    
+
     @Test
     public void deleteGlassOK() throws Exception {
-        mockMvc.perform(
-                delete(PATH + "/" + 2))
-                .andExpect(status().isOk());
+        mockMvc.perform(delete(PATH + "/" + this.id2)).andExpect(status().isOk());
     }
 
     @Test
-    public void deleteIngredientWithWrongIdFails404() throws Exception {
-        mockMvc.perform(
-                delete(PATH + "/" + 751130))
+    public void deleteGlassWithWrongIdFails404() throws Exception {
+        mockMvc.perform(delete(PATH + "/" + 751130)).andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void modifyGlassOKandReturnsChangedContent() throws Exception {
+        GlassAdd glassAdd = new GlassAdd(GLASS3);
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(glassAdd);
+        MvcResult result = mockMvc
+                .perform(put(PATH + "/" + this.id1).contentType(MediaType.APPLICATION_JSON_UTF8).content(content))
+                .andExpect(status().isOk()).andReturn();
+        GlassDto dto = mapper.readValue(result.getResponse().getContentAsString(), GlassDto.class);
+        assertTrue(dto.getName().equals(GLASS3));
+    }
+
+    @Test
+    public void modifyingGlassWithWrongIdFails404() throws Exception {
+        GlassAdd glassAdd = new GlassAdd(GLASS3);
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(glassAdd);
+        mockMvc.perform(put(PATH + "/" + 751130).contentType(MediaType.APPLICATION_JSON_UTF8).content(content))
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    public void modifyingGlassWithEmptyContentsFails() throws Exception {
+        GlassAdd glassAdd = new GlassAdd(EMPTY_STRING);
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(glassAdd);
+        mockMvc.perform(put(PATH + "/" + 1).contentType(MediaType.APPLICATION_JSON_UTF8).content(content))
+                .andExpect(status().isBadRequest());
+    }
 
 }
