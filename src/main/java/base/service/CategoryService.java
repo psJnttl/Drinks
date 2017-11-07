@@ -44,4 +44,14 @@ public class CategoryService {
         CategoryDto dto = new CategoryDto(cat.getId(), cat.getName());
         return Optional.of(dto);
     }
+
+    @Transactional
+    public boolean deleteCategory(long id) {
+        Category category = categoryRepository.findOne(id);
+        if (null == category) {
+            return false;
+        }
+        categoryRepository.delete(category);
+        return true;
+    }
 }

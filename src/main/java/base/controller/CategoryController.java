@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import base.command.CategoryAdd;
 import base.dto.CategoryDto;
-import base.dto.GlassDto;
 import base.service.CategoryService;
 
 @RestController
@@ -50,5 +49,13 @@ public class CategoryController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(cDto.get(), HttpStatus.OK);
+    }
+    
+    @RequestMapping(value = "/api/categories/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<CategoryDto> deleteCategory(@PathVariable long id) {
+        if (! categoryService.deleteCategory(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
