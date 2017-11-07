@@ -37,4 +37,13 @@ public class GlassService {
         GlassDto dto = new GlassDto(g.getId(), g.getName());
         return Optional.of(dto);
     }
+
+    public Optional<GlassDto> findGlass(long id) {
+        Glass glass = glassRepository.findOne(id);
+        if (null == glass) {
+            return Optional.empty();
+        }
+        GlassDto dto = new GlassDto(glass.getId(), glass.getName());
+        return Optional.of(dto);
+    }
 }

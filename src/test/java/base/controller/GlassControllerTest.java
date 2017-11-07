@@ -26,8 +26,10 @@ import org.springframework.web.context.WebApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import base.command.GlassAdd;
+import base.command.IngredientAdd;
 import base.domain.Glass;
 import base.dto.GlassDto;
+import base.dto.IngredientDto;
 import base.repository.GlassRepository;
 
 @RunWith(SpringRunner.class)
@@ -94,4 +96,38 @@ public class GlassControllerTest {
         assertTrue("glass name not correct", dto.getName().equals(GLASS3));
     }
 
+    @Test
+    public void addingGlassWithoutNameFails() throws Exception {
+        GlassAdd glass = new GlassAdd("");
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(glass);
+         mockMvc
+                .perform(
+                        post(PATH)
+                            .contentType(MediaType.APPLICATION_JSON_UTF8)
+                            .content(content))
+                .andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    public void fetchSingleGlassOK() throws Exception {
+        Glass glass = glassRepository.findOne(1L);
+        String name = glass.getName();
+        MvcResult result = mockMvc
+                .perform(get(PATH + "/" + 1))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+        assertFalse("Contents cannot be empty!", result.getResponse().getContentAsString().isEmpty());
+        ObjectMapper mapper = new ObjectMapper();
+        GlassDto dto = mapper.readValue(result.getResponse().getContentAsString(), GlassDto.class);
+        assertTrue(dto.getName().equals(name));
+    }
+    
+    @Test
+    public void fetchSingleGlassWithWrongIdFails404() throws Exception {
+        mockMvc
+                .perform(get(PATH + "/" + 751130))
+                .andExpect(status().isNotFound());
+    }
 }
