@@ -25,7 +25,7 @@ public class IngredientService {
     }
 
     public Optional<IngredientDto> addIngredient(IngredientAdd ingredient) {
-        if (null == ingredient || ingredient.getName().isEmpty()) {
+        if (null == ingredient || null == ingredient.getName() || ingredient.getName().isEmpty()) {
             return Optional.empty();
         }
         Ingredient ing = new Ingredient(ingredient.getName());
