@@ -49,9 +49,8 @@ class Navi extends React.Component {
         <Navbar.Collapse>
           <Nav>
             <RouteNavItem href="/">Home</RouteNavItem>
-            <RouteNavItem href="/employees">Employees</RouteNavItem>
-            <RouteNavItem href="/about">About</RouteNavItem>
             <RouteNavItem href="/ingredients">Ingredients</RouteNavItem>
+            <RouteNavItem href="/about">About</RouteNavItem>
             {this.props.authenticated &&
               <RouteNavItem href="/logout">logout</RouteNavItem>
             }

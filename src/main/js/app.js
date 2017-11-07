@@ -33,9 +33,8 @@ class App extends React.Component {
           />
           <Switch>
             <Route exact path="/" component={Home} />
-            <Route path="/employees" component={Employees} />
-            <Route path="/about" component={About} />
             <Route path="/ingredients" component={Ingredients} />
+            <Route path="/about" component={About} />
             <Route path="/logout" render={(props) => (
               <Logout authenticated={authValue} changeAuthState={this.props.changeAuthState} {...props}  />
             )}/>
