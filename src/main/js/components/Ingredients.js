@@ -5,18 +5,21 @@ import SimpleConfirmationModal from './SimpleConfirmationModal';
 import axios from 'axios';
 import _ from 'lodash';
 import {Button, Glyphicon, Pagination, Table} from 'react-bootstrap';
-
+import IngredientModal from './IngredientModal';
 
 class Ingredients extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {ingredients: [], infoModalOpen: false, addModalVisible:false,
-      delConfirmationVisible: false, ingredient: {}}
+    this.state = {ingredients: [], infoModalVisible: false, addModalVisible:false,
+      delConfirmationVisible: false, ingredient: {},
+      editModalVisible: false, }
     this.setIngredientList = this.setIngredientList.bind(this);
     this.closeInfoModal = this.closeInfoModal.bind(this);
-    this.toggleAddModal = this.toggleAddModal.bind(this);
+    this.openAddModal = this.openAddModal.bind(this);
     this.setDeleteConfirmModalVisible = this.setDeleteConfirmModalVisible.bind(this);
     this.deleteReply = this.deleteReply.bind(this);
+    this.closeAddModal = this.closeAddModal.bind(this);
+    this.addIngredient = this.addIngredient.bind(this);
   }
 
   setIngredientList(data) {
@@ -26,11 +29,7 @@ class Ingredients extends React.Component {
   }
 
   closeInfoModal() {
-    this.setState({infoModalOpen: false});
-  }
-
-  toggleAddModal() {
-    this.setState({addModalVisible: !this.state.addModalVisible});
+    this.setState({infoModalVisible: false});
   }
 
   setDeleteConfirmModalVisible(item) {
@@ -39,8 +38,20 @@ class Ingredients extends React.Component {
     }
   }
   deleteReply(answer) {
+    if (true === answer) {
+      this.deleteIngredient(this.state.ingredient);
+    }
     this.setState({delConfirmationVisible: false, ingredient: {} });
   }
+
+  openAddModal() {
+    this.setState({addModalVisible: true});
+  }
+
+  closeAddModal() {
+      this.setState({addModalVisible: false});
+  }
+
   componentDidMount() {
     const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
@@ -49,11 +60,24 @@ class Ingredients extends React.Component {
               self.setIngredientList(response.data);
          })
         .catch(function (response) {
-          this.setState({infoModalOpen: true});
+          this.setState({infoModalVisible: true});
         });
   }
 
   render() {
+    let addModal;
+    if (true === this.state.addModalVisible) {
+      addModal =
+      <IngredientModal
+        modalOpen={this.state.addModalVisible}
+        title="Add igredient"
+        close={this.closeAddModal}
+        save={this.addIngredient}
+      />
+    }
+    else {
+      addModal = null;
+    }
     const dataRows = this.state.ingredients.map( (row, index) =>
       <tr key={index}>
         <td>{row.id}</td>
@@ -67,7 +91,7 @@ class Ingredients extends React.Component {
     return (
       <div>
         <SimpleInformationModal
-          modalOpen={this.state.infoModalOpen}
+          modalOpen={this.state.infoModalVisible}
           header="failedModalHeader"
           title="Fetch ingredients failed"
           notification = "Could not get the list of ingredients from server!"
@@ -82,8 +106,9 @@ class Ingredients extends React.Component {
           reply={this.deleteReply}
           header="failedModalHeader"
         />
+        {addModal}
 
-        <Button bsStyle="success" onClick={ () => this.toggleAddModal() } title="add"><Glyphicon glyph="plus"/></Button>
+        <Button bsStyle="success" onClick={ () => this.openAddModal() } title="add"><Glyphicon glyph="plus"/></Button>
 
         <Table bordered condensed hover>
           <thead>
@@ -105,12 +130,26 @@ class Ingredients extends React.Component {
     const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
     const url = 'api/ingredients/' + ingredient.id;
-    axios.delete(ulr, config)
+    axios.delete(url, config)
          .then(function (response) {
               console.log("delete ingredient ok");
          })
         .catch(function (response) {
           console.log("delete ingredient failed");
+        });
+  }
+
+  addIngredient(ingredient) {
+    this.closeAddModal();
+    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
+    const self = this;
+    const command  =  _.assign({}, ingredient);
+    axios.post('api/ingredients', command, config)
+         .then(function (response) {
+              console.log("add ingredient ok");
+         })
+        .catch(function (response) {
+          console.log("add ingredient failed");
         });
   }
 
