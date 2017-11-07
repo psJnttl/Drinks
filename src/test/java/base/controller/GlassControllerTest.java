@@ -62,7 +62,7 @@ public class GlassControllerTest {
     }
 
     @Test
-    public void listProjectsResponseStatusOKandContentTypeJsonUtf8() throws Exception {
+    public void listGlassesResponseStatusOKandContentTypeJsonUtf8() throws Exception {
         mockMvc.perform(get(PATH)).andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
     }

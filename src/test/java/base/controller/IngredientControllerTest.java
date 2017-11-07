@@ -59,7 +59,7 @@ public class IngredientControllerTest {
     }
     
     @Test
-    public void listProjectsResponseStatusOKandContentTypeJsonUtf8() throws Exception {
+    public void listIngredientsResponseStatusOKandContentTypeJsonUtf8() throws Exception {
         mockMvc
             .perform(get(PATH))
             .andExpect(status().isOk())
