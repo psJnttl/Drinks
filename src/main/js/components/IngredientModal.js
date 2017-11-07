@@ -35,7 +35,7 @@ class IngredientModal extends React.Component {
             <Modal.Title>{this.props.title}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <FormControl type="text" placeholder="ingredient name" onChange={this.onChangeName} value={this.state.ingredient.name} />
+            <FormControl type="text" placeholder={this.props.placeholder} onChange={this.onChangeName} value={this.state.ingredient.name} />
           </Modal.Body>
           <Modal.Footer bsClass="modalFooter">
             <Button bsStyle="success" onClick={ () => this.props.save(this.state.ingredient) }>Save</Button>
@@ -53,10 +53,12 @@ IngredientModal.PropTypes = {
   close: PropTypes.func.isRequired,
   header: PropTypes.string,
   ingredient: PropTypes.object,
+  placeholder: PropTypes.string,
 }
 IngredientModal.defaultProps = {
   title: "Add ingredient",
   header: "successModalHeader",
   ingredient: {id:0, name:""},
+  placeholder: "ingredient name",
 }
 export default IngredientModal;
