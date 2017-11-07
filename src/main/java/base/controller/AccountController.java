@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import base.service.AccountDto;
+import base.command.AccountAdd;
+import base.dto.AccountDto;
 import base.service.AccountService;
 
 @RestController

@@ -26,9 +26,10 @@ import org.springframework.web.context.WebApplicationContext;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import base.command.IngredientAdd;
 import base.domain.Ingredient;
+import base.dto.IngredientDto;
 import base.repository.IngredientRepository;
-import base.service.IngredientDto;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

@@ -7,8 +7,9 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import base.controller.IngredientAdd;
+import base.command.IngredientAdd;
 import base.domain.Ingredient;
+import base.dto.IngredientDto;
 import base.repository.IngredientRepository;
 
 @Service

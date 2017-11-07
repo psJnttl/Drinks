@@ -1,4 +1,4 @@
-package base.service;
+package base.dto;
 
 public class IngredientDto {
 

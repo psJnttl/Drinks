@@ -1,4 +1,4 @@
-package base.controller;
+package base.command;
 
 public class IngredientAdd {
     private String name;
