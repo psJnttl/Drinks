@@ -20,6 +20,9 @@ class Ingredients extends React.Component {
     this.deleteReply = this.deleteReply.bind(this);
     this.closeAddModal = this.closeAddModal.bind(this);
     this.addIngredient = this.addIngredient.bind(this);
+    this.openEditModal = this.openEditModal.bind(this);
+    this.closeEditModal = this.closeEditModal.bind(this);
+    this.modifyIngredient = this.modifyIngredient.bind(this);
   }
 
   setIngredientList(data) {
@@ -37,6 +40,7 @@ class Ingredients extends React.Component {
       this.setState({delConfirmationVisible: true, ingredient: item});
     }
   }
+
   deleteReply(answer) {
     if (true === answer) {
       this.deleteIngredient(this.state.ingredient);
@@ -49,7 +53,15 @@ class Ingredients extends React.Component {
   }
 
   closeAddModal() {
-      this.setState({addModalVisible: false});
+    this.setState({addModalVisible: false});
+  }
+
+  openEditModal(item) {
+    this.setState({editModalVisible: true, ingredient: item});
+  }
+
+  closeEditModal() {
+    this.setState({editModalVisible: false, ingredient: {} });
   }
 
   componentDidMount() {
@@ -70,9 +82,19 @@ class Ingredients extends React.Component {
       addModal =
       <IngredientModal
         modalOpen={this.state.addModalVisible}
-        title="Add igredient"
+        title="Add ingredient"
         close={this.closeAddModal}
         save={this.addIngredient}
+      />
+    }
+    else if ( true === this.state.editModalVisible ){
+      addModal =
+      <IngredientModal
+        modalOpen={this.state.editModalVisible}
+        title="Edit ingredient"
+        close={this.closeEditModal}
+        ingredient={this.state.ingredient}
+        save={this.modifyIngredient}
       />
     }
     else {
@@ -84,7 +106,7 @@ class Ingredients extends React.Component {
         <td>{row.name}</td>
         <td>
           <Button bsStyle="danger" bsSize="small" onClick={() => this.setDeleteConfirmModalVisible(row)} title="delete"><Glyphicon glyph="trash"/></Button>
-
+          <Button bsStyle="warning" bsSize="small" onClick={() => this.openEditModal(row)} title="edit"><Glyphicon glyph="pencil"/></Button>
         </td>
       </tr>
     );
@@ -150,6 +172,21 @@ class Ingredients extends React.Component {
          })
         .catch(function (response) {
           console.log("add ingredient failed");
+        });
+  }
+
+  modifyIngredient(ingredient) {
+    this.closeEditModal();
+    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
+    const self = this;
+    const command  =  _.assign({}, ingredient);
+    const url = 'api/ingredients/' + ingredient.id;
+    axios.put(url, command, config)
+         .then(function (response) {
+              console.log("modify ingredient ok");
+         })
+        .catch(function (response) {
+          console.log("modify ingredient failed");
         });
   }
 
