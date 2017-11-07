@@ -54,4 +54,13 @@ public class CategoryService {
         categoryRepository.delete(category);
         return true;
     }
+
+    @Transactional
+    public CategoryDto modifyCategory(long id, CategoryAdd category) {
+        Category cat = categoryRepository.findOne(id);
+        cat.setName(category.getName());
+        cat = categoryRepository.save(cat);
+        CategoryDto dto = new CategoryDto(cat.getId(), cat.getName());
+        return dto;
+    }
 }

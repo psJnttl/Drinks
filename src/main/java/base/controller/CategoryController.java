@@ -58,4 +58,17 @@ public class CategoryController {
         }
         return new ResponseEntity<>(HttpStatus.OK);
     }
+    
+    @RequestMapping(value = "/api/categories/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<CategoryDto> modifyCategory(@PathVariable long id, @RequestBody CategoryAdd category) {
+        Optional<CategoryDto> gDto = categoryService.findCategory(id);
+        if (! gDto.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (null == category || null == category.getName() || category.getName().isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        CategoryDto dto = categoryService.modifyCategory(id, category);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
 }
