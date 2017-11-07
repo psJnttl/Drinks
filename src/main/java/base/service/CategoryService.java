@@ -35,4 +35,13 @@ public class CategoryService {
         CategoryDto dto = new CategoryDto(cat.getId(), cat.getName());
         return Optional.of(dto);
     }
+
+    public Optional<CategoryDto> findCategory(long id) {
+        Category cat = categoryRepository.findOne(id);
+        if (null == cat) {
+            return Optional.empty();
+        }
+        CategoryDto dto = new CategoryDto(cat.getId(), cat.getName());
+        return Optional.of(dto);
+    }
 }

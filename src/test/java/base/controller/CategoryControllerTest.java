@@ -88,7 +88,7 @@ public class CategoryControllerTest {
 
     @Test
     public void addingCategoryWithoutNameFails() throws Exception {
-        CategoryAdd catAdd = new CategoryAdd(CATEGORY3);
+        CategoryAdd catAdd = new CategoryAdd(EMPTY_STRING);
         ObjectMapper mapper = new ObjectMapper();
         String content = mapper.writeValueAsString(catAdd);
         mockMvc.perform(post(PATH).contentType(MediaType.APPLICATION_JSON_UTF8).content(content))
