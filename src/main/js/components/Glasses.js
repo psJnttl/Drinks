@@ -3,18 +3,22 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import {Button, Glyphicon, Table} from 'react-bootstrap';
 import IngredientModal from './IngredientModal';
+import SimpleConfirmationModal from './SimpleConfirmationModal';
 
 class Glasses extends React.Component {
   constructor(props) {
     super(props);
     this.state = {glasses: [], infoModalVisible: false, addModalVisible: false,
-        }
+        delConfirmationVisible: false, glass:{},
+    };
     this.fetchGlasses = this.fetchGlasses.bind(this);
     this.setGlassList = this.setGlassList.bind(this);
     this.closeInfoModal = this.closeInfoModal.bind(this);
     this.openAddModal = this.openAddModal.bind(this);
     this.closeAddModal = this.closeAddModal.bind(this);
     this.addGlass = this.addGlass.bind(this);
+    this.setDeleteConfirmModalVisible = this.setDeleteConfirmModalVisible.bind(this);
+    this.deleteReply = this.deleteReply.bind(this);
   }
 
   fetchGlasses() {
@@ -45,6 +49,19 @@ class Glasses extends React.Component {
 
   closeAddModal() {
     this.setState({addModalVisible: false});
+  }
+
+  setDeleteConfirmModalVisible(item) {
+    if (false === this.state.delConfirmationVisible) {
+      this.setState({delConfirmationVisible: true, glass: item});
+    }
+  }
+
+  deleteReply(answer) {
+    if (true === answer) {
+      this.deleteGlass(this.state.glass);
+    }
+    this.setState({delConfirmationVisible: false, glass: {} });
   }
 
   componentDidMount() {
@@ -78,7 +95,13 @@ class Glasses extends React.Component {
     );
     return (
       <div>
-
+        <SimpleConfirmationModal
+          modalOpen={this.state.delConfirmationVisible}
+          title="Delete glass"
+          question={"Are you sure you want to delete " + this.state.glass.name}
+          reply={this.deleteReply}
+          header="failedModalHeader"
+        />
         {addModal}
         <Button bsStyle="success" onClick={ () => this.openAddModal() } title="add"><Glyphicon glyph="plus"/></Button>
 
@@ -111,6 +134,19 @@ class Glasses extends React.Component {
          })
         .catch(function (response) {
           console.log("add glass failed");
+        });
+  }
+
+  deleteGlass(glass) {
+    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
+    const self = this;
+    const url = 'api/glasses/' + glass.id;
+    axios.delete(url, config)
+         .then(function (response) {
+              self.fetchGlasses();
+         })
+        .catch(function (response) {
+          console.log("delete glass failed");
         });
   }
 
