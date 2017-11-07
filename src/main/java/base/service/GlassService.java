@@ -46,4 +46,14 @@ public class GlassService {
         GlassDto dto = new GlassDto(glass.getId(), glass.getName());
         return Optional.of(dto);
     }
+
+    @Transactional
+    public boolean deleteGlass(long id) {
+        Glass glass = glassRepository.findOne(id);
+        if (null == glass) {
+            return false;
+        }
+        glassRepository.delete(glass);
+        return true;
+    }
 }

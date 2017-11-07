@@ -2,15 +2,14 @@ package base.controller;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +25,8 @@ import org.springframework.web.context.WebApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import base.command.GlassAdd;
-import base.command.IngredientAdd;
 import base.domain.Glass;
 import base.dto.GlassDto;
-import base.dto.IngredientDto;
 import base.repository.GlassRepository;
 
 @RunWith(SpringRunner.class)
@@ -130,4 +127,20 @@ public class GlassControllerTest {
                 .perform(get(PATH + "/" + 751130))
                 .andExpect(status().isNotFound());
     }
+    
+    @Test
+    public void deleteGlassOK() throws Exception {
+        mockMvc.perform(
+                delete(PATH + "/" + 2))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteIngredientWithWrongIdFails404() throws Exception {
+        mockMvc.perform(
+                delete(PATH + "/" + 751130))
+                .andExpect(status().isNotFound());
+    }
+
+
 }

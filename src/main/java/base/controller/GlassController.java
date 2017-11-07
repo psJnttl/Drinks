@@ -50,4 +50,13 @@ public class GlassController {
         }
         return new ResponseEntity<>(gDto.get(), HttpStatus.OK);
     }
+    
+    @RequestMapping(value = "/api/glasses/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<GlassDto> deleteGlass(@PathVariable long id) {
+        if (! glassService.deleteGlass(id)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
 }
