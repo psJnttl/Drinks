@@ -6,7 +6,7 @@ import _ from 'lodash';
 class IngredientModal extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {ingredient: {}}
+    this.state = {ingredient: {id:0, name:""} }
     this.onChangeName = this.onChangeName.bind(this);
   }
 
@@ -30,7 +30,7 @@ class IngredientModal extends React.Component {
     }
     return (
       <div>
-        <Modal bsSize="small" show={this.props.modalOpen} onHide={() => this.props.reply(false)}>
+        <Modal bsSize="small" show={this.props.modalOpen} onHide={() => this.props.close()}>
           <Modal.Header closeButton bsClass={this.props.header}>
             <Modal.Title>{this.props.title}</Modal.Title>
           </Modal.Header>
@@ -57,6 +57,6 @@ IngredientModal.PropTypes = {
 IngredientModal.defaultProps = {
   title: "Add ingredient",
   header: "successModalHeader",
-  ingredient: {},
+  ingredient: {id:0, name:""},
 }
 export default IngredientModal;
