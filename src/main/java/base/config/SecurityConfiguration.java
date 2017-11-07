@@ -22,8 +22,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
+        http.headers().frameOptions().sameOrigin();
         http.httpBasic().realmName("Drinks").authenticationEntryPoint(getBasicAuthEntryPoint()).and()
         .authorizeRequests()
+        .antMatchers("/h2-console/*").permitAll()
         .antMatchers("/").permitAll()
         .antMatchers("/api/account/signup").permitAll()
         .anyRequest().authenticated().and()
