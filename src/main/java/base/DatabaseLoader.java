@@ -4,6 +4,11 @@ import base.domain.Manager;
 import base.domain.Role;
 import base.domain.Account;
 import base.domain.Employee;
+import base.domain.Ingredient;
+
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
@@ -12,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import base.repository.AccountRepository;
 import base.repository.EmployeeRepo;
+import base.repository.IngredientRepository;
 import base.repository.ManagerRepository;
 import base.repository.RoleRepository;
 
@@ -23,11 +29,7 @@ import base.repository.RoleRepository;
 @Component
 public class DatabaseLoader implements CommandLineRunner {
 
-    @Autowired
-    private EmployeeRepo employeeRepository;
 
-    @Autowired
-    private ManagerRepository managerRepository;
     
     @Autowired
     private AccountRepository accountRepository;
@@ -36,16 +38,13 @@ public class DatabaseLoader implements CommandLineRunner {
     private RoleRepository roleRepository;
     
     @Autowired
+    private IngredientRepository ingredientRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... strings) throws Exception {
-        Manager palpatine = managerRepository.save(new Manager("palpatine", "emperor", "ROLE_MANAGER"));
-        Manager dodo = managerRepository.save(new Manager("dodo", "joku", "ROLE_MANAGER"));
-        employeeRepository.save(new Employee("Frodo", "Baggins", "ring bearer", dodo));
-        employeeRepository.save(new Employee("Bilbo", "Baggins", "burglar", dodo));
-        employeeRepository.save(new Employee("Darth", "Vader", "Sith Lord", palpatine));
-        employeeRepository.save(new Employee("Anakin", "Skywalker", "cropduster", palpatine));
         if (null != accountRepository.findByUsername("user")) {
             return;
         }
@@ -75,6 +74,21 @@ public class DatabaseLoader implements CommandLineRunner {
             adminAccount.addRole(admin);
             adminAccount = accountRepository.saveAndFlush(adminAccount);
         }
+        if (ingredientRepository.findAll().isEmpty()) {
+            String [] ings = {"Vodka", "Mustikkalikööri", "Schweppes russian", "Kuohuviini", "Appelsiinimehu",
+                    "Omenaviini", "Puolukkalikööri", "Sitruunalimonadi", "Vadelmalikööri", "Valkoviini", 
+                    "Kuohuviini (Rosee)", "Mansikkalikööri", "Viski (Scotch)", "Kirsikkalikööri", "Campari"};
+            insertIngredients(Arrays.asList(ings));
+            
+        }
+    }
+
+    private void insertIngredients(List<String> ingredients) {
+        for (String name: ingredients) {
+            Ingredient ing = new Ingredient(name);
+            ingredientRepository.saveAndFlush(ing);
+        }
+            
     }
 
 }
