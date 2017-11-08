@@ -48,14 +48,17 @@ public class IngredientControllerTest {
     private IngredientRepository ingredientRepository;
     
     private MockMvc mockMvc;
+    private long id1 = 0, id2 = 0;
     
     @Before
     public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         Ingredient i1 = new Ingredient(INGREDIENT1);
         i1 = ingredientRepository.saveAndFlush(i1);
+        id1 = i1.getId();
         Ingredient i2 = new Ingredient(INGREDIENT2);
         i2 = ingredientRepository.saveAndFlush(i2);
+        id2 = i2.getId();
     }
     
     @Test
@@ -108,7 +111,7 @@ public class IngredientControllerTest {
     @Test
     public void fetchSingleIngredient() throws Exception {
         MvcResult result = mockMvc
-                .perform(get(PATH + "/" + 1))
+                .perform(get(PATH + "/" + id1))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
@@ -128,7 +131,7 @@ public class IngredientControllerTest {
     @Test
     public void deleteIngredientOK() throws Exception {
         mockMvc.perform(
-                delete(PATH + "/" + 2))
+                delete(PATH + "/" + id2))
                 .andExpect(status().isOk());
     }
     
@@ -146,7 +149,7 @@ public class IngredientControllerTest {
         String content = mapper.writeValueAsString(ingAdd);
         MvcResult result = mockMvc
                 .perform(
-                        put(PATH + "/" + 1)
+                        put(PATH + "/" + id1)
                                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                                 .content(content))
                 .andExpect(status().isOk())
@@ -176,7 +179,7 @@ public class IngredientControllerTest {
         String content = mapper.writeValueAsString(ingAdd);
         mockMvc
             .perform(
-                put(PATH + "/" + 1)
+                put(PATH + "/" + id1)
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .content(content))
             .andExpect(status().isBadRequest());
