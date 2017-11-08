@@ -25,7 +25,7 @@ class SignupForm extends React.Component {
   render() {
     return (
       <div style={ {margin: 20} }>
-        <h3>Drink archive</h3>
+        <h3>Drinks archive</h3>
         <form>
           <FormGroup controlId="formHorizontalInput">
             <input
