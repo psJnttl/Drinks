@@ -4,18 +4,23 @@ import axios from 'axios';
 import {Button, Glyphicon, Table} from 'react-bootstrap';
 import SimpleInformationModal from './SimpleInformationModal';
 import IngredientModal from './IngredientModal';
+import SimpleConfirmationModal from './SimpleConfirmationModal';
 
 class Categories extends React.Component {
   constructor(props) {
     super(props);
     this.state = {categories: [], infoModalVisible: false, addModalVisible: false,
-    };
+    delConfirmationVisible: false, category: {}
+  };
     this.fetchCategories = this.fetchCategories.bind(this);
     this.setCategoryList = this.setCategoryList.bind(this);
     this.closeInfoModal = this.closeInfoModal.bind(this);
     this.openAddModal = this.openAddModal.bind(this);
     this.closeAddModal = this.closeAddModal.bind(this);
     this.addCategory = this.addCategory.bind(this);
+    this.setDeleteConfirmModalVisible = this.setDeleteConfirmModalVisible.bind(this);
+    this.deleteReply = this.deleteReply.bind(this);
+    this.deleteCategory = this.deleteCategory.bind(this);
   }
 
   fetchCategories() {
@@ -46,6 +51,19 @@ class Categories extends React.Component {
 
   closeAddModal() {
     this.setState({addModalVisible: false});
+  }
+
+  setDeleteConfirmModalVisible(item) {
+    if (false === this.state.delConfirmationVisible) {
+      this.setState({delConfirmationVisible: true, category: item});
+    }
+  }
+
+  deleteReply(answer) {
+    if (true === answer) {
+      this.deleteCategory(this.state.category);
+    }
+    this.setState({delConfirmationVisible: false, category: {} });
   }
 
   componentDidMount() {
@@ -88,6 +106,14 @@ class Categories extends React.Component {
           name=""
           reply={this.closeInfoModal} />
 
+        <SimpleConfirmationModal
+          modalOpen={this.state.delConfirmationVisible}
+          title="Delete category"
+          question={"Are you sure you want to delete " + this.state.category.name}
+          reply={this.deleteReply}
+          header="failedModalHeader"
+        />
+
         {addModal}
 
         <Button bsStyle="success" onClick={ () => this.openAddModal() } title="add"><Glyphicon glyph="plus"/></Button>
@@ -123,6 +149,23 @@ class Categories extends React.Component {
           console.log("add category failed");
         });
   }
+
+  deleteCategory(category) {
+    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
+    const self = this;
+    const url = 'api/categories/' + category.id;
+    axios.delete(url, config)
+         .then(function (response) {
+              self.fetchCategories();
+         })
+        .catch(function (response) {
+          console.log("delete category failed");
+        });
+  }
+
+
+
+
 }
 Categories.PropTypes = {}
 Categories.defaultProps = {}
