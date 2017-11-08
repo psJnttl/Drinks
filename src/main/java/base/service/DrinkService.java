@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import base.domain.Drink;
+import base.domain.Glass;
 import base.domain.Ingredient;
 import base.repository.DrinkRepository;
 
@@ -32,6 +33,10 @@ public class DrinkService {
 
     private Long resultExtractor(ResultSet rs) throws SQLException {
         return rs.getLong("id");
+    }
+
+    public List<Drink> findByGlass(Glass glass) {
+        return drinkRepository.findByGlass(glass);
     }
 
 }

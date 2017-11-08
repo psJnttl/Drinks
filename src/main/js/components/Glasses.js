@@ -183,7 +183,7 @@ class Glasses extends React.Component {
               self.fetchGlasses();
          })
         .catch(function (response) {
-           if (response.response.data === 409) {
+           if (response.response.status === 409) {
              self.setState({infoModalVisible: true,
                infoModalData: {header:"failedModalHeader",
                title:"Delete glass failed",

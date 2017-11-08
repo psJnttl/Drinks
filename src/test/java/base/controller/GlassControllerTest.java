@@ -26,8 +26,10 @@ import org.springframework.web.context.WebApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import base.command.GlassAdd;
 import base.command.IngredientAdd;
+import base.domain.Drink;
 import base.domain.Glass;
 import base.dto.GlassDto;
+import base.repository.DrinkRepository;
 import base.repository.GlassRepository;
 
 @RunWith(SpringRunner.class)
@@ -46,17 +48,21 @@ public class GlassControllerTest {
 
     @Autowired
     private GlassRepository glassRepository;
+    
+    @Autowired
+    private DrinkRepository drinkRepository;
 
     private MockMvc mockMvc;
     private long id1 = 0, id2 = 0;
+    private Glass g1, g2;
 
     @Before
     public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-        Glass g1 = new Glass(GLASS1);
+        g1 = new Glass(GLASS1);
         g1 = glassRepository.save(g1);
         this.id1 = g1.getId();
-        Glass g2 = new Glass(GLASS2);
+        g2 = new Glass(GLASS2);
         g2 = glassRepository.save(g2);
         this.id2 = g2.getId();
     }
@@ -152,4 +158,13 @@ public class GlassControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void deletingGlassUsedInDrinkFails() throws Exception {
+        Drink drink = new Drink("Paulaner");
+        drink.setGlass(this.g1);
+        drinkRepository.saveAndFlush(drink);
+        mockMvc.perform(
+                delete(PATH + "/" + id1))
+                .andExpect(status().isConflict());
+    }
 }

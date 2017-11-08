@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import base.command.GlassAdd;
+import base.domain.Drink;
 import base.domain.Glass;
 import base.dto.GlassDto;
 import base.repository.GlassRepository;
@@ -19,6 +20,9 @@ public class GlassService {
 
     @Autowired
     private GlassRepository glassRepository;
+
+    @Autowired
+    private DrinkService drinkService;
 
     public List<GlassDto> listAll() {
         List<Glass> list = glassRepository.findAll();
@@ -62,5 +66,17 @@ public class GlassService {
         g = glassRepository.save(g);
         GlassDto dto = new GlassDto(g.getId(), g.getName());
         return dto;
+    }
+
+    public boolean isGlassUsed(long id) {
+        Glass glass = glassRepository.findOne(id);
+        if (null == glass) {
+            return false;
+        }
+        List<Drink> list = drinkService.findByGlass(glass);
+        if (list.isEmpty()) {
+            return false;
+        }
+        return true;
     }
 }

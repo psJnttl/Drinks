@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import base.command.GlassAdd;
 import base.dto.GlassDto;
+import base.repository.GlassRepository;
 import base.service.GlassService;
 
 @RestController
@@ -53,9 +54,13 @@ public class GlassController {
     
     @RequestMapping(value = "/api/glasses/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<GlassDto> deleteGlass(@PathVariable long id) {
-        if (! glassService.deleteGlass(id)) {
+        if (! glassService.findGlass(id).isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        if (glassService.isGlassUsed(id)) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+        glassService.deleteGlass(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
