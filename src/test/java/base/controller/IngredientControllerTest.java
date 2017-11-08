@@ -27,8 +27,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import base.command.IngredientAdd;
+import base.domain.Drink;
 import base.domain.Ingredient;
 import base.dto.IngredientDto;
+import base.repository.DrinkRepository;
 import base.repository.IngredientRepository;
 
 @RunWith(SpringRunner.class)
@@ -47,16 +49,20 @@ public class IngredientControllerTest {
     @Autowired
     private IngredientRepository ingredientRepository;
     
+    @Autowired
+    private DrinkRepository drinkRepository;
+    
     private MockMvc mockMvc;
     private long id1 = 0, id2 = 0;
+    private Ingredient i1, i2;
     
     @Before
     public void setup() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-        Ingredient i1 = new Ingredient(INGREDIENT1);
+        i1 = new Ingredient(INGREDIENT1);
         i1 = ingredientRepository.saveAndFlush(i1);
         id1 = i1.getId();
-        Ingredient i2 = new Ingredient(INGREDIENT2);
+        i2 = new Ingredient(INGREDIENT2);
         i2 = ingredientRepository.saveAndFlush(i2);
         id2 = i2.getId();
     }
@@ -183,5 +189,16 @@ public class IngredientControllerTest {
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .content(content))
             .andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    public void cantDeleteIngredientIfInAdrink() throws Exception {
+        Drink drink = new Drink("Vodka Tonic");
+        drink.addIngredient(i1, "6 cl");
+        drink.addIngredient(i2, "6 cl");
+        drinkRepository.saveAndFlush(drink);
+        mockMvc.perform(
+                delete(PATH + "/" + id2))
+                .andExpect(status().isConflict());
     }
 }
