@@ -12,7 +12,7 @@ class Ingredients extends React.Component {
     super(props);
     this.state = {ingredients: [], infoModalVisible: false, addModalVisible:false,
       delConfirmationVisible: false, ingredient: {},
-      editModalVisible: false, }
+      editModalVisible: false, infoModalData: {}, }
     this.setIngredientList = this.setIngredientList.bind(this);
     this.closeInfoModal = this.closeInfoModal.bind(this);
     this.openAddModal = this.openAddModal.bind(this);
@@ -70,10 +70,15 @@ class Ingredients extends React.Component {
     const self = this;
     axios.get('api/ingredients', config)
          .then(function (response) {
-              self.setIngredientList(response.data);
+            self.setIngredientList(response.data);
+
          })
         .catch(function (response) {
-          this.setState({infoModalVisible: true});
+           self.setState({infoModalVisible: true,
+               infoModalData: {header:"failedModalHeader",
+               title:"Fetch ingredients failed",
+              notification: "Could not get the list of ingredients from server!",
+              name: ""} });
         });
   }
   componentDidMount() {
@@ -118,11 +123,11 @@ class Ingredients extends React.Component {
       <div>
         <SimpleInformationModal
           modalOpen={this.state.infoModalVisible}
-          header="failedModalHeader"
-          title="Fetch ingredients failed"
-          notification = "Could not get the list of ingredients from server!"
-          notification2 = {this.state.notification2}
-          name=""
+          header={this.state.infoModalData.header}
+          title={this.state.infoModalData.title}
+          notification = {this.state.infoModalData.notification}
+          notification2 =""
+          name={this.state.infoModalData.name}
           reply={this.closeInfoModal} />
 
         <SimpleConfirmationModal
@@ -162,6 +167,11 @@ class Ingredients extends React.Component {
          })
         .catch(function (response) {
           console.log("delete ingredient failed");
+          self.setState({infoModalVisible: true,
+              infoModalData: {header:"failedModalHeader",
+              title:"Delete ingredients failed",
+             notification: "Can't delete an ingredient that's in a Drink!",
+             name: ""} });
         });
   }
 
