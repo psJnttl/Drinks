@@ -6,6 +6,7 @@ import Navi from './components/Navi';
 import Logout from './Logout';
 import Ingredients from './components/Ingredients';
 import Glasses from './components/Glasses';
+import Categories from './components/Categories';
 
 const Home = () => (
   <div>
@@ -36,6 +37,7 @@ class App extends React.Component {
             <Route exact path="/" component={Home} />
             <Route path="/ingredients" component={Ingredients} />
             <Route path="/glasses" component={Glasses} />
+            <Route path="/categories" component={Categories} />
             <Route path="/about" component={About} />
             <Route path="/logout" render={(props) => (
               <Logout authenticated={authValue} changeAuthState={this.props.changeAuthState} {...props}  />
