@@ -24,14 +24,15 @@ public class IngredientController {
 
     @Autowired
     private IngredientService ingredientService;
-    
+
     @RequestMapping(value = "/api/ingredients", method = RequestMethod.GET)
     public List<IngredientDto> listAll() {
         return ingredientService.listAll();
     }
-    
+
     @RequestMapping(value = "/api/ingredients", method = RequestMethod.POST)
-    public ResponseEntity<IngredientDto> addIngredient(@RequestBody IngredientAdd ingredient) throws URISyntaxException {
+    public ResponseEntity<IngredientDto> addIngredient(@RequestBody IngredientAdd ingredient)
+            throws URISyntaxException {
         Optional<IngredientDto> iDto = ingredientService.addIngredient(ingredient);
         if (!iDto.isPresent()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -41,28 +42,33 @@ public class IngredientController {
         headers.setLocation(new URI("/api/ingredients/" + dto.getId()));
         return new ResponseEntity<>(dto, headers, HttpStatus.CREATED);
     }
-    
+
     @RequestMapping(value = "/api/ingredients/{id}", method = RequestMethod.GET)
     public ResponseEntity<IngredientDto> getIngredient(@PathVariable long id) {
-        Optional<IngredientDto> iDto  = ingredientService.findIngredient(id);
-        if (! iDto.isPresent()) {
+        Optional<IngredientDto> iDto = ingredientService.findIngredient(id);
+        if (!iDto.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(iDto.get(), HttpStatus.OK);
     }
-    
+
     @RequestMapping(value = "/api/ingredients/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<IngredientDto> deleteIngredient(@PathVariable long id) {
-        if (! ingredientService.deleteIngredient((long) id)) {
+        if (!ingredientService.findIngredient(id).isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        if (ingredientService.isIngredientUsed(id)) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+        ingredientService.deleteIngredient(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    
+
     @RequestMapping(value = "/api/ingredients/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<IngredientDto> modifyIngredient(@PathVariable long id, @RequestBody IngredientAdd ingredient) {
-        Optional<IngredientDto> iDto  = ingredientService.findIngredient(id);
-        if (! iDto.isPresent()) {
+    public ResponseEntity<IngredientDto> modifyIngredient(@PathVariable long id,
+            @RequestBody IngredientAdd ingredient) {
+        Optional<IngredientDto> iDto = ingredientService.findIngredient(id);
+        if (!iDto.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         if (null == ingredient || ingredient.getName().isEmpty()) {

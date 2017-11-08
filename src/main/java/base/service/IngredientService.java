@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import base.command.IngredientAdd;
+import base.domain.Drink;
 import base.domain.Ingredient;
 import base.dto.IngredientDto;
 import base.repository.IngredientRepository;
@@ -17,6 +18,9 @@ public class IngredientService {
 
     @Autowired 
     private IngredientRepository ingredientRepository;
+    
+    @Autowired
+    private DrinkService drinkService; 
     
     public List<IngredientDto> listAll() {
         List<Ingredient> list = ingredientRepository.findAll();
@@ -59,5 +63,17 @@ public class IngredientService {
         ing = ingredientRepository.saveAndFlush(ing);
         IngredientDto dto = new IngredientDto(ing.getId(), ing.getName());
         return dto;
+    }
+    
+    public boolean isIngredientUsed(long id) {
+        Ingredient ing = ingredientRepository.findOne(id);
+        if (null == ing) {
+            return false;
+        }
+        List<Drink> list = drinkService.findByIngredient(ing);
+        if (list.isEmpty()) {
+            return false;
+        }
+        return true;
     }
 }
