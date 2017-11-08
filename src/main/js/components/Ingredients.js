@@ -33,7 +33,7 @@ class Ingredients extends React.Component {
   }
 
   closeInfoModal() {
-    this.setState({infoModalVisible: false});
+    this.setState({infoModalVisible: false, infoModalData: {}});
   }
 
   setDeleteConfirmModalVisible(item) {

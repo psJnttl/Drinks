@@ -4,13 +4,14 @@ import axios from 'axios';
 import {Button, Glyphicon, Table} from 'react-bootstrap';
 import IngredientModal from './IngredientModal';
 import SimpleConfirmationModal from './SimpleConfirmationModal';
+import SimpleInformationModal from './SimpleInformationModal';
 
 class Glasses extends React.Component {
   constructor(props) {
     super(props);
     this.state = {glasses: [], infoModalVisible: false, addModalVisible: false,
         delConfirmationVisible: false, glass:{},
-        editModalVisible: false,
+        editModalVisible: false, infoModalData: {},
     };
     this.fetchGlasses = this.fetchGlasses.bind(this);
     this.setGlassList = this.setGlassList.bind(this);
@@ -31,10 +32,14 @@ class Glasses extends React.Component {
     const self = this;
     axios.get('api/glasses', config)
          .then(function (response) {
-              self.setGlassList(response.data);
+            self.setGlassList(response.data);
          })
         .catch(function (response) {
-          this.setState({infoModalVisible: true});
+          self.setState({infoModalVisible: true,
+              infoModalData: {header:"failedModalHeader",
+              title:"Fetch glasses failed",
+             notification: "Could not get the list of glasses from server!",
+             name: ""} });
         });
   }
 
@@ -45,7 +50,7 @@ class Glasses extends React.Component {
   }
 
   closeInfoModal() {
-    this.setState({infoModalVisible: false});
+    this.setState({infoModalVisible: false, infoModalData: {}});
   }
 
   openAddModal() {
@@ -118,6 +123,15 @@ class Glasses extends React.Component {
     );
     return (
       <div>
+        <SimpleInformationModal
+          modalOpen={this.state.infoModalVisible}
+          header={this.state.infoModalData.header}
+          title={this.state.infoModalData.title}
+          notification = {this.state.infoModalData.notification}
+          notification2 =""
+          name={this.state.infoModalData.name}
+          reply={this.closeInfoModal} />
+
         <SimpleConfirmationModal
           modalOpen={this.state.delConfirmationVisible}
           title="Delete glass"
@@ -169,7 +183,13 @@ class Glasses extends React.Component {
               self.fetchGlasses();
          })
         .catch(function (response) {
-          console.log("delete glass failed");
+           if (response.response.data === 409) {
+             self.setState({infoModalVisible: true,
+               infoModalData: {header:"failedModalHeader",
+               title:"Delete glass failed",
+               notification: "Can't delete a glass holding in a Drink!",
+               name: ""} });
+           }
         });
   }
 
