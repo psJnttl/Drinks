@@ -8,6 +8,13 @@ class SimpleInformationModal extends React.Component {
     this.state = {}
   }
   render() {
+    let note1;
+    if (this.props.name === "") {
+      note1 = <strong>{this.props.notification}</strong>
+    }
+    else {
+      note1 = <strong>{this.props.notification} '{this.props.name}' !</strong>
+    }
     return (
       <div>
         <Modal bsSize="small" show={this.props.modalOpen} onHide={() => this.props.reply(false)}>
@@ -15,7 +22,7 @@ class SimpleInformationModal extends React.Component {
             <Modal.Title>{this.props.title}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <strong>{this.props.notification} '{this.props.name}' !</strong><br />
+            {note1} <br />
             {this.props.notification2}
           </Modal.Body>
           <Modal.Footer bsClass="modalFooter">
