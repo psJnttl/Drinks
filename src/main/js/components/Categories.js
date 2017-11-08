@@ -21,6 +21,9 @@ class Categories extends React.Component {
     this.setDeleteConfirmModalVisible = this.setDeleteConfirmModalVisible.bind(this);
     this.deleteReply = this.deleteReply.bind(this);
     this.deleteCategory = this.deleteCategory.bind(this);
+    this.openEditModal = this.openEditModal.bind(this);
+    this.closeEditModal = this.closeEditModal.bind(this);
+    this.modifyCategory = this.modifyCategory.bind(this);
   }
 
   fetchCategories() {
@@ -66,6 +69,14 @@ class Categories extends React.Component {
     this.setState({delConfirmationVisible: false, category: {} });
   }
 
+  openEditModal(item) {
+    this.setState({editModalVisible: true, category: item});
+  }
+
+  closeEditModal() {
+    this.setState({editModalVisible: false, category: {} });
+  }
+
   componentDidMount() {
     this.fetchCategories();
   }
@@ -80,6 +91,16 @@ class Categories extends React.Component {
         close={this.closeAddModal}
         save={this.addCategory}
         placeholder="category name"
+      />
+    }
+    else if (true === this.state.editModalVisible) {
+      addModal =
+      <IngredientModal
+        modalOpen={this.state.editModalVisible}
+        title="Edit category"
+        close={this.closeEditModal}
+        ingredient={this.state.category}
+        save={this.modifyCategory}
       />
     }
     else {
@@ -163,7 +184,20 @@ class Categories extends React.Component {
         });
   }
 
-
+  modifyCategory(category) {
+    this.closeEditModal();
+    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
+    const self = this;
+    const command  =  _.assign({}, category);
+    const url = 'api/categories/' + category.id;
+    axios.put(url, command, config)
+         .then(function (response) {
+           self.fetchCategories();
+         })
+         .catch(function (response) {
+           console.log("modify category failed");
+         });
+  }
 
 
 }
