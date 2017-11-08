@@ -166,12 +166,13 @@ class Ingredients extends React.Component {
               self.fetchIngredients();
          })
         .catch(function (response) {
-          console.log("delete ingredient failed");
-          self.setState({infoModalVisible: true,
-              infoModalData: {header:"failedModalHeader",
-              title:"Delete ingredients failed",
-             notification: "Can't delete an ingredient that's in a Drink!",
-             name: ""} });
+           if (response.response.status === 409) {
+             self.setState({infoModalVisible: true,
+               infoModalData: {header:"failedModalHeader",
+               title:"Delete ingredient failed",
+               notification: "Can't delete an ingredient that's in a Drink!",
+               name: ""} });
+           }
         });
   }
 
