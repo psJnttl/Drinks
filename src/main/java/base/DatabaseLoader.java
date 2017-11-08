@@ -2,6 +2,7 @@ package base;
 
 import base.domain.Role;
 import base.domain.Account;
+import base.domain.Category;
 import base.domain.Glass;
 import base.domain.Ingredient;
 
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import base.repository.AccountRepository;
+import base.repository.CategoryRepository;
 import base.repository.GlassRepository;
 import base.repository.IngredientRepository;
 import base.repository.RoleRepository;
@@ -37,7 +39,10 @@ public class DatabaseLoader implements CommandLineRunner {
     private IngredientRepository ingredientRepository;
 
     @Autowired
-    GlassRepository glassRepository;
+    private GlassRepository glassRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -84,6 +89,10 @@ public class DatabaseLoader implements CommandLineRunner {
                     "Margarita", "On the Rocks", "Shotti", "Valkoviini", "Punaviini" };
             insertGlassware(Arrays.asList(glss));
         }
+        if (categoryRepository.findAll().isEmpty()) {
+            String[] cats = { "Booli", "Drinkki", "Klassikko", "Kuumat", "Shot" };
+            insertCategories(Arrays.asList(cats));
+        }
     }
 
     private void insertIngredients(List<String> ingredients) {
@@ -97,6 +106,13 @@ public class DatabaseLoader implements CommandLineRunner {
         for (String name : glasses) {
             Glass glass = new Glass(name);
             glassRepository.saveAndFlush(glass);
+        }
+    }
+
+    private void insertCategories(List<String> categories) {
+        for (String name : categories) {
+            Category cat = new Category(name);
+            categoryRepository.saveAndFlush(cat);
         }
     }
 
