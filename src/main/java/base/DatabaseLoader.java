@@ -3,6 +3,7 @@ package base;
 import base.domain.Role;
 import base.domain.Account;
 import base.domain.Category;
+import base.domain.Drink;
 import base.domain.Glass;
 import base.domain.Ingredient;
 
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import base.repository.AccountRepository;
 import base.repository.CategoryRepository;
+import base.repository.DrinkRepository;
 import base.repository.GlassRepository;
 import base.repository.IngredientRepository;
 import base.repository.RoleRepository;
@@ -43,6 +45,9 @@ public class DatabaseLoader implements CommandLineRunner {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private DrinkRepository drinkRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -79,9 +84,9 @@ public class DatabaseLoader implements CommandLineRunner {
             adminAccount = accountRepository.saveAndFlush(adminAccount);
         }
         if (ingredientRepository.findAll().isEmpty()) {
-            String[] ings = { "Vodka", "Mustikkalikööri", "Schweppes russian", "Kuohuviini", "Appelsiinimehu",
-                    "Omenaviini", "Puolukkalikööri", "Sitruunalimonadi", "Vadelmalikööri", "Valkoviini",
-                    "Kuohuviini (Rosee)", "Mansikkalikööri", "Viski (Scotch)", "Kirsikkalikööri", "Campari" };
+            String[] ings = { "Vodka", "Valkoinen vermutti", "Schweppes russian", "Kuohuviini", "Appelsiinimehu",
+                    "Ginger ale", "Triple sec", "Sitruunalimonadi", "Vadelmalikööri", "Sokeriliemi", "Viski", 
+                    "Greippimehu", "Vaalea rommi", "Viski (Scotch)", "Limemehu", "Campari", "Samppanja" };
             insertIngredients(Arrays.asList(ings));
         }
         if (glassRepository.findAll().isEmpty()) {
@@ -92,6 +97,20 @@ public class DatabaseLoader implements CommandLineRunner {
         if (categoryRepository.findAll().isEmpty()) {
             String[] cats = { "Booli", "Drinkki", "Klassikko", "Kuumat", "Shot" };
             insertCategories(Arrays.asList(cats));
+        }
+        if (drinkRepository.findAll().isEmpty()) {
+            String[][] ing = { 
+                    { "Vodka", "6 cl", "Valkoinen vermutti", "2 cl" },
+                    {"Vodka","2 cl", "Campari", "2 cl", "Samppanja", "10 cl"}, 
+                    {"Vodka", "3 cl", "Triple sec", "3 cl", "Limemehu", "3 cl"},
+                    {"Viski", "4 cl", "Limemehu", "2 cl", "Ginger ale", "6 cl"},
+                    {"Vaalea rommi", "4 cl", "Limemehu", "1cl", "Greippimehu", "1 cl", "Sokeriliemi", "1 cl"}
+            };
+            insertDrink("Vodka Martini", "Klassikko", "Cocktail", ing[0]);
+            insertDrink("Champagne flamingo", "Drinkki", "Kuohuviini", ing[1]);
+            insertDrink("Kamikaze", "Drinkki", "Kuohuviini", ing[2]);
+            insertDrink("Mobile mule", "Drinkki", "On the Rocks", ing[3]);
+            insertDrink("Nevada", "Drinkki", "Cocktail", ing[3]);
         }
     }
 
@@ -114,6 +133,19 @@ public class DatabaseLoader implements CommandLineRunner {
             Category cat = new Category(name);
             categoryRepository.saveAndFlush(cat);
         }
+    }
+
+    private void insertDrink(String name, String cat, String glss, String[] ingredients) {
+        Category category = categoryRepository.findByName(cat);
+        Glass glass = glassRepository.findByName(glss);
+        Drink drink = new Drink(name);
+        drink.setCategory(category);
+        drink.setGlass(glass);
+        for (int i = 0; i < ingredients.length; i += 2) {
+            Ingredient ingredient = ingredientRepository.findByName(ingredients[i]);
+            drink.addIngredient(ingredient, ingredients[i + 1]);
+        }
+        drinkRepository.saveAndFlush(drink);
     }
 
 }
