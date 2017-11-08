@@ -30,6 +30,10 @@ public class Drink extends AbstractPersistable<Long> {
 
     public Drink() {
     }
+    
+    public Drink(String name) {
+        this.name = name;
+    }
 
     public String getName() {
         return name;
