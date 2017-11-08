@@ -10,6 +10,7 @@ class Glasses extends React.Component {
     super(props);
     this.state = {glasses: [], infoModalVisible: false, addModalVisible: false,
         delConfirmationVisible: false, glass:{},
+        editModalVisible: false,
     };
     this.fetchGlasses = this.fetchGlasses.bind(this);
     this.setGlassList = this.setGlassList.bind(this);
@@ -18,7 +19,11 @@ class Glasses extends React.Component {
     this.closeAddModal = this.closeAddModal.bind(this);
     this.addGlass = this.addGlass.bind(this);
     this.setDeleteConfirmModalVisible = this.setDeleteConfirmModalVisible.bind(this);
+    this.deleteGlass = this.deleteGlass.bind(this);
     this.deleteReply = this.deleteReply.bind(this);
+    this.openEditModal = this.openEditModal.bind(this);
+    this.closeEditModal = this.closeEditModal.bind(this);
+    this.modifyGlass = this.modifyGlass.bind(this);
   }
 
   fetchGlasses() {
@@ -64,6 +69,14 @@ class Glasses extends React.Component {
     this.setState({delConfirmationVisible: false, glass: {} });
   }
 
+  openEditModal(item) {
+    this.setState({editModalVisible: true, glass: item});
+  }
+
+  closeEditModal() {
+    this.setState({editModalVisible: false, glass: {} });
+  }
+
   componentDidMount() {
     this.fetchGlasses();
   }
@@ -78,6 +91,16 @@ class Glasses extends React.Component {
         close={this.closeAddModal}
         save={this.addGlass}
         placeholder="glass name"
+      />
+    }
+    else if (true === this.state.editModalVisible) {
+      addModal =
+      <IngredientModal
+        modalOpen={this.state.editModalVisible}
+        title="Edit glass"
+        close={this.closeEditModal}
+        ingredient={this.state.glass}
+        save={this.modifyGlass}
       />
     }
     else {
@@ -150,6 +173,20 @@ class Glasses extends React.Component {
         });
   }
 
+  modifyGlass(glass) {
+    this.closeEditModal();
+    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
+    const self = this;
+    const command  =  _.assign({}, glass);
+    const url = 'api/glasses/' + glass.id;
+    axios.put(url, command, config)
+         .then(function (response) {
+           self.fetchGlasses();
+         })
+         .catch(function (response) {
+           console.log("modify glass failed");
+         });
+  }
 
 }
 Glasses.PropTypes = {}
