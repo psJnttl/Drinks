@@ -1,5 +1,7 @@
 package base.aop;
 
+import java.time.LocalDateTime;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.JoinPoint;
@@ -10,13 +12,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import base.domain.Glass;
+import base.domain.LogEntry;
 import base.repository.GlassRepository;
+import base.repository.LogEntryRepository;
 
 @Aspect
 public class GlassAspect {
 
     @Autowired
     private GlassRepository glassRepository;
+    
+    @Autowired
+    private LogEntryRepository logEntryRepository;
 
     private Log log = LogFactory.getLog(this.getClass());
 
@@ -27,5 +34,14 @@ public class GlassAspect {
         long id = (long) joinPoint.getArgs()[0];
         Glass glass = glassRepository.findOne(id);
         log.info(username + " DELETE glass id: " + id + ", name: " + glass.getName());
+        LogEntry logEntry = LogEntry.builder()
+                .date(LocalDateTime.now())
+                .username(username)
+                .action("DELETE")
+                .targetEntity("glass")
+                .targetId(id)
+                .targetName(glass.getName())
+                .build();
+        logEntryRepository.save(logEntry); // transactional?
     }
 }
