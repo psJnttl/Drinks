@@ -8,6 +8,9 @@ class SimpleInformationModal extends React.Component {
     this.state = {}
   }
   render() {
+    if (! this.props.modalOpen) {
+      return null;
+    }
     let note1;
     if (this.props.name === "") {
       note1 = <strong>{this.props.notification}</strong>

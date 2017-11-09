@@ -8,6 +8,9 @@ class SimpleConfirmationModal extends React.Component {
     this.state = {}
   }
   render() {
+    if (! this.props.modalOpen) {
+      return null;
+    }
     return (
       <div>
         <Modal bsSize="small" show={this.props.modalOpen} onHide={() => this.props.reply(false)}>
