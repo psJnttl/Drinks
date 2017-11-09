@@ -8,10 +8,8 @@
 
 	<aop:aspectj-autoproxy />
 
-	<bean id="ingredientSvc" class="base.service.IngredientService" />
-
 	<!-- Aspect -->
 	<bean id="ingredientAspect" class="base.aop.IngredientAspect" />
-        
+    <bean id="glassAspect" class="base.aop.GlassAspect" />
 
 </beans>
