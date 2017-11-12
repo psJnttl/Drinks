@@ -1,17 +1,22 @@
 package base.aop;
 
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import base.command.IngredientAdd;
 import base.domain.Ingredient;
+import base.domain.LogEntry;
+import base.dto.IngredientDto;
 import base.repository.IngredientRepository;
+import base.repository.LogEntryRepository;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Aspect
 public class IngredientAspect {
@@ -19,14 +24,60 @@ public class IngredientAspect {
     @Autowired
     private IngredientRepository ingredientRepository;
 
-    private Log log = LogFactory.getLog(this.getClass());
+    @Autowired
+    private LogEntryRepository logEntryRepository;
 
     @Before("execution(* base.service.IngredientService.deleteIngredient(..))")
     private void deleteIngredient(JoinPoint joinPoint) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         long id = (long) joinPoint.getArgs()[0];
-        Ingredient ingredient = ingredientRepository.findOne(id);
-        log.info(username + " DELETE ingredient id: " + id + ", name: " + ingredient.getName());
+        Ingredient ing = ingredientRepository.findOne(id);
+        LogEntry logEntry = LogEntry.builder()
+                .date(LocalDateTime.now())
+                .username(username)
+                .action("DELETE")
+                .targetEntity("ingredient")
+                .targetId(id)
+                .targetName(ing.getName())
+                .build();
+        logEntryRepository.save(logEntry);
+    }
+    
+    @AfterReturning( pointcut = "execution(* base.service.IngredientService.addIngredient(..))",
+            returning = "result")
+    private void addIngredient(JoinPoint joinPoint, Object result) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Optional<IngredientDto> ing = (Optional<IngredientDto>) result;
+        if (ing.isPresent()) {
+            IngredientDto dto = ing.get();
+            LogEntry logEntry = LogEntry.builder()
+                    .date(LocalDateTime.now())
+                    .username(username)
+                    .action("CREATE")
+                    .targetEntity("ingredient")
+                    .targetId(dto.getId())
+                    .targetName(dto.getName())
+                    .build();
+            logEntryRepository.save(logEntry);
+        }
+    }
+
+    @Before("execution(* base.service.IngredientService.modifyIngredient(..))")
+    private void modifyIngredient(JoinPoint joinPoint) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        long id = (long) joinPoint.getArgs()[0];
+        IngredientAdd ingredientMod = (IngredientAdd) joinPoint.getArgs()[1];
+        LogEntry after = LogEntry.builder()
+                .date(LocalDateTime.now())
+                .username(username)
+                .action("MODIFY")
+                .targetEntity("ingredient")
+                .targetId(id)
+                .targetName(ingredientMod.getName())
+                .build();
+        logEntryRepository.save(after);
     }
 }
