@@ -7,6 +7,7 @@ import Logout from './Logout';
 import Ingredients from './components/Ingredients';
 import Glasses from './components/Glasses';
 import Categories from './components/Categories';
+import EventLog from './components/EventLog';
 
 const Home = () => (
   <div>
@@ -25,12 +26,13 @@ class App extends React.Component {
     super(props);
   }
   render() {
-    const authValue = this.props.authenticated;
+    const authValue = this.props.authState.authenticated;
+    const admin = this.props.authState.admin;
     return (
       <Router>
         <div >
           <Navi
-            authenticated={this.props.authenticated}
+            authState={this.props.authState}
             changeAuthState={this.props.changeAuthState}
           />
           <Switch>
@@ -42,6 +44,9 @@ class App extends React.Component {
             <Route path="/logout" render={(props) => (
               <Logout authenticated={authValue} changeAuthState={this.props.changeAuthState} {...props}  />
             )}/>
+            <Route path="/eventlog" render={(props) => (
+              <EventLog authenticated={authValue} {...props}  />
+            )}/>
             <Route render={ () => <div><h1>404 - Not Found!</h1></div>} />
           </Switch>
         </div>
@@ -50,7 +55,7 @@ class App extends React.Component {
   }
 }
 App.PropTypes = {
-  authenticated: PropTypes.bool.isRequired,
+  authState: PropTypes.object.isRequired,
   changeAuthState: PropTypes.func.isRequired,
 }
 App.defaultProps = {}
