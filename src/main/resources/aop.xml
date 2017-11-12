@@ -11,5 +11,6 @@
 	<!-- Aspect -->
 	<bean id="ingredientAspect" class="base.aop.IngredientAspect" />
     <bean id="glassAspect" class="base.aop.GlassAspect" />
+    <bean id="categoryAspect" class="base.aop.CategoryAspect" />
 
 </beans>
