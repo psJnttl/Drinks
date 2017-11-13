@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -68,6 +69,7 @@ public class IngredientControllerTest {
     }
     
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void listIngredientsResponseStatusOKandContentTypeJsonUtf8() throws Exception {
         mockMvc
             .perform(get(PATH))
@@ -76,6 +78,7 @@ public class IngredientControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void listMustNotBeEmpty() throws Exception {
         MvcResult res = mockMvc
                 .perform(get(PATH))
@@ -85,6 +88,7 @@ public class IngredientControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void addingIngredientReturnsLocationHeaderAndDto() throws Exception {
         IngredientAdd ingredient = new IngredientAdd(INGREDIENT3);
         ObjectMapper mapper = new ObjectMapper();
@@ -102,6 +106,7 @@ public class IngredientControllerTest {
     }
     
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void addingIngredientWithoutNameFails() throws Exception {
         IngredientAdd ingredient = new IngredientAdd("");
         ObjectMapper mapper = new ObjectMapper();
@@ -115,6 +120,7 @@ public class IngredientControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void fetchSingleIngredient() throws Exception {
         MvcResult result = mockMvc
                 .perform(get(PATH + "/" + id1))
@@ -128,6 +134,7 @@ public class IngredientControllerTest {
     }
     
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void fetchSingleIngredientWithWrongIdFails404() throws Exception {
         mockMvc
                 .perform(get(PATH + "/" + 751130))
@@ -135,6 +142,7 @@ public class IngredientControllerTest {
     }
     
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void deleteIngredientOK() throws Exception {
         mockMvc.perform(
                 delete(PATH + "/" + id2))
@@ -142,6 +150,7 @@ public class IngredientControllerTest {
     }
     
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void deleteIngredientWithWrongIdFails404() throws Exception {
         mockMvc.perform(
                 delete(PATH + "/" + 751130))
@@ -149,6 +158,7 @@ public class IngredientControllerTest {
     }
     
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void modifyIngredientOKandReturnsChangedContent() throws Exception {
         IngredientAdd ingAdd = new IngredientAdd("Spring water");
         ObjectMapper mapper = new ObjectMapper();
@@ -165,6 +175,7 @@ public class IngredientControllerTest {
     }
     
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void modifyingIngredientWithWrongIdFails404() throws Exception {
         IngredientAdd ingAdd = new IngredientAdd("Spring water");
         ObjectMapper mapper = new ObjectMapper();
@@ -179,6 +190,7 @@ public class IngredientControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void modifyingIngredientWithEmptyContentsFails() throws Exception {
         IngredientAdd ingAdd = new IngredientAdd("");
         ObjectMapper mapper = new ObjectMapper();
@@ -192,6 +204,7 @@ public class IngredientControllerTest {
     }
     
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void cantDeleteIngredientIfInAdrink() throws Exception {
         Drink drink = new Drink("Vodka Tonic");
         drink.addIngredient(i1, "6 cl");

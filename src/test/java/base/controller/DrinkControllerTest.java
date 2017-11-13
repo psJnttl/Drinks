@@ -17,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -127,12 +128,14 @@ public class DrinkControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void listResponseStatusOKandContentTypeJsonUtf8() throws Exception {
         mockMvc.perform(get(PATH)).andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void listMustNotBeEmpty() throws Exception {
         MvcResult res = mockMvc.perform(get(PATH)).andReturn();
         String content = res.getResponse().getContentAsString();

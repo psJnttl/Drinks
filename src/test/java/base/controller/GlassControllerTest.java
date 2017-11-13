@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -68,12 +69,14 @@ public class GlassControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void listGlassesResponseStatusOKandContentTypeJsonUtf8() throws Exception {
         mockMvc.perform(get(PATH)).andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void listMustNotBeEmpty() throws Exception {
         MvcResult res = mockMvc.perform(get(PATH)).andReturn();
         String content = res.getResponse().getContentAsString();
@@ -81,6 +84,7 @@ public class GlassControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void addingGlassReturnsLocationHeaderAndDto() throws Exception {
         GlassAdd glass = new GlassAdd(GLASS3);
         ObjectMapper mapper = new ObjectMapper();
@@ -93,6 +97,7 @@ public class GlassControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void addingGlassWithoutNameFails() throws Exception {
         GlassAdd glass = new GlassAdd("");
         ObjectMapper mapper = new ObjectMapper();
@@ -102,6 +107,7 @@ public class GlassControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void fetchSingleGlassOK() throws Exception {
         Glass glass = glassRepository.findOne(this.id2);
         String name = glass.getName();
@@ -114,21 +120,25 @@ public class GlassControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void fetchSingleGlassWithWrongIdFails404() throws Exception {
         mockMvc.perform(get(PATH + "/" + 751130)).andExpect(status().isNotFound());
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void deleteGlassOK() throws Exception {
         mockMvc.perform(delete(PATH + "/" + this.id2)).andExpect(status().isOk());
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void deleteGlassWithWrongIdFails404() throws Exception {
         mockMvc.perform(delete(PATH + "/" + 751130)).andExpect(status().isNotFound());
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void modifyGlassOKandReturnsChangedContent() throws Exception {
         GlassAdd glassAdd = new GlassAdd(GLASS3);
         ObjectMapper mapper = new ObjectMapper();
@@ -141,6 +151,7 @@ public class GlassControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void modifyingGlassWithWrongIdFails404() throws Exception {
         GlassAdd glassAdd = new GlassAdd(GLASS3);
         ObjectMapper mapper = new ObjectMapper();
@@ -150,6 +161,7 @@ public class GlassControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void modifyingGlassWithEmptyContentsFails() throws Exception {
         GlassAdd glassAdd = new GlassAdd(EMPTY_STRING);
         ObjectMapper mapper = new ObjectMapper();
@@ -159,6 +171,7 @@ public class GlassControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void deletingGlassUsedInDrinkFails() throws Exception {
         Drink drink = new Drink("Paulaner");
         drink.setGlass(this.g1);

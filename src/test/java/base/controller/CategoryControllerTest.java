@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -62,12 +63,14 @@ public class CategoryControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void listResponseStatusOKandContentTypeJsonUtf8() throws Exception {
         mockMvc.perform(get(PATH)).andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void listMustNotBeEmpty() throws Exception {
         MvcResult res = mockMvc.perform(get(PATH)).andReturn();
         String content = res.getResponse().getContentAsString();
@@ -75,6 +78,7 @@ public class CategoryControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void addingCategoryReturnsLocationHeaderAndDto() throws Exception {
         CategoryAdd catAdd = new CategoryAdd(CATEGORY3);
         ObjectMapper mapper = new ObjectMapper();
@@ -87,6 +91,7 @@ public class CategoryControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void addingCategoryWithoutNameFails() throws Exception {
         CategoryAdd catAdd = new CategoryAdd(EMPTY_STRING);
         ObjectMapper mapper = new ObjectMapper();
@@ -96,6 +101,7 @@ public class CategoryControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void fetchSingleCategoryOK() throws Exception {
         Category cat = categoryRepository.findOne(this.id1);
         String name = cat.getName();
@@ -108,21 +114,25 @@ public class CategoryControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void fetchSingleCategoryWithWrongIdFails404() throws Exception {
         mockMvc.perform(get(PATH + "/" + 751130)).andExpect(status().isNotFound());
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void deleteCategoryOK() throws Exception {
         mockMvc.perform(delete(PATH + "/" + this.id1)).andExpect(status().isOk());
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void deleteCategoryWithWrongIdFails404() throws Exception {
         mockMvc.perform(delete(PATH + "/" + 751130)).andExpect(status().isNotFound());
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void modifyCategoryOKandReturnsChangedContent() throws Exception {
         CategoryAdd catAdd = new CategoryAdd(CATEGORY3);
         ObjectMapper mapper = new ObjectMapper();
@@ -135,6 +145,7 @@ public class CategoryControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void modifyingCategoryWithWrongIdFails404() throws Exception {
         CategoryAdd catAdd = new CategoryAdd(CATEGORY3);
         ObjectMapper mapper = new ObjectMapper();
@@ -144,6 +155,7 @@ public class CategoryControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
     public void modifyingCategoryWithEmptyContentsFails() throws Exception {
         CategoryAdd catAdd = new CategoryAdd(EMPTY_STRING);
         ObjectMapper mapper = new ObjectMapper();
