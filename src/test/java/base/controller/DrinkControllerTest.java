@@ -215,5 +215,18 @@ public class DrinkControllerTest {
                     .content(content))
         .andExpect(status().isBadRequest());
     }
-    
+
+    @Test
+    @WithMockUser(username="user", roles={"USER"})
+    public void getSingleDrink() throws Exception {
+        MvcResult result = mockMvc
+                .perform(get(PATH + "/" + drink1.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+        assertFalse("Drink contents missing!", result.getResponse().getContentAsString().isEmpty());
+        ObjectMapper mapper = new ObjectMapper();
+        DrinkDto dto = mapper.readValue(result.getResponse().getContentAsString(), DrinkDto.class);
+        assertTrue(dto.getName().equals(drink1.getName()));
+    }
 }
