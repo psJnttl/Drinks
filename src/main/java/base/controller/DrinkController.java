@@ -31,8 +31,8 @@ public class DrinkController {
     
     @RequestMapping(value = "/api/drinks", method = RequestMethod.POST)
     public ResponseEntity<DrinkDto> addDrink(@RequestBody DrinkAdd drink) throws URISyntaxException {
-        if (null == drink || null == drink.getCategory() || null == drink.getClass() || drink.getName().isEmpty()
-                || null == drink.getComponents() || drink.getComponents().isEmpty()) {
+        if (null == drink || null == drink.getCategory() || null == drink.getClass() || null == drink.getName() || 
+                drink.getName().isEmpty() || null == drink.getComponents() || drink.getComponents().isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         DrinkDto dto = drinkService.addDrink(drink);

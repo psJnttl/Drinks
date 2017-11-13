@@ -166,9 +166,9 @@ public class DrinkControllerTest {
         drink.setCategory(new CategoryDto(category.getId(), category.getName()));
         drink.setGlass(new GlassDto(glass.getId(), glass.getName()));
         List<DrinkComponent> ingredients = new ArrayList<>();
-        ingredients.add(fn("Viski", "4 cl"));
-        ingredients.add(fn("Limemehu", "5 cl"));
-        ingredients.add(fn("Appelsiinimehu", "5 cl"));
+        ingredients.add(createDrinkComponent("Viski", "4 cl"));
+        ingredients.add(createDrinkComponent("Limemehu", "5 cl"));
+        ingredients.add(createDrinkComponent("Appelsiinimehu", "5 cl"));
         drink.setComponents(ingredients);
         ObjectMapper mapper = new ObjectMapper();
         String content = mapper.writeValueAsString(drink);
@@ -186,12 +186,34 @@ public class DrinkControllerTest {
         assertTrue("drink name not correct", dto.getName().equals("drinkero") );
      }
     
-    private DrinkComponent fn(String name, String amount) {
+    private DrinkComponent createDrinkComponent(String name, String amount) {
         Ingredient i = ingredientRepository.findByName(name);
         IngredientDto dto = new IngredientDto(i.getId(), i.getName());
         DrinkComponent dc = new DrinkComponent(dto, amount);
         return dc;
     }
 
+    @Test
+    @WithMockUser(username="user", roles={"USER"})
+    public void addingDrinkWithoutNameFails() throws Exception {
+        DrinkAdd drink = new DrinkAdd();
+        Category category = categoryRepository.findByName("Drinkki");
+        Glass glass = glassRepository.findByName("Cocktail");
+        drink.setCategory(new CategoryDto(category.getId(), category.getName()));
+        drink.setGlass(new GlassDto(glass.getId(), glass.getName()));
+        List<DrinkComponent> ingredients = new ArrayList<>();
+        ingredients.add(createDrinkComponent("Viski", "4 cl"));
+        ingredients.add(createDrinkComponent("Limemehu", "5 cl"));
+        ingredients.add(createDrinkComponent("Appelsiinimehu", "5 cl"));
+        drink.setComponents(ingredients);
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(drink);
+        mockMvc
+        .perform(
+                post(PATH)
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .content(content))
+        .andExpect(status().isBadRequest());
+    }
     
 }
