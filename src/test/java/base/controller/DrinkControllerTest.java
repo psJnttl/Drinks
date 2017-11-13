@@ -142,14 +142,14 @@ public class DrinkControllerTest {
         return drinkRepository.saveAndFlush(drink);
     }
 
-    //@Test
+    @Test
     @WithMockUser(username="user", roles={"USER"})
     public void listResponseStatusOKandContentTypeJsonUtf8() throws Exception {
         mockMvc.perform(get(PATH)).andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
     }
 
-    //@Test
+    @Test
     @WithMockUser(username="user", roles={"USER"})
     public void listMustNotBeEmpty() throws Exception {
         MvcResult res = mockMvc.perform(get(PATH)).andReturn();
