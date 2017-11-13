@@ -10,6 +10,6 @@ import base.domain.Glass;
 
 public interface DrinkRepository extends JpaRepository<Drink, Long> {
     Drink findByName(String name);
-    List<Drink> findByCategory(Category category);
+    List<Category> findByCategory(Category category);
     List<Drink> findByGlass(Glass glass);
 }

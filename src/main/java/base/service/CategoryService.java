@@ -19,6 +19,9 @@ public class CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+    
+    @Autowired
+    private DrinkService drinkService;
 
     public List<CategoryDto> listAll() {
         List<Category> list = categoryRepository.findAll();
@@ -62,5 +65,17 @@ public class CategoryService {
         cat = categoryRepository.save(cat);
         CategoryDto dto = new CategoryDto(cat.getId(), cat.getName());
         return dto;
+    }
+    
+    public boolean isCategoryUsed(long id) {
+        Category cat = categoryRepository.findOne(id);
+        if (null == cat) {
+            return false;
+        }
+        List<Category> list = drinkService.findByCategory(cat);
+        if (list.isEmpty()) {
+            return false;
+        }
+        return true;
     }
 }

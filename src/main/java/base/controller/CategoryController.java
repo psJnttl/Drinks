@@ -53,9 +53,13 @@ public class CategoryController {
     
     @RequestMapping(value = "/api/categories/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<CategoryDto> deleteCategory(@PathVariable long id) {
-        if (! categoryService.deleteCategory(id)) {
+        if (! categoryService.findCategory(id).isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        if ( categoryService.isCategoryUsed(id)) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+        categoryService.deleteCategory(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
     
