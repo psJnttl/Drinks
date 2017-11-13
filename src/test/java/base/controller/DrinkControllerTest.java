@@ -5,6 +5,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -59,6 +62,19 @@ public class DrinkControllerTest {
     @Before
     public void setUp() throws Exception {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        if (ingredientRepository.findAll().isEmpty()) {
+            String[] ings = { "Vodka", "Viski", "Limemehu" };
+            insertIngredients(Arrays.asList(ings));
+        }
+        if (glassRepository.findAll().isEmpty()) {
+            String[] glss = { "Boolimalja", "Cocktail", "Highball", "Hurricane", "Irish Coffee", "Kuohuviini",
+                    "Margarita", "On the Rocks", "Shotti", "Valkoviini", "Punaviini" };
+            insertGlassware(Arrays.asList(glss));
+        }
+        if (categoryRepository.findAll().isEmpty()) {
+            String[] cats = { "Booli", "Drinkki", "Klassikko", "Kuumat", "Shot" };
+            insertCategories(Arrays.asList(cats));
+        }
         String[][] ing = { 
                 { "Vodka", "3 cl", "Viski", "3 cl" },
                 { "Vodka", "4 cl", "Limemehu", "6 cl"} };
@@ -67,10 +83,36 @@ public class DrinkControllerTest {
         drink2 = insertDrink("Moscow mule", "Drinkki", "Highball", ing[1]);
     }
 
+    private void insertIngredients(List<String> ingredients) {
+        for (String name : ingredients) {
+            Ingredient ing = new Ingredient(name);
+            ingredientRepository.saveAndFlush(ing);
+        }
+    }
+
+    private void insertGlassware(List<String> glasses) {
+        for (String name : glasses) {
+            Glass glass = new Glass(name);
+            glassRepository.saveAndFlush(glass);
+        }
+    }
+
+    private void insertCategories(List<String> categories) {
+        for (String name : categories) {
+            Category cat = new Category(name);
+            categoryRepository.saveAndFlush(cat);
+        }
+    }
+
+
     @After
     public void tearDown() throws Exception {
+        drinkRepository.delete(drink1);
+        drinkRepository.delete(drink2);
+        List<Drink> list = drinkRepository.findAll();
+        System.out.println("list size: " + list.size());
     }
-    
+
     private Drink insertDrink(String name, String cat, String glss, String[] ingredients) {
         Category category = categoryRepository.findByName(cat);
         Glass glass = glassRepository.findByName(glss);
@@ -96,4 +138,7 @@ public class DrinkControllerTest {
         String content = res.getResponse().getContentAsString();
         assertFalse("Project list must not be empty.", content.equals("[]"));
     }
+    
+    //@Test
+    
 }
