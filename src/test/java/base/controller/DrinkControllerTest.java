@@ -1,12 +1,18 @@
 package base.controller;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -25,10 +31,19 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import base.command.DrinkAdd;
 import base.domain.Category;
 import base.domain.Drink;
 import base.domain.Glass;
 import base.domain.Ingredient;
+import base.dto.CategoryDto;
+import base.dto.DrinkComponent;
+import base.dto.DrinkDto;
+import base.dto.GlassDto;
+import base.dto.IngredientDto;
 import base.repository.CategoryRepository;
 import base.repository.DrinkRepository;
 import base.repository.GlassRepository;
@@ -39,7 +54,7 @@ import base.repository.IngredientRepository;
 @ActiveProfiles("test")
 public class DrinkControllerTest {
 
-    private static final String PATH = "/api/categories";
+    private static final String PATH = "/api/drinks";
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -64,7 +79,7 @@ public class DrinkControllerTest {
     public void setUp() throws Exception {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         if (ingredientRepository.findAll().isEmpty()) {
-            String[] ings = { "Vodka", "Viski", "Limemehu" };
+            String[] ings = { "Vodka", "Viski", "Limemehu", "Applesiinimehu" };
             insertIngredients(Arrays.asList(ings));
         }
         if (glassRepository.findAll().isEmpty()) {
@@ -127,14 +142,14 @@ public class DrinkControllerTest {
         return drinkRepository.saveAndFlush(drink);
     }
 
-    @Test
+    //@Test
     @WithMockUser(username="user", roles={"USER"})
     public void listResponseStatusOKandContentTypeJsonUtf8() throws Exception {
         mockMvc.perform(get(PATH)).andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
     }
 
-    @Test
+    //@Test
     @WithMockUser(username="user", roles={"USER"})
     public void listMustNotBeEmpty() throws Exception {
         MvcResult res = mockMvc.perform(get(PATH)).andReturn();
@@ -142,6 +157,41 @@ public class DrinkControllerTest {
         assertFalse("Project list must not be empty.", content.equals("[]"));
     }
     
-    //@Test
+    @Test
+    @WithMockUser(username="user", roles={"USER"})
+    public void addDrinkReturnsLocationHeaderAndDto() throws Exception {
+        DrinkAdd drink = new DrinkAdd("drinkero");
+        Category category = categoryRepository.findByName("Drinkki");
+        Glass glass = glassRepository.findByName("Cocktail");
+        drink.setCategory(new CategoryDto(category.getId(), category.getName()));
+        drink.setGlass(new GlassDto(glass.getId(), glass.getName()));
+        List<DrinkComponent> ingredients = new ArrayList<>();
+        ingredients.add(fn("Viski", "4 cl"));
+        ingredients.add(fn("Limemehu", "5 cl"));
+        ingredients.add(fn("Appelsiinimehu", "5 cl"));
+        drink.setComponents(ingredients);
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(drink);
+        System.out.println("add drink");
+        System.out.println(content);
+        MvcResult result = mockMvc
+                .perform(
+                        post(PATH)
+                            .contentType(MediaType.APPLICATION_JSON_UTF8)
+                            .content(content))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", containsString(PATH + "/")))
+                .andReturn();
+        DrinkDto dto = mapper.readValue(result.getResponse().getContentAsString(), DrinkDto.class);
+        assertTrue("drink name not correct", dto.getName().equals("drinkero") );
+     }
+    
+    private DrinkComponent fn(String name, String amount) {
+        Ingredient i = ingredientRepository.findByName(name);
+        IngredientDto dto = new IngredientDto(i.getId(), i.getName());
+        DrinkComponent dc = new DrinkComponent(dto, amount);
+        return dc;
+    }
+
     
 }
