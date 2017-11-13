@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -106,6 +107,15 @@ public class DrinkService {
             ingredients.put(i, component.getValue());
         }
         return ingredients;
+    }
+
+    public Optional<DrinkDto> findDrink(long id) {
+        Drink drink = drinkRepository.findOne(id);
+        if (null == drink) {
+            return Optional.empty();
+        }
+        DrinkDto dto = createDto(drink);
+        return Optional.of(dto);
     }
 
 }

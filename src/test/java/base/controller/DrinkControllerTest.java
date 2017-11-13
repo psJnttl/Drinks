@@ -10,14 +10,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +26,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import base.command.DrinkAdd;
@@ -228,5 +222,13 @@ public class DrinkControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         DrinkDto dto = mapper.readValue(result.getResponse().getContentAsString(), DrinkDto.class);
         assertTrue(dto.getName().equals(drink1.getName()));
+    }
+    
+    @Test
+    @WithMockUser(username="user", roles={"USER"})
+    public void fetchSingleDrinkWithWrongIdFails404() throws Exception {
+        mockMvc
+                .perform(get(PATH + "/" + 751130))
+                .andExpect(status().isNotFound());
     }
 }
