@@ -69,7 +69,12 @@ class App extends React.Component {
             changeAuthState={this.props.changeAuthState}
           />
           <Switch>
-            <Route exact path="/" component={Drinks} />
+            <Route exact path="/" render={ (props) => (
+              <Drinks
+                categories={this.state.categories}
+                glasses={this.state.glasses}
+                ingredients={this.state.ingredients} />
+            )} />
             <Route path="/ingredients" render={(props) => (
               <Ingredients updateRoot={this.setList} {...props} />
             )} />

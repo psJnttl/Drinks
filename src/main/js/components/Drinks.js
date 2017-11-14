@@ -95,6 +95,10 @@ class Drinks extends React.Component {
     );
   }
 }
-Drinks.PropTypes = {}
+Drinks.PropTypes = {
+  categories: PropTypes.array.isRequired,
+  glasses: PropTypes.array.isRequired,
+  ingredients: PropTypes.array.isRequired,
+}
 Drinks.defaultProps = {}
 export default Drinks;
