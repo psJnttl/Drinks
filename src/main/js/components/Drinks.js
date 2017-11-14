@@ -8,6 +8,7 @@ class Drinks extends React.Component {
     this.state = {drinks: [], infoModalVisible: false,  };
     this.fetchDrinks = this.fetchDrinks.bind(this);
     this.setDrinkList = this.setDrinkList.bind(this);
+    this.drinkClick = this.drinkClick.bind(this);
   }
 
   fetchDrinks() {
@@ -34,16 +35,22 @@ class Drinks extends React.Component {
     this.setState({drinks: theList});
   }
 
+  drinkClick(id) {
+    console.log("drink id: " + id)
+  }
+
   componentDidMount() {
     this.fetchDrinks();
   }
   render() {
     const drinkList =  this.state.drinks.length === 0 ?
                        null :
-    <ul style={{'display': 'flex'}}>{
+    <ul style={{'display': 'flex', 'cursor': 'pointer', 'font-family': 'effra'}}>{
       this.state.drinks.map( (drink, index) =>
-        <div key={drink.id} style={{ 'padding': '10px'}}>
-          <div>{drink.name}</div>
+        <div key={drink.id} style={{ 'padding': '10px'}} onClick={() => this.drinkClick(drink.id)}>
+          <div><h3>{drink.name}</h3></div>
+          <div title="kategoria" style={{'background': '#e3f2fd'}}><h5>{drink.category.name}</h5></div>
+          <div title="lasi" style={{'background': '#bbdefb'}}><h5>{drink.glass.name}</h5></div>
         </div>
       )
     }</ul>
