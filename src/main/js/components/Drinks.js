@@ -38,8 +38,20 @@ class Drinks extends React.Component {
     this.fetchDrinks();
   }
   render() {
+    const drinkList =  this.state.drinks.length === 0 ?
+                       null :
+    <ul style={{'display': 'flex'}}>{
+      this.state.drinks.map( (drink, index) =>
+        <div key={drink.id} style={{ 'padding': '10px'}}>
+          <div>{drink.name}</div>
+        </div>
+      )
+    }</ul>
     return (
-      <h4>Drinks listed here</h4>
+      <div>
+        <h4>Drinks listed here</h4>
+        {drinkList}
+      </div>
     );
   }
 }
