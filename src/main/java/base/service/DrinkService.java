@@ -118,6 +118,7 @@ public class DrinkService {
         return Optional.of(dto);
     }
 
+    @Transactional
     public boolean deleteDrink(long id) {
         Drink drink = drinkRepository.findOne(id);
         if (null == drink) {
@@ -125,6 +126,20 @@ public class DrinkService {
         }
         drinkRepository.delete(drink);
         return true;
+    }
+
+    @Transactional
+    public DrinkDto modifyDrink(long id, DrinkAdd drink) {
+        Drink oldDrink = drinkRepository.findOne(id);
+        oldDrink.setName(drink.getName());
+        Category category = categoryRepository.findOne(drink.getCategory().getId());
+        oldDrink.setCategory(category);
+        Glass glass = glassRepository.findOne(drink.getGlass().getId());
+        oldDrink.setGlass(glass);
+        Map<Ingredient, String> ingredients = componentsToIngredients(drink.getComponents());
+        oldDrink.setIngredients(ingredients);
+        oldDrink = drinkRepository.saveAndFlush(oldDrink);
+        return createDto(oldDrink);
     }
 
 }
