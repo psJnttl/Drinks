@@ -97,7 +97,7 @@ public class DatabaseLoader implements CommandLineRunner {
         if (categoryRepository.findAll().isEmpty()) {
             String[] cats = { "Booli", "Drinkki", "Klassikko", "Kuumat", "Shot" };
             insertCategories(Arrays.asList(cats));
-        }/*
+        }
         if (drinkRepository.findAll().isEmpty()) {
             String[][] ing = { 
                     { "Vodka", "6 cl", "Valkoinen vermutti", "2 cl" },
@@ -111,7 +111,7 @@ public class DatabaseLoader implements CommandLineRunner {
             insertDrink("Kamikaze", "Drinkki", "Kuohuviini", ing[2]);
             insertDrink("Mobile mule", "Drinkki", "On the Rocks", ing[3]);
             insertDrink("Nevada", "Drinkki", "Cocktail", ing[3]);
-        }*/
+        }
     }
 
     private void insertIngredients(List<String> ingredients) {
