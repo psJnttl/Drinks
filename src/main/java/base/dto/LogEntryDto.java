@@ -1,14 +1,10 @@
-package base.domain;
+package base.dto;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.Entity;
+public class LogEntryDto {
 
-import org.springframework.data.jpa.domain.AbstractPersistable;
-
-@Entity
-public class LogEntry extends AbstractPersistable<Long> {
-
+    private long id;
     private LocalDateTime date;
     private String username;
     private String action;
@@ -16,9 +12,8 @@ public class LogEntry extends AbstractPersistable<Long> {
     private Long targetId;
     private String targetName;
 
-    public LogEntry() {}
-    
-    private LogEntry(Builder builder) {
+    private LogEntryDto(Builder builder) {
+        this.id = builder.id;
         this.date = builder.date;
         this.username = builder.username;
         this.action = builder.action;
@@ -32,6 +27,7 @@ public class LogEntry extends AbstractPersistable<Long> {
     }
 
     public static final class Builder {
+        private long id;
         private LocalDateTime date;
         private String username;
         private String action;
@@ -40,6 +36,11 @@ public class LogEntry extends AbstractPersistable<Long> {
         private String targetName;
 
         private Builder() {
+        }
+
+        public Builder id(long id) {
+            this.id = id;
+            return this;
         }
 
         public Builder date(LocalDateTime date) {
@@ -72,9 +73,17 @@ public class LogEntry extends AbstractPersistable<Long> {
             return this;
         }
 
-        public LogEntry build() {
-            return new LogEntry(this);
+        public LogEntryDto build() {
+            return new LogEntryDto(this);
         }
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public LocalDateTime getDate() {
@@ -131,6 +140,7 @@ public class LogEntry extends AbstractPersistable<Long> {
         int result = 1;
         result = prime * result + ((action == null) ? 0 : action.hashCode());
         result = prime * result + ((date == null) ? 0 : date.hashCode());
+        result = prime * result + (int) (id ^ (id >>> 32));
         result = prime * result + ((targetEntity == null) ? 0 : targetEntity.hashCode());
         result = prime * result + ((targetId == null) ? 0 : targetId.hashCode());
         result = prime * result + ((targetName == null) ? 0 : targetName.hashCode());
@@ -143,7 +153,7 @@ public class LogEntry extends AbstractPersistable<Long> {
         if (this == obj) return true;
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
-        LogEntry other = (LogEntry) obj;
+        LogEntryDto other = (LogEntryDto) obj;
         if (action == null) {
             if (other.action != null) return false;
         }
@@ -152,6 +162,7 @@ public class LogEntry extends AbstractPersistable<Long> {
             if (other.date != null) return false;
         }
         else if (!date.equals(other.date)) return false;
+        if (id != other.id) return false;
         if (targetEntity == null) {
             if (other.targetEntity != null) return false;
         }
@@ -170,5 +181,6 @@ public class LogEntry extends AbstractPersistable<Long> {
         else if (!username.equals(other.username)) return false;
         return true;
     }
-
+    
+    
 }
