@@ -30,6 +30,7 @@ class Ingredients extends React.Component {
     const theList = data.map( item =>
        _.assign({}, {id: item.id, name: item.name}) );
     this.setState({ingredients: theList});
+    this.props.updateRoot(3, theList);
   }
 
   closeInfoModal() {
@@ -71,7 +72,6 @@ class Ingredients extends React.Component {
     axios.get('api/ingredients', config)
          .then(function (response) {
             self.setIngredientList(response.data);
-
          })
         .catch(function (response) {
            self.setState({infoModalVisible: true,
@@ -208,6 +208,8 @@ class Ingredients extends React.Component {
   }
 
 }
-Ingredients.PropTypes = {}
+Ingredients.PropTypes = {
+  updateRoot: PropTypes.func.isRequired,
+}
 Ingredients.defaultProps = {}
 export default Ingredients;

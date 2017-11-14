@@ -42,6 +42,7 @@ class Categories extends React.Component {
     const theList = data.map( item =>
        _.assign({}, {id: item.id, name: item.name}) );
     this.setState({categories: theList});
+    this.props.updateRoot(1, theList);
   }
 
   closeInfoModal() {
@@ -201,6 +202,8 @@ class Categories extends React.Component {
 
 
 }
-Categories.PropTypes = {}
+Categories.PropTypes = {
+  updateRoot: PropTypes.func.isRequired,
+}
 Categories.defaultProps = {}
 export default Categories;

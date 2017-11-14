@@ -47,6 +47,7 @@ class Glasses extends React.Component {
     const theList = data.map( item =>
        _.assign({}, {id: item.id, name: item.name}) );
     this.setState({glasses: theList});
+    this.props.updateRoot(2, theList);
   }
 
   closeInfoModal() {
@@ -209,6 +210,8 @@ class Glasses extends React.Component {
   }
 
 }
-Glasses.PropTypes = {}
+Glasses.PropTypes = {
+  updateRoot: PropTypes.func.isRequired,
+}
 Glasses.defaultProps = {}
 export default Glasses;

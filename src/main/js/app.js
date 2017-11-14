@@ -9,6 +9,8 @@ import Glasses from './components/Glasses';
 import Categories from './components/Categories';
 import EventLog from './components/EventLog';
 import Drinks from './components/Drinks';
+import _ from 'lodash';
+import axios from 'axios';
 
 const About = () => (
   <div>
@@ -19,7 +21,43 @@ const About = () => (
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {categories: [], glasses: [], ingredients: []};
+    this.setList = this.setList.bind(this);
+    this.fetchItems = this.fetchItems.bind(this);
   }
+
+  setList(no, data) {
+    const theList = data.map( item =>
+       _.assign({}, {id: item.id, name: item.name}) );
+    if (1 === no) {
+      this.setState({categories: theList});
+    }
+    else if ( 2 === no) {
+      this.setState({glasses: theList});
+    }
+    else if (3 === no) {
+      this.setState({ingredients: theList});
+    }
+  }
+
+  fetchItems(entity, listNo) {
+    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
+    const self = this;
+    axios.get('api/' + entity, config)
+         .then(function (response) {
+            self.setList(listNo, response.data);
+         })
+         .catch(function (response) {
+
+         });
+  }
+
+  componentDidMount() {
+    this.fetchItems("categories", 1);
+    this.fetchItems("glasses", 2);
+    this.fetchItems("ingredients", 3);
+  }
+
   render() {
     const authValue = this.props.authState.authenticated;
     const admin = this.props.authState.admin;
@@ -32,9 +70,15 @@ class App extends React.Component {
           />
           <Switch>
             <Route exact path="/" component={Drinks} />
-            <Route path="/ingredients" component={Ingredients} />
-            <Route path="/glasses" component={Glasses} />
-            <Route path="/categories" component={Categories} />
+            <Route path="/ingredients" render={(props) => (
+              <Ingredients updateRoot={this.setList} {...props} />
+            )} />
+            <Route path="/glasses" render={(props) => (
+              <Glasses updateRoot={this.setList} {...props} />
+            )} />
+            <Route path="/categories" render={(props) => (
+              <Categories updateRoot={this.setList} {...props} />
+            )} />
             <Route path="/about" component={About} />
             <Route path="/logout" render={(props) => (
               <Logout authenticated={authValue} changeAuthState={this.props.changeAuthState} {...props}  />
