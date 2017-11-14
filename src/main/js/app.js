@@ -8,12 +8,7 @@ import Ingredients from './components/Ingredients';
 import Glasses from './components/Glasses';
 import Categories from './components/Categories';
 import EventLog from './components/EventLog';
-
-const Home = () => (
-  <div>
-    Home page of the application.
-  </div>
-);
+import Drinks from './components/Drinks';
 
 const About = () => (
   <div>
@@ -36,7 +31,7 @@ class App extends React.Component {
             changeAuthState={this.props.changeAuthState}
           />
           <Switch>
-            <Route exact path="/" component={Home} />
+            <Route exact path="/" component={Drinks} />
             <Route path="/ingredients" component={Ingredients} />
             <Route path="/glasses" component={Glasses} />
             <Route path="/categories" component={Categories} />

@@ -50,7 +50,7 @@ class Navi extends React.Component {
         <Navbar.Toggle />
         <Navbar.Collapse>
           <Nav>
-            <RouteNavItem href="/">Home</RouteNavItem>
+            <RouteNavItem href="/">Drinks</RouteNavItem>
             <RouteNavItem href="/ingredients">Ingredients</RouteNavItem>
             <RouteNavItem href="/glasses">Glasses</RouteNavItem>
             <RouteNavItem href="/categories">Categories</RouteNavItem>
