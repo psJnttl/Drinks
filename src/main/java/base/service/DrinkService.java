@@ -118,4 +118,13 @@ public class DrinkService {
         return Optional.of(dto);
     }
 
+    public boolean deleteDrink(long id) {
+        Drink drink = drinkRepository.findOne(id);
+        if (null == drink) {
+            return false;
+        }
+        drinkRepository.delete(drink);
+        return true;
+    }
+
 }

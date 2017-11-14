@@ -2,6 +2,7 @@ package base.controller;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -229,6 +230,22 @@ public class DrinkControllerTest {
     public void fetchSingleDrinkWithWrongIdFails404() throws Exception {
         mockMvc
                 .perform(get(PATH + "/" + 751130))
+                .andExpect(status().isNotFound());
+    }
+    
+    @Test
+    @WithMockUser(username="user", roles={"USER"})
+    public void deleteDrinkOK() throws Exception {
+        mockMvc.perform(
+                delete(PATH + "/" + drink2.getId()))
+                .andExpect(status().isOk());
+    }
+    
+    @Test
+    @WithMockUser(username="user", roles={"USER"})
+    public void deleteDrinkWithWrongIdFails404() throws Exception {
+        mockMvc.perform(
+                delete(PATH + "/" + 751130))
                 .andExpect(status().isNotFound());
     }
 }

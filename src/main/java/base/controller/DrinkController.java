@@ -49,4 +49,13 @@ public class DrinkController {
         }
         return new ResponseEntity<>(drinkDto.get(), HttpStatus.OK);
     }
+    
+    @RequestMapping(value = "/api/drinks/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<DrinkDto> deleteDrink(@PathVariable long id) {
+        if (! drinkService.findDrink(id).isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        drinkService.deleteDrink(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
