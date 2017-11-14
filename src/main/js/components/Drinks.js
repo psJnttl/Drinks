@@ -1,14 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import {Button, Glyphicon} from 'react-bootstrap';
+import DrinkModal from './DrinkModal';
 
 class Drinks extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {drinks: [], infoModalVisible: false,  };
+    this.state = {drinks: [], infoModalVisible: false,  addModalVisible: false, };
     this.fetchDrinks = this.fetchDrinks.bind(this);
     this.setDrinkList = this.setDrinkList.bind(this);
     this.drinkClick = this.drinkClick.bind(this);
+    this.openAddModal = this.openAddModal.bind(this);
+    this.closeAddModal = this.closeAddModal.bind(this);
+    this.sendNewDrinkToServer = this.sendNewDrinkToServer.bind(this);
   }
 
   fetchDrinks() {
@@ -39,10 +44,36 @@ class Drinks extends React.Component {
     console.log("drink id: " + id)
   }
 
+  openAddModal() {
+    this.setState({addModalVisible: true})
+  }
+
+  closeAddModal() {
+    this.setState({addModalVisible: false});
+  }
+
+  sendNewDrinkToServer(drink) {
+    console.log("sendNewDrinkToServer");
+    console.log(drink.name);
+  }
+
   componentDidMount() {
     this.fetchDrinks();
   }
   render() {
+    let drinkModal;
+    if (true === this.state.addModalVisible) {
+      drinkModal =
+      <DrinkModal
+        modalOpen={this.state.addModalVisible}
+        close={this.closeAddModal}
+        title="Add a Drink"
+        save={this.sendNewDrinkToServer}
+      />
+    }
+    else {
+      drinkModal = null;
+    }
     const drinkList =  this.state.drinks.length === 0 ?
                        null :
     <ul style={{'display': 'flex', 'cursor': 'pointer', 'font-family': 'effra'}}>{
@@ -57,7 +88,9 @@ class Drinks extends React.Component {
     return (
       <div>
         <h4>Drinks listed here</h4>
+        <Button bsStyle="success" onClick={ () => this.openAddModal() } title="add Drink"><Glyphicon glyph="plus"/></Button>
         {drinkList}
+        {drinkModal}
       </div>
     );
   }
