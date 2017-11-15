@@ -4,18 +4,20 @@ import axios from 'axios';
 import {Button, Glyphicon} from 'react-bootstrap';
 import DrinkModal from './DrinkModal';
 import _ from 'lodash';
+import SimpleInformationModal from './SimpleInformationModal';
 
 class Drinks extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {drinks: [], infoModalVisible: false,  addModalVisible: false, };
+    this.state = {drinks: [], infoModalVisible: false,  addModalVisible: false,
+      infoModalData: {} };
     this.fetchDrinks = this.fetchDrinks.bind(this);
     this.setDrinkList = this.setDrinkList.bind(this);
     this.drinkClick = this.drinkClick.bind(this);
     this.openAddModal = this.openAddModal.bind(this);
     this.closeAddModal = this.closeAddModal.bind(this);
     this.sendNewDrinkToServer = this.sendNewDrinkToServer.bind(this);
-
+    this.closeInfoModal = this.closeInfoModal.bind(this);
   }
 
   fetchDrinks() {
@@ -26,7 +28,11 @@ class Drinks extends React.Component {
             self.setDrinkList(response.data);
          })
          .catch(function (response) {
-            self.setState({infoModalVisible: true});
+           self.setState({infoModalVisible: true,
+               infoModalData: {header:"failedModalHeader",
+               title:"Fetch drinks failed",
+              notification: "Could not get the list of drinks from server!",
+              name: ""} });
          });
   }
 
@@ -40,6 +46,10 @@ class Drinks extends React.Component {
          components: item.components
        }) );
     this.setState({drinks: theList});
+  }
+
+  closeInfoModal() {
+    this.setState({infoModalVisible: false, infoModalData: {}});
   }
 
   drinkClick(id) {
@@ -103,6 +113,15 @@ class Drinks extends React.Component {
     }</ul>
     return (
       <div>
+        <SimpleInformationModal
+          modalOpen={this.state.infoModalVisible}
+          header={this.state.infoModalData.header}
+          title={this.state.infoModalData.title}
+          notification = {this.state.infoModalData.notification}
+          notification2 =""
+          name={this.state.infoModalData.name}
+          reply={this.closeInfoModal} />
+
         <h4>Drinks listed here</h4>
         <Button bsStyle="success" onClick={ () => this.openAddModal() } title="add Drink"><Glyphicon glyph="plus"/></Button>
         {drinkList}
