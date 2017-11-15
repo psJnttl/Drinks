@@ -74,6 +74,7 @@ class Drinks extends React.Component {
         save={this.sendNewDrinkToServer}
         categories={this.props.categories}
         glasses={this.props.glasses}
+        ingredients={this.props.ingredients}
       />
     }
     else {

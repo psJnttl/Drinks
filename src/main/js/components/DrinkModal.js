@@ -3,16 +3,20 @@ import PropTypes from 'prop-types';
 import {Button, Col, Form, FormControl, FormGroup, Modal} from 'react-bootstrap';
 import _ from 'lodash';
 import SelectEntity from './SelectEntity';
+import DrinkIngredients from './DrinkIngredients';
 
 class DrinkModal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {drink: {id:0, name: "", category: {id:0, name:""},
-                  glass: {id:0, name:""}, components: []},
+                  glass: {id:0, name:""},
+                  components: [{ingredient: {id: 0, name: ""}, value: ""}]},
                  }
     this.onChangeName = this.onChangeName.bind(this);
     this.handleSelectCategory = this.handleSelectCategory.bind(this);
     this.handleSelectGlass = this.handleSelectGlass.bind(this);
+    this.handleDrinkIngredient = this.handleDrinkIngredient.bind(this);
+    this.addIngredient = this.addIngredient.bind(this);
   }
 
   onChangeName(e) {
@@ -48,6 +52,26 @@ class DrinkModal extends React.Component {
     this.setState({drink: drink});
   }
 
+  handleDrinkIngredient(component) {
+    console.log(component);
+    const index = component.index; // ->  drink.components[index]
+    var array = _.slice(this.state.drink.components, 0, component.index);
+    const cmpnt = _.omit(component, "index");
+    array = _.concat(array, cmpnt);
+    if (undefined !== this.state.drink.components[component.index+1]) {
+      array = _.concat(array, this.state.drink.components[component.index+1]);
+    }
+    console.log(array);
+    const drink = _.assign({}, this.state.drink, {components: array});
+    this.setState({drink: drink});
+  }
+
+  addIngredient() {
+    const components = _.concat(this.state.drink.components, {ingredient: {id: 0, name: ""}, value: ""});
+    const drink = _.assign({}, this.state.drink, {components: components});
+    this.setState({drink: drink});
+  }
+
   render() {
     if (false === this.props.modalOpen) {
       return null;
@@ -78,6 +102,14 @@ class DrinkModal extends React.Component {
                 value={this.state.drink.glass}
               />
             </FormGroup>
+            <FormGroup controlId="formSelect">
+              <DrinkIngredients
+                ingredients={this.props.ingredients}
+                value={this.state.drink.components}
+                handleIngredient={this.handleDrinkIngredient}
+                addIngredient={this.addIngredient}
+              />
+            </FormGroup>
           </Modal.Body>
           <Modal.Footer bsClass="modalFooter">
             <Button bsStyle="success" onClick={ () => this.props.save(this.state.drink) }>Save</Button>
@@ -97,9 +129,11 @@ DrinkModal.PropTypes = {
   save: PropTypes.func.isRequired,
   categories: PropTypes.array.isRequired,
   glasses: PropTypes.array.isRequired,
+  ingredients: PropTypes.array.isRequired,
 }
 DrinkModal.defaultProps = {
-  drink: {id:0, name: "", category: {id:0, name:""}, glass: {id:0, name:""}, components: []},
+  drink: {id:0, name: "", category: {id:0, name:""}, glass: {id:0, name:""},
+          components: [{ingredient: {id: 0, name: ""}, value: ""}]},
   headerStyle: "successModalHeader",
 }
 export default DrinkModal;
