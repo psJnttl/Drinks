@@ -59,8 +59,6 @@ class Drinks extends React.Component {
     console.log(drink.name);
   }
 
-
-
   componentDidMount() {
     this.fetchDrinks();
   }
@@ -75,6 +73,7 @@ class Drinks extends React.Component {
         title="Add a Drink"
         save={this.sendNewDrinkToServer}
         categories={this.props.categories}
+        glasses={this.props.glasses}
       />
     }
     else {

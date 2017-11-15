@@ -12,6 +12,7 @@ class DrinkModal extends React.Component {
                  }
     this.onChangeName = this.onChangeName.bind(this);
     this.handleSelectCategory = this.handleSelectCategory.bind(this);
+    this.handleSelectGlass = this.handleSelectGlass.bind(this);
   }
 
   onChangeName(e) {
@@ -33,6 +34,20 @@ class DrinkModal extends React.Component {
     this.setState({drink: drink});
   }
 
+  handleSelectGlass(e) {
+    const id = parseInt(e.target.value);
+    const glassIndex = _.findIndex(this.props.glasses, (g) => (g.id === id));
+    let drink;
+    if (-1 === glassIndex) {
+      drink = _.assign({}, this.state.drink, {glass: {id: 0, name: ""}});
+    }
+    else {
+      const glss = this.props.glasses[glassIndex];
+      drink = _.assign({}, this.state.drink, {glass: glss});
+    }
+    this.setState({drink: drink});
+  }
+
   render() {
     if (false === this.props.modalOpen) {
       return null;
@@ -44,13 +59,25 @@ class DrinkModal extends React.Component {
             <Modal.Title>{this.props.title}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <FormControl type="text" placeholder="drink name" onChange={this.onChangeName} value={this.state.drink.name} />
-            <SelectEntity
-              title="Category"
-              entityList={this.props.categories}
-              onSelect={this.handleSelectCategory}
-              value={this.props.drink.category}
-            />
+            <FormGroup controlId="formInput">
+              <FormControl type="text" placeholder="drink name" onChange={this.onChangeName} value={this.state.drink.name} />
+            </FormGroup>
+            <FormGroup controlId="formSelect">
+              <SelectEntity
+                title="Category"
+                entityList={this.props.categories}
+                onSelect={this.handleSelectCategory}
+                value={this.state.drink.category}
+              />
+            </FormGroup>
+            <FormGroup controlId="formSelect">
+              <SelectEntity
+                title="Glass"
+                entityList={this.props.glasses}
+                onSelect={this.handleSelectGlass}
+                value={this.state.drink.glass}
+              />
+            </FormGroup>
           </Modal.Body>
           <Modal.Footer bsClass="modalFooter">
             <Button bsStyle="success" onClick={ () => this.props.save(this.state.drink) }>Save</Button>
@@ -69,6 +96,7 @@ DrinkModal.PropTypes = {
   drink: PropTypes.object,
   save: PropTypes.func.isRequired,
   categories: PropTypes.array.isRequired,
+  glasses: PropTypes.array.isRequired,
 }
 DrinkModal.defaultProps = {
   drink: {id:0, name: "", category: {id:0, name:""}, glass: {id:0, name:""}, components: []},
