@@ -17,6 +17,7 @@ class DrinkModal extends React.Component {
     this.handleSelectGlass = this.handleSelectGlass.bind(this);
     this.handleDrinkIngredient = this.handleDrinkIngredient.bind(this);
     this.addIngredient = this.addIngredient.bind(this);
+    this.deleteIngredient = this.deleteIngredient.bind(this);
   }
 
   onChangeName(e) {
@@ -53,15 +54,14 @@ class DrinkModal extends React.Component {
   }
 
   handleDrinkIngredient(component) {
-    console.log(component);
-    const index = component.index; // ->  drink.components[index]
-    var array = _.slice(this.state.drink.components, 0, component.index);
+    const index = component.index;
+    var array = _.slice(this.state.drink.components, 0, index);
     const cmpnt = _.omit(component, "index");
     array = _.concat(array, cmpnt);
-    if (undefined !== this.state.drink.components[component.index+1]) {
-      array = _.concat(array, this.state.drink.components[component.index+1]);
+    if (undefined !== this.state.drink.components[index + 1]) {
+      const rest = _.drop(this.state.drink.components, index + 1);
+      array = _.concat(array, rest);
     }
-    console.log(array);
     const drink = _.assign({}, this.state.drink, {components: array});
     this.setState({drink: drink});
   }
@@ -69,6 +69,17 @@ class DrinkModal extends React.Component {
   addIngredient() {
     const components = _.concat(this.state.drink.components, {ingredient: {id: 0, name: ""}, value: ""});
     const drink = _.assign({}, this.state.drink, {components: components});
+    this.setState({drink: drink});
+  }
+
+  deleteIngredient(index) {
+    const start = _.slice(this.state.drink.components, 0, index);
+    var array = _.concat([], start);
+    if (undefined !== this.state.drink.components[index + 1]) {
+      const end = _.drop(this.state.drink.components, index + 1);
+      array = _.concat(array, end);
+    }
+    const drink = _.assign({}, this.state.drink, {components: array});
     this.setState({drink: drink});
   }
 
@@ -108,6 +119,7 @@ class DrinkModal extends React.Component {
                 value={this.state.drink.components}
                 handleIngredient={this.handleDrinkIngredient}
                 addIngredient={this.addIngredient}
+                deleteIngredient={this.deleteIngredient}
               />
             </FormGroup>
           </Modal.Body>

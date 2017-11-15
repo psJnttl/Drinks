@@ -55,8 +55,18 @@ class Drinks extends React.Component {
   }
 
   sendNewDrinkToServer(drink) {
-    console.log("sendNewDrinkToServer");
-    console.log(drink.name);
+    this.closeAddModal();
+    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
+    const self = this;
+    const command  =  _.assign({}, drink);
+    axios.post('api/drinks', command, config)
+         .then(function (response) {
+              const drnks = _.concat(self.state.drinks, response.data);
+              self.setState({drinks: drnks});
+         })
+        .catch(function (response) {
+          console.log("add drink failed");
+        });
   }
 
   componentDidMount() {

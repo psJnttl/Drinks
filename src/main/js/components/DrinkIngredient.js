@@ -50,12 +50,12 @@ class DrinkIngredient extends React.Component {
             title="Ingredient"
             entityList={this.props.ingredients}
             onSelect={this.handleSelectIngredient}
-            value={this.props.value}
+            value={this.props.value.ingredient}
           />
         </td><td>
           <FormControl type="text" placeholder="amount (cl, dl, oz, ...)" onChange={this.onChangeAmount} value={this.props.value.value} />
         </td><td>
-          <Button bsStyle="danger" bsSize="small" onClick={() => {} } title="delete"><Glyphicon glyph="trash"/></Button>
+          <Button bsStyle="danger" bsSize="small" onClick={() => this.props.deleteIngredient(this.props.index) } title="delete"><Glyphicon glyph="trash"/></Button>
         </td>
       </tr>
     );
@@ -66,6 +66,7 @@ DrinkIngredient.PropTypes = {
   index: PropTypes.number.isRequired,
   value: PropTypes.object.isRequired,
   handleIngredient: PropTypes.func.isRequired,
+  deleteIngredient: PropTypes.func.isRequired,
 }
 DrinkIngredient.defaultProps = {}
 export default DrinkIngredient;

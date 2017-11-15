@@ -8,21 +8,18 @@ class DrinkIngredients extends React.Component {
   constructor(props) {
     super(props);
     this.state = {}
-    this.addIngredient = this.addIngredient.bind(this);
-  }
-
-  addIngredient() {
-    console.log("addIngredient()");
   }
 
   render() {
-    const dataRows =
+    const dataRows = this.props.value.map((row, index) =>
       <DrinkIngredient
         ingredients={this.props.ingredients}
-        value={this.props.value[0]}
-        index={0}
+        value={this.props.value[index]}
+        index={index}
         handleIngredient={this.props.handleIngredient}
+        deleteIngredient={this.props.deleteIngredient}
       />
+    );
     return (
       <div>
         <Table condensed hover>
@@ -48,6 +45,7 @@ DrinkIngredients.PropTypes = {
   value: PropTypes.array.isRequired,
   handleIngredient : PropTypes.func.isRequired,
   addIngredient: PropTypes.func.isRequired,
+  deleteIngredient: PropTypes.func.isRequired,
 }
 DrinkIngredients.defaultProps = {}
 export default DrinkIngredients;
