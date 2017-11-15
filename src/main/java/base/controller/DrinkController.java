@@ -59,7 +59,7 @@ public class DrinkController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
     
-    @RequestMapping(value = "/api/drinks/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/drinks/{id}", method = RequestMethod.PUT)
     public ResponseEntity<DrinkDto> modifyDrink(@PathVariable long id, @RequestBody DrinkAdd drink) {
         if (! drinkService.findDrink(id).isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

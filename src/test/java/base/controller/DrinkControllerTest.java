@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -265,7 +266,7 @@ public class DrinkControllerTest {
         String content = mapper.writeValueAsString(drink);
         MvcResult result = mockMvc
                 .perform(
-                        post(PATH + "/" + id)
+                        put(PATH + "/" + id)
                             .contentType(MediaType.APPLICATION_JSON_UTF8)
                             .content(content))
                 .andExpect(status().isOk())
@@ -292,7 +293,7 @@ public class DrinkControllerTest {
         String content = mapper.writeValueAsString(drink);
         mockMvc
                 .perform(
-                        post(PATH + "/" + id)
+                        put(PATH + "/" + id)
                             .contentType(MediaType.APPLICATION_JSON_UTF8)
                             .content(content))
                 .andExpect(status().isNotFound());
