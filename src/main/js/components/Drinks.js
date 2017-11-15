@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import {Button, Glyphicon} from 'react-bootstrap';
 import DrinkModal from './DrinkModal';
+import _ from 'lodash';
 
 class Drinks extends React.Component {
   constructor(props) {
@@ -14,6 +15,7 @@ class Drinks extends React.Component {
     this.openAddModal = this.openAddModal.bind(this);
     this.closeAddModal = this.closeAddModal.bind(this);
     this.sendNewDrinkToServer = this.sendNewDrinkToServer.bind(this);
+
   }
 
   fetchDrinks() {
@@ -57,9 +59,12 @@ class Drinks extends React.Component {
     console.log(drink.name);
   }
 
+
+
   componentDidMount() {
     this.fetchDrinks();
   }
+
   render() {
     let drinkModal;
     if (true === this.state.addModalVisible) {
@@ -69,6 +74,7 @@ class Drinks extends React.Component {
         close={this.closeAddModal}
         title="Add a Drink"
         save={this.sendNewDrinkToServer}
+        categories={this.props.categories}
       />
     }
     else {
