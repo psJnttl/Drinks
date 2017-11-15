@@ -25,3 +25,7 @@
   background: #ffc107;
   color: black;
 }
+
+.modalFooter button {
+  margin: 0 6px 0 6px;  
+}
