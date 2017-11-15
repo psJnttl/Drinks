@@ -83,6 +83,10 @@ class DrinkModal extends React.Component {
     this.setState({drink: drink});
   }
 
+  componentDidMount() {
+    this.setState({drink: this.props.drink});
+  }
+
   render() {
     if (false === this.props.modalOpen) {
       return null;
