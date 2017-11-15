@@ -183,9 +183,7 @@ class Ingredients extends React.Component {
     const command  =  _.assign({}, ingredient);
     axios.post('api/ingredients', command, config)
          .then(function (response) {
-              console.log("add ingredient ok");
-              const ings = _.concat(self.state.ingredients, response.data);
-              self.setState({ingredients: ings});
+              self.fetchIngredients();
          })
         .catch(function (response) {
           console.log("add ingredient failed");

@@ -166,9 +166,7 @@ class Glasses extends React.Component {
     const command  =  _.assign({}, glass);
     axios.post('api/glasses', command, config)
          .then(function (response) {
-              console.log("add glass ok");
-              const glsss = _.concat(self.state.glasses, response.data);
-              self.setState({glasses: glsss});
+              self.fetchGlasses();
          })
         .catch(function (response) {
           console.log("add glass failed");

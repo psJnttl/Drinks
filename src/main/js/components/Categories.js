@@ -163,9 +163,7 @@ class Categories extends React.Component {
     const command  =  _.assign({}, category);
     axios.post('api/categories', command, config)
          .then(function (response) {
-              console.log("add category ok");
-              const cats = _.concat(self.state.categories, response.data);
-              self.setState({categories: cats});
+              self.fetchCategories();
          })
         .catch(function (response) {
           console.log("add category failed");
