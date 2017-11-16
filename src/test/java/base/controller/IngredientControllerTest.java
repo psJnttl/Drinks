@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,9 +41,9 @@ import base.repository.IngredientRepository;
 public class IngredientControllerTest {
 
     private static final String PATH = "/api/ingredients";
-    private static final String INGREDIENT1 = "Tonic vesi";
-    private static final String INGREDIENT2 = "Vodka";
-    private static final String INGREDIENT3 = "Bourbon";
+    private static final String INGREDIENT1 = "Toniccc wasser";
+    private static final String INGREDIENT2 = "Spirit V.";
+    private static final String INGREDIENT3 = "Spirit B.";
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -54,7 +55,6 @@ public class IngredientControllerTest {
     private DrinkRepository drinkRepository;
     
     private MockMvc mockMvc;
-    private long id1 = 0, id2 = 0;
     private Ingredient i1, i2;
     
     @Before
@@ -62,12 +62,20 @@ public class IngredientControllerTest {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         i1 = new Ingredient(INGREDIENT1);
         i1 = ingredientRepository.saveAndFlush(i1);
-        id1 = i1.getId();
         i2 = new Ingredient(INGREDIENT2);
         i2 = ingredientRepository.saveAndFlush(i2);
-        id2 = i2.getId();
     }
-    
+
+    @After
+    public void teardown() {
+        ingredientRepository.delete(i1);
+        ingredientRepository.delete(i2);
+        Ingredient i3 = ingredientRepository.findByName(INGREDIENT3);
+        if (null != i3) {
+            ingredientRepository.delete(i3);
+        }
+    }
+
     @Test
     @WithMockUser(username="user", roles={"USER"})
     public void listIngredientsResponseStatusOKandContentTypeJsonUtf8() throws Exception {
@@ -123,7 +131,7 @@ public class IngredientControllerTest {
     @WithMockUser(username="user", roles={"USER"})
     public void fetchSingleIngredient() throws Exception {
         MvcResult result = mockMvc
-                .perform(get(PATH + "/" + id1))
+                .perform(get(PATH + "/" + i1.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
@@ -145,7 +153,7 @@ public class IngredientControllerTest {
     @WithMockUser(username="user", roles={"USER"})
     public void deleteIngredientOK() throws Exception {
         mockMvc.perform(
-                delete(PATH + "/" + id2))
+                delete(PATH + "/" + i2.getId()))
                 .andExpect(status().isOk());
     }
     
@@ -165,7 +173,7 @@ public class IngredientControllerTest {
         String content = mapper.writeValueAsString(ingAdd);
         MvcResult result = mockMvc
                 .perform(
-                        put(PATH + "/" + id1)
+                        put(PATH + "/" + i1.getId())
                                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                                 .content(content))
                 .andExpect(status().isOk())
@@ -197,12 +205,12 @@ public class IngredientControllerTest {
         String content = mapper.writeValueAsString(ingAdd);
         mockMvc
             .perform(
-                put(PATH + "/" + id1)
+                put(PATH + "/" + i1.getId())
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .content(content))
             .andExpect(status().isBadRequest());
     }
-    
+
     @Test
     @WithMockUser(username="user", roles={"USER"})
     public void cantDeleteIngredientIfInAdrink() throws Exception {
@@ -211,7 +219,7 @@ public class IngredientControllerTest {
         drink.addIngredient(i2, "6 cl");
         drinkRepository.saveAndFlush(drink);
         mockMvc.perform(
-                delete(PATH + "/" + id2))
+                delete(PATH + "/" + i2.getId()))
                 .andExpect(status().isConflict());
     }
 }
