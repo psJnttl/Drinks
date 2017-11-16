@@ -10,6 +10,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import base.command.CategoryAdd;
 import base.domain.Category;
+import base.domain.Drink;
 import base.dto.CategoryDto;
 import base.repository.CategoryRepository;
 
@@ -49,19 +53,29 @@ public class CategoryControllerTest {
     private CategoryRepository categoryRepository;
 
     private MockMvc mockMvc;
-    private long id1 = 0, id2 = 0;
+    private Category c1, c2;
 
     @Before
     public void setUp() throws Exception {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-        Category cat1 = new Category(CATEGORY1);
-        cat1 = categoryRepository.save(cat1);
-        this.id1 = cat1.getId();
-        Category cat2 = new Category(CATEGORY2);
-        cat2 = categoryRepository.save(cat2);
-        this.id2 = cat2.getId();
+        c1 = new Category(CATEGORY1);
+        c1 = categoryRepository.save(c1);
+        c2 = new Category(CATEGORY2);
+        c2 = categoryRepository.save(c2);
     }
 
+    @After
+    public void tearDown() throws Exception {
+        categoryRepository.delete(c1);
+        categoryRepository.delete(c2);
+        Category c3 = categoryRepository.findByName(CATEGORY3);
+        if (null != c3) {
+            categoryRepository.delete(c3);
+        }
+        List<Category> list = categoryRepository.findAll();
+        System.out.println("list size: " + list.size());
+    }
+    
     @Test
     @WithMockUser(username="user", roles={"USER"})
     public void listResponseStatusOKandContentTypeJsonUtf8() throws Exception {
@@ -103,9 +117,9 @@ public class CategoryControllerTest {
     @Test
     @WithMockUser(username="user", roles={"USER"})
     public void fetchSingleCategoryOK() throws Exception {
-        Category cat = categoryRepository.findOne(this.id1);
+        Category cat = categoryRepository.findOne(this.c1.getId());
         String name = cat.getName();
-        MvcResult result = mockMvc.perform(get(PATH + "/" + this.id1)).andExpect(status().isOk())
+        MvcResult result = mockMvc.perform(get(PATH + "/" + this.c1.getId())).andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8)).andReturn();
         assertFalse("Contents cannot be empty!", result.getResponse().getContentAsString().isEmpty());
         ObjectMapper mapper = new ObjectMapper();
@@ -122,7 +136,7 @@ public class CategoryControllerTest {
     @Test
     @WithMockUser(username="user", roles={"USER"})
     public void deleteCategoryOK() throws Exception {
-        mockMvc.perform(delete(PATH + "/" + this.id1)).andExpect(status().isOk());
+        mockMvc.perform(delete(PATH + "/" + this.c1.getId())).andExpect(status().isOk());
     }
 
     @Test
@@ -138,7 +152,7 @@ public class CategoryControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         String content = mapper.writeValueAsString(catAdd);
         MvcResult result = mockMvc
-                .perform(put(PATH + "/" + this.id2).contentType(MediaType.APPLICATION_JSON_UTF8).content(content))
+                .perform(put(PATH + "/" + this.c2.getId()).contentType(MediaType.APPLICATION_JSON_UTF8).content(content))
                 .andExpect(status().isOk()).andReturn();
         CategoryDto dto = mapper.readValue(result.getResponse().getContentAsString(), CategoryDto.class);
         assertTrue(dto.getName().equals(CATEGORY3));
@@ -160,7 +174,7 @@ public class CategoryControllerTest {
         CategoryAdd catAdd = new CategoryAdd(EMPTY_STRING);
         ObjectMapper mapper = new ObjectMapper();
         String content = mapper.writeValueAsString(catAdd);
-        mockMvc.perform(put(PATH + "/" + this.id2).contentType(MediaType.APPLICATION_JSON_UTF8).content(content))
+        mockMvc.perform(put(PATH + "/" + this.c2.getId()).contentType(MediaType.APPLICATION_JSON_UTF8).content(content))
                 .andExpect(status().isBadRequest());
     }
 }
