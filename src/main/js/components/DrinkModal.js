@@ -18,6 +18,7 @@ class DrinkModal extends React.Component {
     this.handleDrinkIngredient = this.handleDrinkIngredient.bind(this);
     this.addIngredient = this.addIngredient.bind(this);
     this.deleteIngredient = this.deleteIngredient.bind(this);
+    this.isDrinkValid = this.isDrinkValid.bind(this);
   }
 
   onChangeName(e) {
@@ -128,12 +129,20 @@ class DrinkModal extends React.Component {
             </FormGroup>
           </Modal.Body>
           <Modal.Footer bsClass="modalFooter">
-            <Button bsStyle="success" onClick={ () => this.props.save(this.state.drink) }>Save</Button>
+            <Button bsStyle="success" disabled={!this.isDrinkValid()} onClick={ () => this.props.save(this.state.drink) }>Save</Button>
             <Button bsStyle="danger" onClick={ () => this.props.close() }>Cancel</Button>
           </Modal.Footer>
         </Modal>
       </div>
     );
+  }
+  isDrinkValid() {
+    const drink = this.state.drink;
+    const catIndex = _.findIndex(drink.components, (c) =>
+        (c.ingredient.name.length === 0 || c.value.length === 0) );
+    return drink.name.length > 0 && drink.category.name.length > 0 &&
+           drink.glass.name.length > 0 && drink.components.length > 0 &&
+           -1 === catIndex;
   }
 }
 DrinkModal.PropTypes = {
