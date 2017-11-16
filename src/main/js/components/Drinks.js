@@ -78,7 +78,13 @@ class Drinks extends React.Component {
               self.setState({drinks: drnks});
          })
         .catch(function (response) {
-          console.log("add drink failed");
+          if (response.response.status === 423) {
+            self.setState({infoModalVisible: true,
+              infoModalData: {header:"failedModalHeader",
+              title:"Add drink failed",
+              notification: "Drink with same name already exists!",
+              name: ""} });
+          }
         });
   }
 

@@ -35,6 +35,9 @@ public class DrinkController {
                 || drink.getName().isEmpty() || null == drink.getComponents() || drink.getComponents().isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        if (drinkService.drinkExistsCaseInsensitive(drink)) {
+            return new ResponseEntity<>(HttpStatus.LOCKED);
+        }
         DrinkDto dto = drinkService.addDrink(drink);
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(new URI("/api/drinks/" + dto.getId()));

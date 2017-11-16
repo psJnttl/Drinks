@@ -12,4 +12,5 @@ public interface DrinkRepository extends JpaRepository<Drink, Long> {
     Drink findByName(String name);
     List<Category> findByCategory(Category category);
     List<Drink> findByGlass(Glass glass);
+    List<Drink> findByNameContainingIgnoreCase(String name);
 }
