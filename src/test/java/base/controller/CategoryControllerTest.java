@@ -195,4 +195,17 @@ public class CategoryControllerTest {
                 delete(PATH + "/" + c1.getId()))
                 .andExpect(status().isConflict());
     }
+    
+    @Test
+    @WithMockUser(username="user", roles={"USER"})
+    public void addingCategoryWithExistingNameFails() throws Exception {
+        CategoryAdd catAdd = new CategoryAdd(CATEGORY1);
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(catAdd);
+        mockMvc.perform(post(PATH)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(content))
+        .andExpect(status().isLocked());       
+        
+    }
 }

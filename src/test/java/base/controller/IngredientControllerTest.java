@@ -227,4 +227,20 @@ public class IngredientControllerTest {
                 delete(PATH + "/" + i2.getId()))
                 .andExpect(status().isConflict());
     }
+    
+    @Test
+    @WithMockUser(username="user", roles={"USER"})
+    public void addingIngredientWithExistingNameFails() throws Exception {
+        IngredientAdd ingredient = new IngredientAdd(INGREDIENT1);
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(ingredient);
+        mockMvc
+            .perform(
+                    post(PATH)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(content))
+            .andExpect(status().isLocked());
+        ingredient.setName(INGREDIENT1.toLowerCase());
+    }
+    
 }

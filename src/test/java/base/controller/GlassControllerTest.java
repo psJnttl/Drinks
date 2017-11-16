@@ -195,4 +195,17 @@ public class GlassControllerTest {
                 delete(PATH + "/" + g1.getId()))
                 .andExpect(status().isConflict());
     }
+    
+    @Test
+    @WithMockUser(username="user", roles={"USER"})
+    public void addingGlassWithExistingNameFails() throws Exception {
+        GlassAdd glass = new GlassAdd(GLASS1);
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(glass);
+        mockMvc
+            .perform(post(PATH)
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .content(content))
+            .andExpect(status().isLocked());
+    }
 }

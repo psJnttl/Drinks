@@ -299,4 +299,26 @@ public class DrinkControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    @WithMockUser
+    public void addingDrinkWithExistingNameFails() throws Exception {
+        DrinkAdd drink = new DrinkAdd("Semi");
+        Category category = categoryRepository.findByName("Klassikko");
+        Glass glass = glassRepository.findByName("Cocktail");
+        drink.setCategory(new CategoryDto(category.getId(), category.getName()));
+        drink.setGlass(new GlassDto(glass.getId(), glass.getName()));
+        List<DrinkComponent> ingredients = new ArrayList<>();
+        ingredients.add(createDrinkComponent("Viski", "4 cl"));
+        ingredients.add(createDrinkComponent("Limemehu", "5 cl"));
+        ingredients.add(createDrinkComponent("Appelsiinimehu", "5 cl"));
+        drink.setComponents(ingredients);
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(drink);
+        mockMvc
+            .perform(
+                    post(PATH)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(content))
+            .andExpect(status().isLocked());
+    }
 }
