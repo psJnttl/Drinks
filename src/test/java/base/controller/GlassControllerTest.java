@@ -10,6 +10,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,7 +57,6 @@ public class GlassControllerTest {
     private DrinkRepository drinkRepository;
 
     private MockMvc mockMvc;
-    private long id1 = 0, id2 = 0;
     private Glass g1, g2;
 
     @Before
@@ -62,10 +64,18 @@ public class GlassControllerTest {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         g1 = new Glass(GLASS1);
         g1 = glassRepository.save(g1);
-        this.id1 = g1.getId();
         g2 = new Glass(GLASS2);
         g2 = glassRepository.save(g2);
-        this.id2 = g2.getId();
+    }
+    
+    @After
+    public void teardown() {
+        glassRepository.delete(g1);
+        glassRepository.delete(g2);
+        Glass g3 = glassRepository.findByName(GLASS3);
+        if (null != g3) {
+            glassRepository.delete(g3);
+        }
     }
 
     @Test
@@ -109,9 +119,9 @@ public class GlassControllerTest {
     @Test
     @WithMockUser(username="user", roles={"USER"})
     public void fetchSingleGlassOK() throws Exception {
-        Glass glass = glassRepository.findOne(this.id2);
+        Glass glass = glassRepository.findOne(this.g2.getId());
         String name = glass.getName();
-        MvcResult result = mockMvc.perform(get(PATH + "/" + this.id2)).andExpect(status().isOk())
+        MvcResult result = mockMvc.perform(get(PATH + "/" + this.g2.getId())).andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8)).andReturn();
         assertFalse("Contents cannot be empty!", result.getResponse().getContentAsString().isEmpty());
         ObjectMapper mapper = new ObjectMapper();
@@ -128,7 +138,7 @@ public class GlassControllerTest {
     @Test
     @WithMockUser(username="user", roles={"USER"})
     public void deleteGlassOK() throws Exception {
-        mockMvc.perform(delete(PATH + "/" + this.id2)).andExpect(status().isOk());
+        mockMvc.perform(delete(PATH + "/" + this.g2.getId())).andExpect(status().isOk());
     }
 
     @Test
@@ -144,7 +154,7 @@ public class GlassControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         String content = mapper.writeValueAsString(glassAdd);
         MvcResult result = mockMvc
-                .perform(put(PATH + "/" + this.id1).contentType(MediaType.APPLICATION_JSON_UTF8).content(content))
+                .perform(put(PATH + "/" + this.g1.getId()).contentType(MediaType.APPLICATION_JSON_UTF8).content(content))
                 .andExpect(status().isOk()).andReturn();
         GlassDto dto = mapper.readValue(result.getResponse().getContentAsString(), GlassDto.class);
         assertTrue(dto.getName().equals(GLASS3));
@@ -177,7 +187,7 @@ public class GlassControllerTest {
         drink.setGlass(this.g1);
         drinkRepository.saveAndFlush(drink);
         mockMvc.perform(
-                delete(PATH + "/" + id1))
+                delete(PATH + "/" + g1.getId()))
                 .andExpect(status().isConflict());
     }
 }
