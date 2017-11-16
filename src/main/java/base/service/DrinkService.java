@@ -84,7 +84,7 @@ public class DrinkService {
         return new DrinkDto(drink.getId(), drink.getName(), catDto, glassDto, components);
     }
 
-    public List<Category> findByCategory(Category cat) {
+    public List<Drink> findByCategory(Category cat) {
         return drinkRepository.findByCategory(cat);
     }
 

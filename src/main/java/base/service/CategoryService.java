@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import base.command.CategoryAdd;
 import base.domain.Category;
+import base.domain.Drink;
 import base.dto.CategoryDto;
 import base.repository.CategoryRepository;
 
@@ -76,7 +77,7 @@ public class CategoryService {
         if (null == cat) {
             return false;
         }
-        List<Category> list = drinkService.findByCategory(cat);
+        List<Drink> list = drinkService.findByCategory(cat);
         if (list.isEmpty()) {
             return false;
         }

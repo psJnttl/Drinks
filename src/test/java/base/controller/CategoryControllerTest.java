@@ -34,6 +34,7 @@ import base.domain.Category;
 import base.domain.Drink;
 import base.dto.CategoryDto;
 import base.repository.CategoryRepository;
+import base.repository.DrinkRepository;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -45,12 +46,16 @@ public class CategoryControllerTest {
     private static final String CATEGORY2 = "Stiff enuff";
     private static final String CATEGORY3 = "Coming down or going up?";
     private static final String EMPTY_STRING = "";
+    private static final String DRINK_NAME = "Random drink name, this.";
 
     @Autowired
     private WebApplicationContext webApplicationContext;
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private DrinkRepository drinkRepository;
 
     private MockMvc mockMvc;
     private Category c1, c2;
@@ -66,14 +71,16 @@ public class CategoryControllerTest {
 
     @After
     public void tearDown() throws Exception {
+        Drink d1 = drinkRepository.findByName(DRINK_NAME);
+        if (null != d1) {
+            drinkRepository.delete(d1);
+        }
         categoryRepository.delete(c1);
         categoryRepository.delete(c2);
         Category c3 = categoryRepository.findByName(CATEGORY3);
         if (null != c3) {
             categoryRepository.delete(c3);
         }
-        List<Category> list = categoryRepository.findAll();
-        System.out.println("list size: " + list.size());
     }
     
     @Test
@@ -176,5 +183,16 @@ public class CategoryControllerTest {
         String content = mapper.writeValueAsString(catAdd);
         mockMvc.perform(put(PATH + "/" + this.c2.getId()).contentType(MediaType.APPLICATION_JSON_UTF8).content(content))
                 .andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    @WithMockUser(username="user", roles={"USER"})
+    public void cantDeleteCategoryIfInAdrink() throws Exception {
+        Drink drink = new Drink(DRINK_NAME);
+        drink.setCategory(c1);
+        drinkRepository.saveAndFlush(drink);
+        mockMvc.perform(
+                delete(PATH + "/" + c1.getId()))
+                .andExpect(status().isConflict());
     }
 }
