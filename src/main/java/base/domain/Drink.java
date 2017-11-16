@@ -14,6 +14,8 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 
 @Entity
 public class Drink extends AbstractPersistable<Long> {
+
+    @Column(unique=true)
     private String name;
 
     @ManyToOne
