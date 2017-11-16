@@ -11,7 +11,7 @@ class DrinkModal extends React.Component {
     this.state = {drink: {id:0, name: "", category: {id:0, name:""},
                   glass: {id:0, name:""},
                   components: [{ingredient: {id: 0, name: ""}, value: ""}]},
-                 }
+                 mounted: false, }
     this.onChangeName = this.onChangeName.bind(this);
     this.handleSelectCategory = this.handleSelectCategory.bind(this);
     this.handleSelectGlass = this.handleSelectGlass.bind(this);
@@ -85,11 +85,11 @@ class DrinkModal extends React.Component {
   }
 
   componentDidMount() {
-    this.setState({drink: this.props.drink});
+    this.setState({drink: this.props.drink, mounted: true});
   }
 
   render() {
-    if (false === this.props.modalOpen) {
+    if (false === this.props.modalOpen || false === this.state.mounted ) {
       return null;
     }
     return (

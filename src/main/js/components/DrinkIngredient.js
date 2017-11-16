@@ -50,10 +50,10 @@ class DrinkIngredient extends React.Component {
             title="Ingredient"
             entityList={this.props.ingredients}
             onSelect={this.handleSelectIngredient}
-            value={this.props.value.ingredient}
+            value={this.state.ingredient}
           />
         </td><td>
-          <FormControl type="text" placeholder="amount (cl, dl, oz, ...)" onChange={this.onChangeAmount} value={this.props.value.value} />
+          <FormControl type="text" placeholder="amount (cl, dl, oz, ...)" onChange={this.onChangeAmount} value={this.state.amount} />
         </td><td>
           <Button bsStyle="danger" bsSize="small" onClick={() => this.props.deleteIngredient(this.props.index) } title="delete"><Glyphicon glyph="trash"/></Button>
         </td>
