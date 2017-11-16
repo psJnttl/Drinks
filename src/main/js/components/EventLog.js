@@ -9,6 +9,7 @@ class EventLog extends React.Component {
     this.state = {eventLog: [], }
     this.fetchEventLog = this.fetchEventLog.bind(this);
     this.setEventLogList = this.setEventLogList.bind(this);
+    this.parseDate = this.parseDate.bind(this);
   }
 
   fetchEventLog() {
@@ -23,9 +24,22 @@ class EventLog extends React.Component {
          });
   }
 
+  parseDate(java8LocalDateTime) {
+    console.log(java8LocalDateTime);
+    const year = java8LocalDateTime.year;
+    const month = java8LocalDateTime.monthValue -1;
+    const day = java8LocalDateTime.dayOfMonth;
+    const hour = java8LocalDateTime.hour;
+    const minute = java8LocalDateTime.minute;
+    const second = java8LocalDateTime.second;
+    const millis = java8LocalDateTime.nano / 1000000;
+    const timeStamp = new Date(year, month, day, hour, minute, second, millis);
+    return timeStamp.toString();
+  }
+
   setEventLogList(data) {
     const theList = data.map( item =>
-       _.assign({}, {id: item.id, date: item.date, action: item.action, targetEntity: item.targetEntity,
+       _.assign({}, {id: item.id, date: this.parseDate(item.date), action: item.action, targetEntity: item.targetEntity,
                 targetId: item.targetId, targetName: item.targetName, username: item.username }) );
     this.setState({eventLog: theList});
   }
@@ -35,11 +49,11 @@ class EventLog extends React.Component {
   }
 
   render() {
-    const dataRows = this.state.eventLog.map((row, index) => 
+    const dataRows = this.state.eventLog.map((row, index) =>
       <tr key={index}>
         <td>{row.id}</td>
         <td>{row.action}</td>
-        <td></td>
+        <td>{row.date}</td>
         <td>{row.targetEntity}</td>
         <td>{row.targetId}</td>
         <td>{row.targetName}</td>
