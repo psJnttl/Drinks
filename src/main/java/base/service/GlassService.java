@@ -80,7 +80,7 @@ public class GlassService {
         return true;
     }
 
-    public boolean categoryExistsCaseInsensitive(GlassAdd glass) {
+    public boolean glassExistsCaseInsensitive(GlassAdd glass) {
         List<Glass> glasses = glassRepository.findByNameContainingIgnoreCase(glass.getName());
         if (glasses.isEmpty()) {
             return false;

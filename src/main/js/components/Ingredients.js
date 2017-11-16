@@ -186,7 +186,13 @@ class Ingredients extends React.Component {
               self.fetchIngredients();
          })
         .catch(function (response) {
-          console.log("add ingredient failed");
+          if (response.response.status === 423) {
+            self.setState({infoModalVisible: true,
+              infoModalData: {header:"failedModalHeader",
+              title:"Add ingredient failed",
+              notification: "Ingredient with same name already exists!",
+              name: ""} });
+          }
         });
   }
 

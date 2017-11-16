@@ -33,7 +33,7 @@ public class GlassController {
     
     @RequestMapping(value = "/api/glasses", method = RequestMethod.POST)
     public ResponseEntity<GlassDto> addGlass(@RequestBody GlassAdd glass) throws URISyntaxException {
-        if (glassService.categoryExistsCaseInsensitive(glass)) {
+        if (glassService.glassExistsCaseInsensitive(glass)) {
             return new ResponseEntity<>(HttpStatus.LOCKED);
         }
         Optional<GlassDto> gDto = glassService.addGlass(glass);

@@ -33,6 +33,9 @@ public class IngredientController {
     @RequestMapping(value = "/api/ingredients", method = RequestMethod.POST)
     public ResponseEntity<IngredientDto> addIngredient(@RequestBody IngredientAdd ingredient)
             throws URISyntaxException {
+        if (ingredientService.ingredientExistsCaseInsensitive(ingredient)) {
+            return new ResponseEntity<>(HttpStatus.LOCKED);
+        }
         Optional<IngredientDto> iDto = ingredientService.addIngredient(ingredient);
         if (!iDto.isPresent()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
