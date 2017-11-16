@@ -55,19 +55,16 @@ public class GlassAspect {
     private void addGlass(JoinPoint joinPoint, Object result) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        Optional<GlassDto> glass = (Optional<GlassDto>) result;
-        if (glass.isPresent()) {
-            GlassDto dto = glass.get();
-            LogEntry logEntry = LogEntry.builder()
-                    .date(LocalDateTime.now())
-                    .username(username)
-                    .action("CREATE")
-                    .targetEntity("glass")
-                    .targetId(dto.getId())
-                    .targetName(dto.getName())
-                    .build();
-            logEntryRepository.save(logEntry);
-        }
+        GlassDto dto = (GlassDto) result;
+        LogEntry logEntry = LogEntry.builder()
+                .date(LocalDateTime.now())
+                .username(username)
+                .action("CREATE")
+                .targetEntity("glass")
+                .targetId(dto.getId())
+                .targetName(dto.getName())
+                .build();
+        logEntryRepository.save(logEntry);
     }
     
     @Before("execution(* base.service.GlassService.modifyGlass(..))")

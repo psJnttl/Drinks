@@ -29,15 +29,19 @@ public class GlassService {
         return list.stream().map(i -> new GlassDto(i.getId(), i.getName())).collect(Collectors.toList());
     }
 
-    @Transactional
-    public Optional<GlassDto> addGlass(GlassAdd glass) {
+    public boolean isGlassValid(GlassAdd glass) {
         if (null == glass || null == glass.getName() || glass.getName().isEmpty()) {
-            return Optional.empty();
+            return false;
         }
+        return true;
+    }
+
+    @Transactional
+    public GlassDto addGlass(GlassAdd glass) {
         Glass g = new Glass(glass.getName());
         g = glassRepository.save(g);
         GlassDto dto = new GlassDto(g.getId(), g.getName());
-        return Optional.of(dto);
+        return dto;
     }
 
     public Optional<GlassDto> findGlass(long id) {
@@ -87,4 +91,5 @@ public class GlassService {
         }
         return true;
     }
+
 }
