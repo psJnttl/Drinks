@@ -181,7 +181,7 @@ class Drinks extends React.Component {
     }
     const drinkList =  this.state.drinks.length === 0 ?
                        null :
-    <ul style={{'display': 'flex', 'fontFamily': 'effra', 'listStyleType': 'none'}}>{
+    <ul style={{'display': 'flex', 'flexWrap': 'wrap', 'fontFamily': 'effra', 'listStyleType': 'none'}}>{
       this.state.drinks.map( (drink, index) =>
         <li key={drink.id} style={{ 'padding': '10px', 'border': 'solid', 'margin': '10px'}} >
           <div title="lasi" style={{'background': 'white', 'textAlign': 'right'}}>
