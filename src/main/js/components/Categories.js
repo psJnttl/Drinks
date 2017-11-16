@@ -191,7 +191,13 @@ class Categories extends React.Component {
               self.fetchCategories();
          })
         .catch(function (response) {
-          console.log("delete category failed");
+          if (response.response.status === 409) {
+            self.setState({infoModalVisible: true,
+              infoModalData: {header:"failedModalHeader",
+              title:"Delete category failed",
+              notification: "Can't delete a category that's in a Drink!",
+              name: ""} });
+          }
         });
   }
 
@@ -206,7 +212,13 @@ class Categories extends React.Component {
            self.fetchCategories();
          })
          .catch(function (response) {
-           console.log("modify category failed");
+           if (response.response.status === 400) {
+             self.setState({infoModalVisible: true,
+               infoModalData: {header:"failedModalHeader",
+               title:"Modify category failed",
+               notification: "Please check category name next time.",
+               name: ""} });
+           }
          });
   }
 
