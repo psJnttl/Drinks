@@ -169,7 +169,13 @@ class Glasses extends React.Component {
               self.fetchGlasses();
          })
         .catch(function (response) {
-          console.log("add glass failed");
+          if (response.response.status === 423) {
+            self.setState({infoModalVisible: true,
+              infoModalData: {header:"failedModalHeader",
+              title:"Add glass failed",
+              notification: "Glass with same name already exists!",
+              name: ""} });
+          }
         });
   }
 

@@ -80,7 +80,7 @@ public class CategoryService {
     }
     
     public boolean categoryExistsCaseInsensitive(CategoryAdd category) {
-        String nameToTest = category.getName();//.toLowerCase();
+        String nameToTest = category.getName();
         List<Category> categories = categoryRepository.findByNameContainingIgnoreCase(nameToTest);
         if (categories.isEmpty()) {
             return false;
