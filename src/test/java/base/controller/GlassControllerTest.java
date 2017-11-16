@@ -46,6 +46,7 @@ public class GlassControllerTest {
     private static final String GLASS2 = "Stout glass";
     private static final String GLASS3 = "Spring water glass";
     private static final String EMPTY_STRING = "";
+    private static final String DRINK_NAME = "Random drink name, this.";
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -70,6 +71,10 @@ public class GlassControllerTest {
     
     @After
     public void teardown() {
+        Drink d1 = drinkRepository.findByName(DRINK_NAME);
+        if (null != d1) {
+            drinkRepository.delete(d1);
+        }
         glassRepository.delete(g1);
         glassRepository.delete(g2);
         Glass g3 = glassRepository.findByName(GLASS3);
@@ -183,7 +188,7 @@ public class GlassControllerTest {
     @Test
     @WithMockUser(username="user", roles={"USER"})
     public void deletingGlassUsedInDrinkFails() throws Exception {
-        Drink drink = new Drink("Paulaner");
+        Drink drink = new Drink(DRINK_NAME);
         drink.setGlass(this.g1);
         drinkRepository.saveAndFlush(drink);
         mockMvc.perform(

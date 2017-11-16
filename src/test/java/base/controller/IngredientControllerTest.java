@@ -44,6 +44,7 @@ public class IngredientControllerTest {
     private static final String INGREDIENT1 = "Toniccc wasser";
     private static final String INGREDIENT2 = "Spirit V.";
     private static final String INGREDIENT3 = "Spirit B.";
+    private static final String DRINK_NAME = "Random drink name, this.";
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -68,6 +69,10 @@ public class IngredientControllerTest {
 
     @After
     public void teardown() {
+        Drink d1 = drinkRepository.findByName(DRINK_NAME);
+        if (null != d1) {
+            drinkRepository.delete(d1);
+        }
         ingredientRepository.delete(i1);
         ingredientRepository.delete(i2);
         Ingredient i3 = ingredientRepository.findByName(INGREDIENT3);
@@ -214,7 +219,7 @@ public class IngredientControllerTest {
     @Test
     @WithMockUser(username="user", roles={"USER"})
     public void cantDeleteIngredientIfInAdrink() throws Exception {
-        Drink drink = new Drink("Vodka Tonic");
+        Drink drink = new Drink(DRINK_NAME);
         drink.addIngredient(i1, "6 cl");
         drink.addIngredient(i2, "6 cl");
         drinkRepository.saveAndFlush(drink);
