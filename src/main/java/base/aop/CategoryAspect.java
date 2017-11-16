@@ -49,19 +49,16 @@ public class CategoryAspect {
     private void addCategory(JoinPoint joinPoint, Object result) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        Optional<CategoryDto> category = (Optional<CategoryDto>) result;
-        if (category.isPresent()) {
-            CategoryDto dto = category.get();
-            LogEntry logEntry = LogEntry.builder()
-                    .date(LocalDateTime.now())
-                    .username(username)
-                    .action("CREATE")
-                    .targetEntity("category")
-                    .targetId(dto.getId())
-                    .targetName(dto.getName())
-                    .build();
-            logEntryRepository.save(logEntry);
-        }
+        CategoryDto dto = (CategoryDto) result;
+        LogEntry logEntry = LogEntry.builder()
+                .date(LocalDateTime.now())
+                .username(username)
+                .action("CREATE")
+                .targetEntity("category")
+                .targetId(dto.getId())
+                .targetName(dto.getName())
+                .build();
+        logEntryRepository.save(logEntry);
     }
 
     @Before("execution(* base.service.CategoryService.modifyCategory(..))")

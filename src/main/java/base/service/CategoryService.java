@@ -28,15 +28,19 @@ public class CategoryService {
         return list.stream().map(i -> new CategoryDto(i.getId(), i.getName())).collect(Collectors.toList());
     }
 
-    @Transactional
-    public Optional<CategoryDto> addCategory(CategoryAdd category) {
+    public boolean isCategoryValid(CategoryAdd category) {
         if (null == category || null == category.getName() || category.getName().isEmpty()) {
-            return Optional.empty();
+            return false;
         }
+        return true;
+    }
+
+    @Transactional
+    public CategoryDto addCategory(CategoryAdd category) {
         Category cat = new Category(category.getName());
         cat = categoryRepository.save(cat);
         CategoryDto dto = new CategoryDto(cat.getId(), cat.getName());
-        return Optional.of(dto);
+        return dto;
     }
 
     public Optional<CategoryDto> findCategory(long id) {

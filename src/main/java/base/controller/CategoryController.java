@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import base.command.CategoryAdd;
 import base.dto.CategoryDto;
+import base.repository.CategoryRepository;
 import base.service.CategoryService;
 
 @RestController
@@ -32,14 +33,13 @@ public class CategoryController {
     
     @RequestMapping(value = "/api/categories", method = RequestMethod.POST)
     public ResponseEntity<CategoryDto> addCategory(@RequestBody CategoryAdd category) throws URISyntaxException {
+        if (! categoryService.isCategoryValid(category)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         if (categoryService.categoryExistsCaseInsensitive(category)) {
             return new ResponseEntity<>(HttpStatus.LOCKED);
         }
-        Optional<CategoryDto> cDto = categoryService.addCategory(category);
-        if (! cDto.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        CategoryDto dto = cDto.get();
+        CategoryDto dto = categoryService.addCategory(category);
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(new URI("/api/categories/" + dto.getId()));
         return new ResponseEntity<>(dto, headers, HttpStatus.CREATED);
