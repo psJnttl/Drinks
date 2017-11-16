@@ -49,19 +49,16 @@ public class IngredientAspect {
     private void addIngredient(JoinPoint joinPoint, Object result) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        Optional<IngredientDto> ing = (Optional<IngredientDto>) result;
-        if (ing.isPresent()) {
-            IngredientDto dto = ing.get();
-            LogEntry logEntry = LogEntry.builder()
-                    .date(LocalDateTime.now())
-                    .username(username)
-                    .action("CREATE")
-                    .targetEntity("ingredient")
-                    .targetId(dto.getId())
-                    .targetName(dto.getName())
-                    .build();
-            logEntryRepository.save(logEntry);
-        }
+        IngredientDto dto = (IngredientDto) result;
+        LogEntry logEntry = LogEntry.builder()
+                .date(LocalDateTime.now())
+                .username(username)
+                .action("CREATE")
+                .targetEntity("ingredient")
+                .targetId(dto.getId())
+                .targetName(dto.getName())
+                .build();
+        logEntryRepository.save(logEntry);
     }
 
     @Before("execution(* base.service.IngredientService.modifyIngredient(..))")

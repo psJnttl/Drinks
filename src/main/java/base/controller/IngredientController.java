@@ -33,14 +33,13 @@ public class IngredientController {
     @RequestMapping(value = "/api/ingredients", method = RequestMethod.POST)
     public ResponseEntity<IngredientDto> addIngredient(@RequestBody IngredientAdd ingredient)
             throws URISyntaxException {
+        if (!ingredientService.isIngredientValid(ingredient)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         if (ingredientService.ingredientExistsCaseInsensitive(ingredient)) {
             return new ResponseEntity<>(HttpStatus.LOCKED);
         }
-        Optional<IngredientDto> iDto = ingredientService.addIngredient(ingredient);
-        if (!iDto.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        IngredientDto dto = iDto.get();
+        IngredientDto dto = ingredientService.addIngredient(ingredient);
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(new URI("/api/ingredients/" + dto.getId()));
         return new ResponseEntity<>(dto, headers, HttpStatus.CREATED);

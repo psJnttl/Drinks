@@ -29,14 +29,18 @@ public class IngredientService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<IngredientDto> addIngredient(IngredientAdd ingredient) {
+    public boolean isIngredientValid(IngredientAdd ingredient) {
         if (null == ingredient || null == ingredient.getName() || ingredient.getName().isEmpty()) {
-            return Optional.empty();
+            return false;
         }
+        return true;
+    }
+
+    public IngredientDto addIngredient(IngredientAdd ingredient) {
         Ingredient ing = new Ingredient(ingredient.getName());
         ing = ingredientRepository.saveAndFlush(ing);
         IngredientDto dto = new IngredientDto(ing.getId(), ing.getName());
-        return Optional.of(dto);
+        return dto;
     }
 
     public Optional<IngredientDto> findIngredient(long id) {
@@ -84,4 +88,5 @@ public class IngredientService {
         }
         return true;
     }
+
 }
