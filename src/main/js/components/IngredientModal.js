@@ -38,7 +38,8 @@ class IngredientModal extends React.Component {
             <FormControl type="text" placeholder={this.props.placeholder} onChange={this.onChangeName} value={this.state.ingredient.name} />
           </Modal.Body>
           <Modal.Footer bsClass="modalFooter">
-            <Button bsStyle="success" onClick={ () => this.props.save(this.state.ingredient) }>Save</Button>
+            <Button bsStyle="success" onClick={ () => this.props.save(this.state.ingredient) }
+              disabled={! (this.state.ingredient.name.length > 0)} >Save</Button>
             <Button bsStyle="danger" onClick={ () => this.props.close() }>Cancel</Button>
           </Modal.Footer>
         </Modal>
