@@ -78,4 +78,13 @@ public class CategoryService {
         }
         return true;
     }
+    
+    public boolean categoryExistsCaseInsensitive(CategoryAdd category) {
+        String nameToTest = category.getName();//.toLowerCase();
+        List<Category> categories = categoryRepository.findByNameContainingIgnoreCase(nameToTest);
+        if (categories.isEmpty()) {
+            return false;
+        }
+        return true;
+    }
 }

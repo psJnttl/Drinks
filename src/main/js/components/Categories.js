@@ -10,7 +10,8 @@ class Categories extends React.Component {
   constructor(props) {
     super(props);
     this.state = {categories: [], infoModalVisible: false, addModalVisible: false,
-    delConfirmationVisible: false, category: {}
+    delConfirmationVisible: false, category: {},
+    editModalVisible: false, infoModalData: {},
   };
     this.fetchCategories = this.fetchCategories.bind(this);
     this.setCategoryList = this.setCategoryList.bind(this);
@@ -34,7 +35,11 @@ class Categories extends React.Component {
             self.setCategoryList(response.data);
          })
          .catch(function (response) {
-            self.setState({infoModalVisible: true});
+           self.setState({infoModalVisible: true,
+               infoModalData: {header:"failedModalHeader",
+               title:"Fetch categories failed",
+              notification: "Could not get the list of categories from server!",
+              name: ""} });
          });
   }
 
@@ -122,10 +127,11 @@ class Categories extends React.Component {
       <div>
         <SimpleInformationModal
           modalOpen={this.state.infoModalVisible}
-          header="failedModalHeader"
-          title="Fetch categories failed"
-          notification = "Could not get the list of categories from server!"
-          name=""
+          header={this.state.infoModalData.header}
+          title={this.state.infoModalData.title}
+          notification = {this.state.infoModalData.notification}
+          notification2 =""
+          name={this.state.infoModalData.name}
           reply={this.closeInfoModal} />
 
         <SimpleConfirmationModal
@@ -166,7 +172,13 @@ class Categories extends React.Component {
               self.fetchCategories();
          })
         .catch(function (response) {
-          console.log("add category failed");
+          if (response.response.status === 423) {
+            self.setState({infoModalVisible: true,
+              infoModalData: {header:"failedModalHeader",
+              title:"Add category failed",
+              notification: "Category with same name already exists!",
+              name: ""} });
+          }
         });
   }
 

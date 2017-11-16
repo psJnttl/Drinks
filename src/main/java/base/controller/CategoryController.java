@@ -32,6 +32,9 @@ public class CategoryController {
     
     @RequestMapping(value = "/api/categories", method = RequestMethod.POST)
     public ResponseEntity<CategoryDto> addCategory(@RequestBody CategoryAdd category) throws URISyntaxException {
+        if (categoryService.categoryExistsCaseInsensitive(category)) {
+            return new ResponseEntity<>(HttpStatus.LOCKED);
+        }
         Optional<CategoryDto> cDto = categoryService.addCategory(category);
         if (! cDto.isPresent()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
