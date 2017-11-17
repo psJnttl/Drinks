@@ -82,7 +82,7 @@ public class IngredientService {
     }
 
     public boolean ingredientExistsCaseInsensitive(IngredientAdd ingredient) {
-        List<Ingredient> ingredients = ingredientRepository.findByNameContainingIgnoreCase(ingredient.getName());
+        List<Ingredient> ingredients = ingredientRepository.findByNameIgnoreCase(ingredient.getName());
         if (ingredients.isEmpty()) {
             return false;
         }

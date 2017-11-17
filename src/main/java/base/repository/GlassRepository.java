@@ -8,5 +8,5 @@ import base.domain.Glass;
 
 public interface GlassRepository extends JpaRepository<Glass, Long> {
     Glass findByName(String name);
-    List<Glass> findByNameContainingIgnoreCase(String name);
+    List<Glass> findByNameIgnoreCase(String name);
 }

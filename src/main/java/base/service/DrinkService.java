@@ -143,7 +143,7 @@ public class DrinkService {
     }
 
     public boolean drinkExistsCaseInsensitive(DrinkAdd drink) {
-        List<Drink> drinks = drinkRepository.findByNameContainingIgnoreCase(drink.getName());
+        List<Drink> drinks = drinkRepository.findByNameIgnoreCase(drink.getName());
         if (drinks.isEmpty()) {
             return false;
         }

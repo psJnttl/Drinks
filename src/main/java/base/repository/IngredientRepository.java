@@ -8,5 +8,5 @@ import base.domain.Ingredient;
 
 public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
     Ingredient findByName(String name);
-    List<Ingredient> findByNameContainingIgnoreCase(String name);
+    List<Ingredient> findByNameIgnoreCase(String name);
 }

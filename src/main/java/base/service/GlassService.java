@@ -85,7 +85,7 @@ public class GlassService {
     }
 
     public boolean glassExistsCaseInsensitive(GlassAdd glass) {
-        List<Glass> glasses = glassRepository.findByNameContainingIgnoreCase(glass.getName());
+        List<Glass> glasses = glassRepository.findByNameIgnoreCase(glass.getName());
         if (glasses.isEmpty()) {
             return false;
         }
