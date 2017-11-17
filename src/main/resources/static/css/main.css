@@ -27,5 +27,16 @@
 }
 
 .modalFooter button {
-  margin: 0 6px 0 6px;  
+  margin: 0 6px 0 6px;
+}
+
+.searchinput {
+  border-radius: 4px;
+  margin-left: 10px;
+  padding: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  width: 100%;
+  height: 34px;
+  color: #555;
 }

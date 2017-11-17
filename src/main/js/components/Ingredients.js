@@ -4,7 +4,7 @@ import SimpleInformationModal from './SimpleInformationModal';
 import SimpleConfirmationModal from './SimpleConfirmationModal';
 import axios from 'axios';
 import _ from 'lodash';
-import {Button, Glyphicon, Pagination, Table} from 'react-bootstrap';
+import {Button, Col, Glyphicon, Pagination, Table} from 'react-bootstrap';
 import IngredientModal from './IngredientModal';
 
 class Ingredients extends React.Component {
@@ -13,7 +13,8 @@ class Ingredients extends React.Component {
     this.state = {ingredients: [], infoModalVisible: false, addModalVisible:false,
       delConfirmationVisible: false, ingredient: {},
       editModalVisible: false, infoModalData: {},
-      pgCurrentPage: 1, pgItemsPerPage: 10}
+      pgCurrentPage: 1, pgItemsPerPage: 10,
+      searchName: "", }
     this.setIngredientList = this.setIngredientList.bind(this);
     this.closeInfoModal = this.closeInfoModal.bind(this);
     this.openAddModal = this.openAddModal.bind(this);
@@ -28,6 +29,7 @@ class Ingredients extends React.Component {
     this.setCurrentPage = this.setCurrentPage.bind(this);
     this.setItemsPerPage = this.setItemsPerPage.bind(this);
     this.paginate = this.paginate.bind(this);
+    this.onChangeSearchName = this.onChangeSearchName.bind(this);
   }
 
   setIngredientList(data) {
@@ -99,6 +101,10 @@ class Ingredients extends React.Component {
       (index < (this.state.pgCurrentPage-1) * this.state.pgItemsPerPage + this.state.pgItemsPerPage);
   }
 
+  onChangeSearchName(e) {
+    this.setState({searchName: e.target.value, pgCurrentPage: 1});
+  }
+
   componentDidMount() {
     this.fetchIngredients();
   }
@@ -127,8 +133,9 @@ class Ingredients extends React.Component {
     else {
       addModal = null;
     }
-    const pageAmount = Math.ceil(this.state.ingredients.length / this.state.pgItemsPerPage);
-    const itemsOnPage = this.state.ingredients.filter ( (item, index) => this.paginate(item, index) );
+    const filtered = this.state.ingredients.filter(item => item.name.toLowerCase().includes(this.state.searchName.toLowerCase()));
+    const pageAmount = Math.ceil(filtered.length / this.state.pgItemsPerPage);
+    const itemsOnPage = filtered.filter ( (item, index) => this.paginate(item, index) );
 
     const dataRows = itemsOnPage.map( (row, index) =>
       <tr key={index}>
@@ -159,37 +166,50 @@ class Ingredients extends React.Component {
           header="failedModalHeader"
         />
         {addModal}
+        <ul style={{'display': 'flex', 'listStyleType': 'none'}}>
+          <li>
+            <Button bsStyle="success" onClick={ () => this.openAddModal() } title="add"><Glyphicon glyph="plus"/></Button>
+          </li>
+          <li>
+            <input
+              className="searchinput"
+              type="text"
+              placeholder="search by name"
+              onChange={ this.onChangeSearchName }
+              value={this.state.searchName}
+            autoComplete="off" />
+          </li>
+        </ul>
 
-        <Button bsStyle="success" onClick={ () => this.openAddModal() } title="add"><Glyphicon glyph="plus"/></Button>
+        <Col sm={6}>
+          <Table bordered condensed hover>
+            <thead>
+              <tr>
+                <th>id</th>
+                <th>name</th>
+                <th>action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {dataRows}
+            </tbody>
+          </Table>
 
-        <Table bordered condensed hover>
-          <thead>
-            <tr>
-              <th>id</th>
-              <th>name</th>
-              <th>action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {dataRows}
-          </tbody>
-        </Table>
-
-        <Pagination
-          bsSize="medium"
-          items={ pageAmount }
-          activePage={this.state.pgCurrentPage}
-          onSelect={ this.setCurrentPage}
-          prev
-          next
-          boundaryLinks
-          ellipsis
-          maxButtons={5}
-        />
-        <Button bsStyle={this.state.pgItemsPerPage === 5 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(5)}>5</Button>
-        <Button bsStyle={this.state.pgItemsPerPage === 10 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(10)}>10</Button>
-        <Button bsStyle={this.state.pgItemsPerPage === 20 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(20)}>20</Button>
-
+          <Pagination
+            bsSize="medium"
+            items={ pageAmount }
+            activePage={this.state.pgCurrentPage}
+            onSelect={ this.setCurrentPage}
+            prev
+            next
+            boundaryLinks
+            ellipsis
+            maxButtons={5}
+          />
+          <Button bsStyle={this.state.pgItemsPerPage === 5 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(5)}>5</Button>
+          <Button bsStyle={this.state.pgItemsPerPage === 10 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(10)}>10</Button>
+          <Button bsStyle={this.state.pgItemsPerPage === 20 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(20)}>20</Button>
+        </Col>
       </div>
     );
   }
