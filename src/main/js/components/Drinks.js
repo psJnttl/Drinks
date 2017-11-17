@@ -199,8 +199,10 @@ class Drinks extends React.Component {
     }
 
     const filtered = this.state.drinks.filter(item => item.name.toLowerCase().includes(this.state.searchName.toLowerCase()));
-    const pageAmount = Math.ceil(filtered.length / this.state.pgItemsPerPage);
-    const itemsOnPage = filtered.filter ( (item, index) => this.paginate(item, index) );
+    const sorted = _.orderBy(filtered, [function(d) { return d.name.toLowerCase(); }], ['asc']);
+
+    const pageAmount = Math.ceil(sorted.length / this.state.pgItemsPerPage);
+    const itemsOnPage = sorted.filter ( (item, index) => this.paginate(item, index) );
 
     const drinkList =  itemsOnPage.length === 0 ?
                        null :
