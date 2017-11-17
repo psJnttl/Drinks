@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import {Button, Glyphicon} from 'react-bootstrap';
+import {Button, Col, Glyphicon, Pagination} from 'react-bootstrap';
 import DrinkModal from './DrinkModal';
 import _ from 'lodash';
 import SimpleInformationModal from './SimpleInformationModal';
@@ -12,7 +12,9 @@ class Drinks extends React.Component {
     super(props);
     this.state = {drinks: [], infoModalVisible: false,  addModalVisible: false,
       infoModalData: {}, editModalVisible: false, drink: {},
-      delConfirmationVisible: false, };
+      delConfirmationVisible: false,
+      pgCurrentPage: 1, pgItemsPerPage: 10, searchName: "",
+    };
     this.fetchDrinks = this.fetchDrinks.bind(this);
     this.setDrinkList = this.setDrinkList.bind(this);
     this.openAddModal = this.openAddModal.bind(this);
@@ -25,6 +27,9 @@ class Drinks extends React.Component {
     this.setDeleteConfirmModalVisible = this.setDeleteConfirmModalVisible.bind(this);
     this.deleteReply = this.deleteReply.bind(this);
     this.deleteDrink = this.deleteDrink.bind(this);
+    this.setCurrentPage = this.setCurrentPage.bind(this);
+    this.setItemsPerPage = this.setItemsPerPage.bind(this);
+    this.paginate = this.paginate.bind(this);
   }
 
   fetchDrinks() {
@@ -145,6 +150,19 @@ class Drinks extends React.Component {
         });
   }
 
+  setCurrentPage(pageNbr) {
+    this.setState({pgCurrentPage: pageNbr})
+  }
+
+  setItemsPerPage(nbrItems) {
+    this.setState({pgItemsPerPage: nbrItems, pgCurrentPage: 1});
+  }
+
+  paginate (item, index) {
+    return (index >= (this.state.pgCurrentPage-1) * this.state.pgItemsPerPage) &&
+      (index < (this.state.pgCurrentPage-1) * this.state.pgItemsPerPage + this.state.pgItemsPerPage);
+  }
+
   componentDidMount() {
     this.fetchDrinks();
   }
@@ -179,10 +197,15 @@ class Drinks extends React.Component {
     else {
       drinkModal = null;
     }
-    const drinkList =  this.state.drinks.length === 0 ?
+
+    const filtered = this.state.drinks.filter(item => item.name.toLowerCase().includes(this.state.searchName.toLowerCase()));
+    const pageAmount = Math.ceil(filtered.length / this.state.pgItemsPerPage);
+    const itemsOnPage = filtered.filter ( (item, index) => this.paginate(item, index) );
+
+    const drinkList =  itemsOnPage.length === 0 ?
                        null :
     <ul style={{'display': 'flex', 'flexWrap': 'wrap', 'fontFamily': 'effra', 'listStyleType': 'none'}}>{
-      this.state.drinks.map( (drink, index) =>
+      itemsOnPage.map( (drink, index) =>
         <li key={drink.id} style={{ 'padding': '10px', 'border': 'solid', 'margin': '10px'}} >
           <div title="lasi" style={{'background': 'white', 'textAlign': 'right'}}>
             <Button bsStyle="danger" bsSize="xsmall" onClick={ () => this.setDeleteConfirmModalVisible(drink) } title="delete Drink">X</Button>
@@ -217,9 +240,28 @@ class Drinks extends React.Component {
           header="failedModalHeader"
         />
 
-        <h4>Drinks listed here</h4>
-        <Button bsStyle="success" onClick={ () => this.openAddModal() } title="add Drink"><Glyphicon glyph="plus"/></Button>
-        {drinkList}
+        <ul style={{'display': 'flex', 'listStyleType': 'none'}}>
+          <li>
+            <Button bsStyle="success" onClick={ () => this.openAddModal() } title="add Drink"><Glyphicon glyph="plus"/></Button>
+          </li>
+        </ul>
+        <Col sm={11}>
+          {drinkList}
+          <Pagination
+            bsSize="medium"
+            items={ pageAmount }
+            activePage={this.state.pgCurrentPage}
+            onSelect={ this.setCurrentPage}
+            prev
+            next
+            boundaryLinks
+            ellipsis
+            maxButtons={5}
+          /><br/>
+          <Button bsStyle={this.state.pgItemsPerPage === 10 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(10)}>10</Button>
+          <Button bsStyle={this.state.pgItemsPerPage === 20 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(20)}>20</Button>
+          <Button bsStyle={this.state.pgItemsPerPage === 40 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(40)}>40</Button>
+        </Col>
         {drinkModal}
       </div>
     );
