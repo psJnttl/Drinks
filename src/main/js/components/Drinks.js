@@ -168,6 +168,20 @@ class Drinks extends React.Component {
     this.setState({searchName: e.target.value});
   }
 
+  concatenateSearchResults(target, source) {
+    const result1 = source.filter( item => !this.checkDuplicate(target, item));
+    const result = _.concat(target, result1);
+    return result;
+  }
+
+  checkDuplicate(list, item) {
+    const index = _.findIndex(list, item);
+    if (-1 === index) {
+      return false;
+    }
+    return true;
+  }
+
   componentDidMount() {
     this.fetchDrinks();
   }
@@ -204,7 +218,12 @@ class Drinks extends React.Component {
     }
 
     const filtered = this.state.drinks.filter(item => item.name.toLowerCase().includes(this.state.searchName.toLowerCase()));
-    const sorted = _.orderBy(filtered, [function(d) { return d.name.toLowerCase(); }], ['asc']);
+    const filteredByCat = this.state.drinks.filter(item => item.category.name.toLowerCase().includes(this.state.searchName.toLowerCase()));
+    const concat1 = this.concatenateSearchResults(filtered, filteredByCat);
+    const filteredByGlass = this.state.drinks.filter(item => item.glass.name.toLowerCase().includes(this.state.searchName.toLowerCase()));
+    const concat2 = this.concatenateSearchResults(concat1, filteredByGlass);
+
+    const sorted = _.orderBy(concat2, [function(d) { return d.name.toLowerCase(); }], ['asc']);
 
     const pageAmount = Math.ceil(sorted.length / this.state.pgItemsPerPage);
     const itemsOnPage = sorted.filter ( (item, index) => this.paginate(item, index) );
@@ -255,7 +274,7 @@ class Drinks extends React.Component {
             <input
               className="searchinput"
               type="text"
-              placeholder="search by name"
+              placeholder="name, glass, category"
               onChange={ this.onChangeSearchName }
               value={this.state.searchName}
               autoComplete="off"
