@@ -17,39 +17,5 @@ public class DrinksApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(DrinksApplication.class, args);
 	}
-	
-    @Bean
-    public EmbeddedServletContainerFactory servletContainer() {
-      TomcatEmbeddedServletContainerFactory tomcat =
-          new TomcatEmbeddedServletContainerFactory() {
 
-            @Override
-            protected void postProcessContext(Context context) {
-              SecurityConstraint securityConstraint = new SecurityConstraint();
-              securityConstraint.setUserConstraint("CONFIDENTIAL");
-              SecurityCollection collection = new SecurityCollection();
-              collection.addPattern("/*");
-              securityConstraint.addCollection(collection);
-              context.addConstraint(securityConstraint);
-            }
-          };
-      tomcat.addAdditionalTomcatConnectors(createHttpConnector());
-      return tomcat;
-    }
-
-    @Value("${server.port-http}")
-    private int serverPortHttp;
-
-    @Value("${server.port}")
-    private int serverPortHttps;
-
-    private Connector createHttpConnector() {
-      Connector connector =
-          new Connector("org.apache.coyote.http11.Http11NioProtocol");
-      connector.setScheme("http");
-      connector.setSecure(false);
-      connector.setPort(serverPortHttp);
-      connector.setRedirectPort(serverPortHttps);
-      return connector;
-    }
 }
