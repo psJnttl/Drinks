@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +19,7 @@ public class LogEntryController {
     @Autowired
     private LogEntryRepository logEntryRepository;
     
+    @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping(value = "/api/logentries", method = RequestMethod.GET)
     public List<LogEntryDto> listAll() {
         List<LogEntry> logEntries = logEntryRepository.findAll();

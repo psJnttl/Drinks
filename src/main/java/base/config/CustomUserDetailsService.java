@@ -1,8 +1,10 @@
 package base.config;
 
-import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,8 +28,15 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("No such user: " + username);
         }
         User user = new User(account.getUsername(), account.getPassword(), true, true, true, true,
-                Arrays.asList(new SimpleGrantedAuthority("USER")));
+                getRoles(account));
         return user;
+    }
+    
+    private List<GrantedAuthority> getRoles(Account account) {
+        return account.getRoles().stream()
+            .map(e ->  e.getName())
+            .map(n -> new SimpleGrantedAuthority(n))
+            .collect(Collectors.toList());
     }
 
 }
