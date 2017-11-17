@@ -30,6 +30,7 @@ class Drinks extends React.Component {
     this.setCurrentPage = this.setCurrentPage.bind(this);
     this.setItemsPerPage = this.setItemsPerPage.bind(this);
     this.paginate = this.paginate.bind(this);
+    this.onChangeSearchName = this.onChangeSearchName.bind(this);
   }
 
   fetchDrinks() {
@@ -163,6 +164,10 @@ class Drinks extends React.Component {
       (index < (this.state.pgCurrentPage-1) * this.state.pgItemsPerPage + this.state.pgItemsPerPage);
   }
 
+  onChangeSearchName(e) {
+    this.setState({searchName: e.target.value});
+  }
+
   componentDidMount() {
     this.fetchDrinks();
   }
@@ -245,6 +250,16 @@ class Drinks extends React.Component {
         <ul style={{'display': 'flex', 'listStyleType': 'none'}}>
           <li>
             <Button bsStyle="success" onClick={ () => this.openAddModal() } title="add Drink"><Glyphicon glyph="plus"/></Button>
+          </li>
+          <li>
+            <input
+              className="searchinput"
+              type="text"
+              placeholder="search by name"
+              onChange={ this.onChangeSearchName }
+              value={this.state.searchName}
+              autoComplete="off"
+            />
           </li>
         </ul>
         <Col sm={11}>
