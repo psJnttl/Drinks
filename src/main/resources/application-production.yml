@@ -13,4 +13,9 @@ spring:
             ddl-auto: update
 
 server:
-    port: 8080
+    port: 8443
+    port-http: 8080
+    ssl.key-store: classpath:ssl/keystore.p12
+    ssl.key-store-password: password
+    ssl.keyStoreType: PKCS12
+    ssl.keyAlias: tomcat
