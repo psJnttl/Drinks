@@ -42,6 +42,7 @@ class Navi extends React.Component {
   render() {
     const authenticated = this.props.authState.authenticated;
     const admin = this.props.authState.admin;
+    const username = this.props.authState.username;
     return (
       <Navbar fluid collapseOnSelect>
         <Navbar.Header>
@@ -56,7 +57,7 @@ class Navi extends React.Component {
             <RouteNavItem href="/categories">Categories</RouteNavItem>
             <RouteNavItem href="/about">About</RouteNavItem>
             {authenticated &&
-              <RouteNavItem href="/logout">logout</RouteNavItem>
+              <RouteNavItem href="/logout">logout {username}</RouteNavItem>
             }
             {authenticated && admin &&
               <RouteNavItem href="/eventlog">Eventlog</RouteNavItem>
