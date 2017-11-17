@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -14,26 +13,26 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@Profile({"development", "test"})
+@Profile("production")
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class ProductionSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserDetailsService userDetailsService;
-
+    
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.headers().frameOptions().sameOrigin();
-        http.httpBasic().realmName("Drinks").authenticationEntryPoint(getBasicAuthEntryPoint()).and()
+        http.requiresChannel();
+        http
+        .httpBasic().realmName("SEC 1 test").authenticationEntryPoint(getBasicAuthEntryPoint()).and()
         .authorizeRequests()
         .antMatchers("/h2-console/*").permitAll()
         .antMatchers("/").permitAll()
-        .antMatchers("/api/account/signup").permitAll()
         .anyRequest().authenticated().and()
-        .logout().permitAll().logoutSuccessUrl("/").deleteCookies("JSESSIONID");
+        .logout().permitAll().logoutSuccessUrl("/");
     }
 
     @Override
