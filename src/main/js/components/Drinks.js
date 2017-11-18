@@ -182,6 +182,14 @@ class Drinks extends React.Component {
     return true;
   }
 
+  drinkHasComponent(drink, name) {
+    const ingredientIndex = _.findIndex(drink.components, (c) => (c.ingredient.name.toLowerCase().includes(name)) );
+    if (-1 === ingredientIndex) {
+      return false;
+    }
+    return true;
+  }
+
   componentDidMount() {
     this.fetchDrinks();
   }
@@ -222,8 +230,9 @@ class Drinks extends React.Component {
     const concat1 = this.concatenateSearchResults(filtered, filteredByCat);
     const filteredByGlass = this.state.drinks.filter(item => item.glass.name.toLowerCase().includes(this.state.searchName.toLowerCase()));
     const concat2 = this.concatenateSearchResults(concat1, filteredByGlass);
-
-    const sorted = _.orderBy(concat2, [function(d) { return d.name.toLowerCase(); }], ['asc']);
+    const filteredByIngredient= this.state.drinks.filter(item => this.drinkHasComponent(item, this.state.searchName.toLowerCase()));
+    const concat3 = this.concatenateSearchResults(concat2, filteredByIngredient);
+    const sorted = _.orderBy(concat3, [function(d) { return d.name.toLowerCase(); }], ['asc']);
 
     const pageAmount = Math.ceil(sorted.length / this.state.pgItemsPerPage);
     const itemsOnPage = sorted.filter ( (item, index) => this.paginate(item, index) );
@@ -274,10 +283,11 @@ class Drinks extends React.Component {
             <input
               className="searchinput"
               type="text"
-              placeholder="name, glass, category"
+              placeholder="search"
               onChange={ this.onChangeSearchName }
               value={this.state.searchName}
               autoComplete="off"
+              title="by name, glass, category or ingredient"
             />
           </li>
         </ul>
