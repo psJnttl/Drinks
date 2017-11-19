@@ -165,7 +165,7 @@ class Drinks extends React.Component {
   }
 
   onChangeSearchName(e) {
-    this.setState({searchName: e.target.value});
+    this.setState({searchName: e.target.value, pgCurrentPage: 1});
   }
 
   concatenateSearchResults(target, source) {
