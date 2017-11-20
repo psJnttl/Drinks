@@ -9,6 +9,7 @@ import Glasses from './components/Glasses';
 import Categories from './components/Categories';
 import EventLog from './components/EventLog';
 import Drinks from './components/Drinks';
+import Account from './components/Account';
 import _ from 'lodash';
 import axios from 'axios';
 
@@ -88,6 +89,9 @@ class App extends React.Component {
             <Route path="/logout" render={(props) => (
               <Logout authenticated={authValue} changeAuthState={this.props.changeAuthState} {...props}  />
             )}/>
+            <Route path="/account" render={(props) => (
+              <Account authState={this.props.authState} {...props} />
+            )} />
             <Route path="/eventlog" render={(props) => (
               <EventLog authenticated={authValue} {...props}  />
             )}/>

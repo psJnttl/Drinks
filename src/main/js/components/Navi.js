@@ -59,6 +59,8 @@ class Navi extends React.Component {
             {authenticated &&
               <RouteNavItem href="/logout">logout {username}</RouteNavItem>
             }
+            {authenticated &&
+              <RouteNavItem href="/account">Account</RouteNavItem>}
             {authenticated && admin &&
               <RouteNavItem href="/eventlog">Eventlog</RouteNavItem>
             }
