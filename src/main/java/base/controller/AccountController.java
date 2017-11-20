@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import base.command.AccountAdd;
+import base.command.AccountMod;
 import base.dto.AccountDto;
 import base.service.AccountService;
 
@@ -36,5 +37,17 @@ public class AccountController {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         return new ResponseEntity<>(accountDto.get(), HttpStatus.CREATED);
+    }
+    
+    @RequestMapping(value = "/api/account", method = RequestMethod.PUT)
+    public ResponseEntity<AccountDto> changePassword(@RequestBody AccountMod account) {
+        if (!accountService.isRequestValid(account)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Optional<AccountDto> accountDto = accountService.changePassword(account); 
+        if (!accountDto.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<>(accountDto.get(), HttpStatus.OK);
     }
 }

@@ -10,6 +10,9 @@ public class AccountDto {
     private String password;
     private List<Role> roles;
 
+    public AccountDto() {
+    }
+
     public AccountDto(String username) {
         this.username = username;
     }
