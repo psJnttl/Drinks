@@ -1,16 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Table} from 'react-bootstrap';
+import {Button, Pagination, Table} from 'react-bootstrap';
 import axios from 'axios';
 
 class EventLog extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {eventLog: [], searchName: ""  }
+    this.state = {eventLog: [], searchName: "",
+      pgCurrentPage: 1, pgItemsPerPage: 10,
+    }
     this.fetchEventLog = this.fetchEventLog.bind(this);
     this.setEventLogList = this.setEventLogList.bind(this);
     this.parseDate = this.parseDate.bind(this);
     this.onChangeSearchName = this.onChangeSearchName.bind(this);
+    this.setItemsPerPage = this.setItemsPerPage.bind(this);
+    this.setCurrentPage = this.setCurrentPage.bind(this);
   }
 
   fetchEventLog() {
@@ -63,6 +67,19 @@ class EventLog extends React.Component {
     return result;
   }
 
+  paginate (item, index) {
+    return (index >= (this.state.pgCurrentPage-1) * this.state.pgItemsPerPage) &&
+      (index < (this.state.pgCurrentPage-1) * this.state.pgItemsPerPage + this.state.pgItemsPerPage);
+  }
+
+  setItemsPerPage(nbrItems) {
+    this.setState({pgItemsPerPage: nbrItems, pgCurrentPage: 1});
+  }
+
+  setCurrentPage(pageNbr) {
+    this.setState({pgCurrentPage: pageNbr})
+  }
+
   componentDidMount() {
     this.fetchEventLog();
   }
@@ -75,8 +92,11 @@ class EventLog extends React.Component {
     const concat1 = this.concatenateSearchResults(byAction, byTargetEntity);
     const concat2 = this.concatenateSearchResults(concat1, byTargetName);
     const concat3 = this.concatenateSearchResults(concat2, byUsername);
-    const sorted = _.orderBy(concat3, [function(l) { return l.id }], ['asc']);
-    const dataRows = concat3.map((row, index) =>
+    const sorted = _.orderBy(concat3, [function(l) { return l.id }], ['desc']);
+    const pageAmount = Math.ceil(sorted.length / this.state.pgItemsPerPage);
+    const itemsOnPage = sorted.filter ( (item, index) => this.paginate(item, index) );
+
+    const dataRows = itemsOnPage.map((row, index) =>
       <tr key={index}>
         <td>{row.id}</td>
         <td>{row.action}</td>
@@ -118,7 +138,20 @@ class EventLog extends React.Component {
             {dataRows}
           </tbody>
         </Table>
-
+        <Pagination
+          bsSize="medium"
+          items={ pageAmount }
+          activePage={this.state.pgCurrentPage}
+          onSelect={ this.setCurrentPage}
+          prev
+          next
+          boundaryLinks
+          ellipsis
+          maxButtons={5}
+        /><br/>
+        <Button bsStyle={this.state.pgItemsPerPage === 10 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(10)}>10</Button>
+        <Button bsStyle={this.state.pgItemsPerPage === 20 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(20)}>20</Button>
+        <Button bsStyle={this.state.pgItemsPerPage === 40 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(40)}>40</Button>
       </div>
     );
   }
