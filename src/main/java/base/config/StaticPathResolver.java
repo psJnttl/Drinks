@@ -17,7 +17,7 @@ import org.springframework.web.servlet.resource.ResourceResolverChain;
 class StaticPathResolver implements ResourceResolver {
 
     private Resource indexHtml = new ClassPathResource("/templates/index.html");
-    private List<String> handledExtensions = Arrays.asList("css", "html", "ico", "js", "map");
+    private List<String> handledExtensions = Arrays.asList("css", "html", "ico", "js", "map", "woff2");
     private List<String> ignoredPaths = Arrays.asList("api");
 
     /**
@@ -45,7 +45,7 @@ class StaticPathResolver implements ResourceResolver {
      */
     @Override
     public String resolveUrlPath(String resourcePath, List<? extends Resource> locations, ResourceResolverChain chain) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private Resource resolve(String requestPath, List<? extends Resource> locations) {
