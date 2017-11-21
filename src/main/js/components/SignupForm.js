@@ -19,7 +19,6 @@ class SignupForm extends React.Component {
     this.setState({password: value});
   }
   submit() {
-    console.log("signup with login/password: " + this.state.name + "/" + this.state.password);
     this.props.signupFn(this.state.name, this.state.password);
   }
   render() {

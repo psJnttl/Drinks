@@ -19,7 +19,6 @@ class LoginForm extends React.Component {
     this.setState({password: value});
   }
   submit() {
-    console.log("login/password: " + this.state.name + "/" + this.state.password);
     this.props.loginFn(this.state.name, this.state.password);
   }
   render() {
