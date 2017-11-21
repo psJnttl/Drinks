@@ -1,5 +1,6 @@
 package base.service;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -13,14 +14,19 @@ import org.springframework.stereotype.Service;
 import base.command.AccountAdd;
 import base.command.AccountMod;
 import base.domain.Account;
+import base.domain.Role;
 import base.dto.AccountDto;
 import base.repository.AccountRepository;
+import base.repository.RoleRepository;
 
 @Service
 public class AccountService {
 
     @Autowired
     private AccountRepository accountRepository;
+    
+    @Autowired
+    private RoleRepository roleRepository;
     
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -35,6 +41,12 @@ public class AccountService {
         dto.setRoles(account.getRoles());
         return Optional.of(dto);
     }
+    
+    /**
+     * Add user during signup. Authorization level is always USER.
+     * @param accountAdd  command
+     * @return  Optional AccountDto to be returned to client.
+     */
 
     @Transactional
     public Optional<AccountDto> addUser(AccountAdd account) {
@@ -45,7 +57,8 @@ public class AccountService {
         Account user = new Account();
         user.setUsername(account.getUsername());
         user.setPassword(passwordEncoder.encode(account.getPassword()));
-        user.setRoles(account.getRoles());
+        Role userRole = roleRepository.findByName("USER");
+        user.setRoles(Arrays.asList(userRole));
         user = accountRepository.saveAndFlush(user);
         AccountDto dto = new AccountDto(user.getUsername());
         dto.setRoles(user.getRoles());
