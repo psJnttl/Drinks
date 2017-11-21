@@ -1,7 +1,9 @@
 package base.service;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -24,10 +26,10 @@ public class AccountService {
 
     @Autowired
     private AccountRepository accountRepository;
-    
+
     @Autowired
     private RoleRepository roleRepository;
-    
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -41,11 +43,13 @@ public class AccountService {
         dto.setRoles(account.getRoles());
         return Optional.of(dto);
     }
-    
+
     /**
      * Add user during signup. Authorization level is always USER.
-     * @param accountAdd  command
-     * @return  Optional AccountDto to be returned to client.
+     * 
+     * @param accountAdd
+     *            command
+     * @return Optional AccountDto to be returned to client.
      */
 
     @Transactional
@@ -66,12 +70,12 @@ public class AccountService {
     }
 
     public boolean isRequestValid(AccountMod account) {
-        if (null == account || null == account.getOldPassword() || null == account.getNewPassword() ||
-                null == account.getRoles() || null == account.getUsername()) {
+        if (null == account || null == account.getOldPassword() || null == account.getNewPassword()
+                || null == account.getRoles() || null == account.getUsername()) {
             return false;
         }
-        if (account.getOldPassword().isEmpty() || account.getNewPassword().isEmpty() || account.getRoles().isEmpty() ||
-                account.getUsername().isEmpty()) {
+        if (account.getOldPassword().isEmpty() || account.getNewPassword().isEmpty() || account.getRoles().isEmpty()
+                || account.getUsername().isEmpty()) {
             return false;
         }
         Optional<AccountDto> user = getUser();
@@ -85,11 +89,13 @@ public class AccountService {
     }
 
     /**
-     * Used for changing password. Can't be used for changing user roles.
-     * Please use method isRequestValid to validate input first.
-     * @param accountMod  command on account to be changed
-     * @return AccountDto  Optional.empty if old password was incorrect
-     *                     If password change OK, has username & roles, but no password.
+     * Used for changing password. Can't be used for changing user roles. Please
+     * use method isRequestValid to validate input first.
+     * 
+     * @param accountMod
+     *            command on account to be changed
+     * @return AccountDto Optional.empty if old password was incorrect If
+     *         password change OK, has username & roles, but no password.
      */
     @Transactional
     public Optional<AccountDto> changePassword(AccountMod account) {
@@ -98,7 +104,7 @@ public class AccountService {
             return Optional.empty();
         }
         Account accountToMod = accountRepository.findByUsername(user.get().getUsername());
-        if (!passwordEncoder.matches(account.getOldPassword(), accountToMod.getPassword()) ) {
+        if (!passwordEncoder.matches(account.getOldPassword(), accountToMod.getPassword())) {
             return Optional.empty();
         }
         accountToMod.setPassword(passwordEncoder.encode(account.getNewPassword()));
@@ -106,6 +112,11 @@ public class AccountService {
         AccountDto dto = new AccountDto(accountToMod.getUsername());
         dto.setRoles(accountToMod.getRoles());
         return Optional.of(dto);
+    }
+
+    public List<AccountDto> listAll() {
+        List<Account> accounts = accountRepository.findAll();
+        return accounts.stream().map(a -> new AccountDto(a.getUsername(), a.getRoles())).collect(Collectors.toList());
     }
 
 }

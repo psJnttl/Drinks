@@ -7,7 +7,7 @@ import base.domain.Role;
 
 public class AccountDto {
     private String username;
-    private String password;
+    private String password = "";
     private List<Role> roles;
 
     public AccountDto() {
@@ -15,6 +15,11 @@ public class AccountDto {
 
     public AccountDto(String username) {
         this.username = username;
+    }
+
+    public AccountDto(String username, List<Role> roles) {
+        this.username = username;
+        this.roles = roles;
     }
 
     public String getUsername() {

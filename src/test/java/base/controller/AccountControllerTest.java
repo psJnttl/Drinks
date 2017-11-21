@@ -2,7 +2,9 @@ package base.controller;
 
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
@@ -46,6 +49,7 @@ public class AccountControllerTest {
     private PasswordEncoder passwordEncoder;
     
     private static final String PATH = "/api/account";
+    private static final String PATH_ADMIN = "/api/accounts";
     private static final String USERNAME1 = "user1";
     private static final String PASSWORD1 = "password";
     private static final String PASSWORD_NEW = "NewPassword";
@@ -142,4 +146,23 @@ public class AccountControllerTest {
                         .content(content))
             .andExpect(status().isBadRequest());
     }
+    
+    @Test
+    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    public void listAllAccounts() throws Exception {
+        mockMvc
+            .perform(get(PATH_ADMIN))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+    }
+    
+    @Test(expected = AccessDeniedException.class)
+    @WithMockUser(username=USERNAME1, authorities={"USER"})
+    public void listAllAccountsNotAdminFails() throws Exception {
+        mockMvc
+            .perform(get(PATH_ADMIN))
+                .andExpect(status().isForbidden()); 
+    }
+    
+    
 }
