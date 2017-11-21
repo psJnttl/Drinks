@@ -6,10 +6,11 @@ import axios from 'axios';
 class EventLog extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {eventLog: [], }
+    this.state = {eventLog: [], searchName: ""  }
     this.fetchEventLog = this.fetchEventLog.bind(this);
     this.setEventLogList = this.setEventLogList.bind(this);
     this.parseDate = this.parseDate.bind(this);
+    this.onChangeSearchName = this.onChangeSearchName.bind(this);
   }
 
   fetchEventLog() {
@@ -44,12 +45,38 @@ class EventLog extends React.Component {
     this.setState({eventLog: theList});
   }
 
+  onChangeSearchName(e) {
+    this.setState({searchName: e.target.value});
+  }
+
+  checkDuplicate(list, item) {
+    const index = _.findIndex(list, item);
+    if (-1 === index) {
+      return false;
+    }
+    return true;
+  }
+
+  concatenateSearchResults(target, source) {
+    const result1 = source.filter( item => !this.checkDuplicate(target, item));
+    const result = _.concat(target, result1);
+    return result;
+  }
+
   componentDidMount() {
     this.fetchEventLog();
   }
 
   render() {
-    const dataRows = this.state.eventLog.map((row, index) =>
+    const byAction = this.state.eventLog.filter(item => item.action.toLowerCase().includes(this.state.searchName.toLowerCase()));
+    const byTargetEntity = this.state.eventLog.filter(item => item.targetEntity.toLowerCase().includes(this.state.searchName.toLowerCase()));
+    const byTargetName = this.state.eventLog.filter(item => item.targetName.toLowerCase().includes(this.state.searchName.toLowerCase()));
+    const byUsername = this.state.eventLog.filter(item => item.username.toLowerCase().includes(this.state.searchName.toLowerCase()));
+    const concat1 = this.concatenateSearchResults(byAction, byTargetEntity);
+    const concat2 = this.concatenateSearchResults(concat1, byTargetName);
+    const concat3 = this.concatenateSearchResults(concat2, byUsername);
+    const sorted = _.orderBy(concat3, [function(l) { return l.id }], ['asc']);
+    const dataRows = concat3.map((row, index) =>
       <tr key={index}>
         <td>{row.id}</td>
         <td>{row.action}</td>
@@ -62,7 +89,19 @@ class EventLog extends React.Component {
     );
     return (
       <div>
-        <h4>Event Log</h4>
+        <ul style={{'display': 'flex', 'listStyleType': 'none', 'marginTop': '10px'}}>
+          <li>
+            <input
+              className="searchinput"
+              type="text"
+              placeholder="search"
+              onChange={ this.onChangeSearchName }
+              value={this.state.searchName}
+              autoComplete="off"
+              title="by action, target entity, target name or or username"
+            />
+          </li>
+        </ul>
         <Table bordered condensed hover>
           <thead>
             <tr>

@@ -10,6 +10,7 @@ import Categories from './components/Categories';
 import EventLog from './components/EventLog';
 import Drinks from './components/Drinks';
 import Account from './components/Account';
+import Admin from './components/Admin';
 import _ from 'lodash';
 import axios from 'axios';
 
@@ -60,7 +61,7 @@ class App extends React.Component {
   }
 
   render() {
-    const authValue = this.props.authState.authenticated;
+    const authState = this.props.authState;
     const admin = this.props.authState.admin;
     return (
       <Router>
@@ -87,13 +88,13 @@ class App extends React.Component {
             )} />
             <Route path="/about" component={About} />
             <Route path="/logout" render={(props) => (
-              <Logout authenticated={authValue} changeAuthState={this.props.changeAuthState} {...props}  />
+              <Logout authenticated={authState.authenticated} changeAuthState={this.props.changeAuthState} {...props}  />
             )}/>
             <Route path="/account" render={(props) => (
-              <Account authState={this.props.authState} {...props} />
+              <Account authState={authState} {...props} />
             )} />
-            <Route path="/eventlog" render={(props) => (
-              <EventLog authenticated={authValue} {...props}  />
+            <Route path="/admin" render={(props) => (
+              <Admin authState={authState} {...props}  />
             )}/>
             <Route render={ () => <div><h1>404 - Not Found!</h1></div>} />
           </Switch>
