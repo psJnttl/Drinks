@@ -10,7 +10,7 @@ class Users extends React.Component {
   constructor(props) {
     super(props);
     this.state = {accounts: [], infoModalVisible: false, infoModalData: {},
-      addModalVisible: false, roles: [],
+      addModalVisible: false, roles: [], editModalVisible: false, user: {},
     }
     this.fetchAccounts = this.fetchAccounts.bind(this);
     this.setAccountsData = this.setAccountsData.bind(this);
@@ -20,6 +20,9 @@ class Users extends React.Component {
     this.saveNewUser = this.saveNewUser.bind(this);
     this.fetchRoles = this.fetchRoles.bind(this);
     this.setRolesData = this.setRolesData.bind(this);
+    this.openEditModal = this.openEditModal.bind(this);
+    this.closeEditModal = this.closeEditModal.bind(this);
+    this.saveOldUser = this.saveOldUser.bind(this);
   }
 
   fetchAccounts() {
@@ -123,6 +126,36 @@ class Users extends React.Component {
         });
   }
 
+  saveOldUser(user) {
+    this.closeEditModal();
+    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
+    const command = {
+      username: user.username,
+      newPassword: user.password,
+      roles: _.concat([], user.roles)
+    };
+    const self = this;
+    axios.put('api/accounts', command, config)
+         .then(function (response) {
+              self.fetchAccounts();
+         })
+        .catch(function (response) {
+          self.setState({infoModalVisible: true,
+              infoModalData: {header:"failedModalHeader",
+              title:"Modify user failed",
+             notification: "Could not modify user on server!",
+             name: ""} });
+        });
+  }
+
+  openEditModal(item) {
+    this.setState({editModalVisible: true, user: item});
+  }
+
+  closeEditModal() {
+    this.setState({editModalVisible: false, user: {} });
+  }
+
   componentDidMount() {
     this.fetchAccounts();
     this.fetchRoles();
@@ -138,6 +171,17 @@ class Users extends React.Component {
         title="Add new user"
         save={this.saveNewUser}
         roles={this.state.roles}
+      />
+    }
+    else if (true === this.state.editModalVisible) {
+      userModal =
+      <UserModal
+        modalOpen={this.state.editModalVisible}
+        close={this.closeEditModal}
+        title="Edit user"
+        save={this.saveOldUser}
+        roles={this.state.roles}
+        user={this.state.user}
       />
     }
     else {
