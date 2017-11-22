@@ -20,10 +20,17 @@ class UserModal extends React.Component {
 
   isFormValid() {
     const user = this.state.user;
-    if (user.username.length >= 4 && user.password.length >= 4 &&
-        user.roles.length > 0) {
-          return true;
-        }
+    if (this.props.title === "Add new user") {
+      if (user.username.length >= 4 && user.password.length >= 4 &&
+          user.roles.length > 0) {
+        return true;
+      }
+    }
+    else if (this.props.title === "Edit user") {
+      if (user.username.length >= 4 && user.roles.length > 0) {
+        return true;
+      }
+    }
     return false;
   }
 
@@ -84,7 +91,11 @@ class UserModal extends React.Component {
               <FormControl type="text" placeholder="username" onChange={this.onChangeUsername} value={this.state.user.username} />
             </FormGroup>
             <FormGroup controlId="formInput">
-              <FormControl type="password" placeholder="password" onChange={this.onChangePassword} value={this.state.user.password} />
+              {this.props.title === "Edit user" ?
+                <FormControl type="password" placeholder="enter password only to reset it" 
+                  onChange={this.onChangePassword} value={this.state.user.password} />
+              :
+              <FormControl type="password" placeholder="password" onChange={this.onChangePassword} value={this.state.user.password} />}
             </FormGroup>
             <FormGroup controlId="formSelect">
               <Table>
