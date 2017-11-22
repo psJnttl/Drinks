@@ -150,7 +150,7 @@ public class AccountService {
     public AccountDto modifyAccount(AccountMod account) {
         Account user = accountRepository.findByUsername(account.getUsername());
         if (null != account.getNewPassword() && !account.getNewPassword().isEmpty()) {
-            user.setPassword(account.getNewPassword());
+            user.setPassword(passwordEncoder.encode(account.getNewPassword()));
         }
         if (null != account.getRoles() && !account.getRoles().isEmpty()) {
             user.setRoles(getRoleEntities(account.getRoles()));
