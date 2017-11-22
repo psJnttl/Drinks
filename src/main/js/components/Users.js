@@ -92,7 +92,35 @@ class Users extends React.Component {
   }
 
   saveNewUser(user) {
-    console.log(user);
+    this.closeAddModal();
+    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
+    const command = {
+      username: user.username,
+      password: user.password,
+      roles: _.concat([], user.roles)
+    };
+    const self = this;
+    axios.post('api/accounts', command, config)
+         .then(function (response) {
+              self.fetchAccounts();
+         })
+        .catch(function (response) {
+          let info;
+          if (409 === response.response.status) {
+            info = {header:"failedModalHeader",
+            title:"Add user failed",
+           notification: "User with same username exists!",
+           name: ""}
+          }
+          else {
+            info = {header:"failedModalHeader",
+            title:"Add user failed",
+           notification: "Could not get add new user!",
+           name: ""}
+          }
+          self.setState({infoModalVisible: true,
+              infoModalData: info });
+        });
   }
 
   componentDidMount() {
