@@ -140,4 +140,23 @@ public class AccountService {
                     .map(r -> roleRepository.findByName(r.getName()))
                     .collect(Collectors.toList());
     }
+    /**
+     * Modify active account: set authorization roles or reset password.
+     * Password is reset if new password is defined. Roles are changed if they're defined.
+     * @param AccountMod
+     * @return AccountDto
+     */
+    @Transactional
+    public AccountDto modifyAccount(AccountMod account) {
+        Account user = accountRepository.findByUsername(account.getUsername());
+        if (null != account.getNewPassword() && !account.getNewPassword().isEmpty()) {
+            user.setPassword(account.getNewPassword());
+        }
+        if (null != account.getRoles() && !account.getRoles().isEmpty()) {
+            user.setRoles(getRoleEntities(account.getRoles()));
+        }
+        user = accountRepository.saveAndFlush(user);
+        AccountDto dto = new AccountDto(user.getUsername(), user.getRoles());
+        return dto;
+    }
 }

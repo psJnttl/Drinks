@@ -79,5 +79,15 @@ public class AccountController {
         return new ResponseEntity<>(dto, headers, HttpStatus.CREATED);
     }
 
-    
+    /**
+     * For changing authorization roles and reseting password. ADMIN access only.
+     * @param AccountMod
+     * @return AccountDto
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @RequestMapping(value = "/api/accounts", method = RequestMethod.PUT)
+    public ResponseEntity<AccountDto> modifyAccount(@RequestBody AccountMod account) {
+        AccountDto dto = accountService.modifyAccount(account);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
 }

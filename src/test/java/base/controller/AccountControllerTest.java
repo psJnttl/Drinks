@@ -229,4 +229,32 @@ public class AccountControllerTest {
         assertTrue("Must have two roles", dto.getRoles().size() == 2);
     }
 
+    @Test
+    @WithMockUser(username="admin", authorities={"USER", "ADMIN"})
+    public void modifyUserByAdminAddAdminAuthority() throws Exception {
+        AccountMod account = buildAccountModCmd(USERNAME1, EMPTY_STRING, Arrays.asList("USER", "ADMIN"));
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(account);
+        MvcResult result = mockMvc
+                .perform(
+                        put(PATH_ADMIN)
+                            .contentType(MediaType.APPLICATION_JSON_UTF8)
+                            .content(content))
+                .andExpect(status().isOk())
+                .andReturn();
+        AccountDto dto = mapper.readValue(result.getResponse().getContentAsString(), AccountDto.class);
+        assertTrue("Username not correct", dto.getUsername().equals(USERNAME1));
+        assertTrue("Must have USER role", dto.getRoles().stream().filter(r -> r.getName().equals("USER")).findFirst().isPresent());
+        assertTrue("Must have ADMIN role", dto.getRoles().stream().filter(r -> r.getName().equals("ADMIN")).findFirst().isPresent());
+        assertTrue("Must have two roles", dto.getRoles().size() == 2);
+    }
+
+    private AccountMod buildAccountModCmd(String username, String password, List<String> roles) {
+        AccountMod acc = new AccountMod();
+        acc.setUsername(username);
+        acc.setNewPassword(password);
+        List<Role> roleEntities = roles.stream().map(r -> roleRepository.findByName(r)).collect(Collectors.toList());
+        acc.setRoles(roleEntities);
+        return acc;
+    }
 }
