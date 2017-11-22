@@ -8,16 +8,22 @@ import UserRoles from './UserRoles';
 class UserModal extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {user: {username: "", password: "", roles: []}, role: {},
+    this.state = {user: {username: "", password: "", roles: [{id:1, name: "USER"}]}, role: {},
     }
     this.isFormValid = this.isFormValid.bind(this);
     this.onChangeUsername = this.onChangeUsername.bind(this);
     this.onChangePassword = this.onChangePassword.bind(this);
     this.handleSelectRole = this.handleSelectRole.bind(this);
     this.handleAddRole = this.handleAddRole.bind(this);
+    this.deleteRole = this.deleteRole.bind(this);
   }
 
   isFormValid() {
+    const user = this.state.user;
+    if (user.username.length >= 4 && user.password.length >= 4 &&
+        user.roles.length > 0) {
+          return true;
+        }
     return false;
   }
 
@@ -41,11 +47,22 @@ class UserModal extends React.Component {
   }
 
   handleAddRole() {
-    if (undefined !== this.state.role) {
-      // check for duplicate: a role must only appear once in the list
-      const oldRoles = this.state.user.roles;
+    if (undefined !== this.state.role.id) {
+      const id = this.state.role.id;
+      const roleIndex = _.findIndex(this.state.user.roles, (r) => (r.id === id) );
+      if (-1 === roleIndex) {
+        const newRoles = _.concat(this.state.user.roles, this.state.role);
+        const newUser = _.assign(this.state.user, {roles: newRoles});
+        this.setState({user: newUser});
+      }
     }
     return;
+  }
+
+  deleteRole(item) {
+    const newRoles = _.filter(this.state.user.roles, function(r) { return r.id !== item.id; });
+    const newUser = _.assign(this.state.user, {roles: newRoles});
+    this.setState({user: newUser});
   }
 
   componentDidMount() {
@@ -116,6 +133,6 @@ UserModal.PropTypes = {
 UserModal.defaultProps = {
   title: "Add an user",
   header: "successModalHeader",
-  user: {username: "", password: "", roles: []}
+  user: {username: "", password: "", roles: [{id:1, name: "USER"}]}
 }
 export default UserModal;
