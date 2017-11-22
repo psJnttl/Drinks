@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,7 +38,7 @@ public class AccountController {
     
     @RequestMapping(value = "/api/account/signup", method = RequestMethod.POST)
     public ResponseEntity<AccountDto> signup(@RequestBody AccountAdd account) {
-        if (accountService.doesAccountAlreadyExist(account)) {
+        if (accountService.doesAccountExist(account)) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         Optional<AccountDto> accountDto = accountService.addUser(account);
@@ -70,7 +71,7 @@ public class AccountController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping(value = "/api/accounts", method = RequestMethod.POST)
     public ResponseEntity<AccountDto> addAccount(@RequestBody AccountAdd account) throws URISyntaxException {
-        if (accountService.doesAccountAlreadyExist(account)) {
+        if (accountService.doesAccountExist(account)) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         AccountDto dto = accountService.addUserWithAuthorization(account);
@@ -89,5 +90,14 @@ public class AccountController {
     public ResponseEntity<AccountDto> modifyAccount(@RequestBody AccountMod account) {
         AccountDto dto = accountService.modifyAccount(account);
         return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+    
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @RequestMapping(value = "/api/accounts/{username}", method = RequestMethod.DELETE)
+    public ResponseEntity<AccountDto> deleteAccount(@PathVariable String username) {
+        if (! accountService.deleteAccountByUsername(username)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

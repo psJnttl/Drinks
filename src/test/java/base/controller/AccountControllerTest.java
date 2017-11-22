@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -256,5 +257,21 @@ public class AccountControllerTest {
         List<Role> roleEntities = roles.stream().map(r -> roleRepository.findByName(r)).collect(Collectors.toList());
         acc.setRoles(roleEntities);
         return acc;
+    }
+    
+    @Test
+    @WithMockUser(username="admin", authorities={"USER", "ADMIN"})
+    public void deleteUserByAdminOK() throws Exception {
+        mockMvc.perform(
+                delete(PATH_ADMIN + "/" + USERNAME1))
+                .andExpect(status().isOk());
+    }
+    
+    @Test
+    @WithMockUser(username="admin", authorities={"USER", "ADMIN"})
+    public void deleteUserByAdminFails404() throws Exception {
+        mockMvc.perform(
+                delete(PATH_ADMIN + "/" + USERNAME2))
+                .andExpect(status().isNotFound());
     }
 }

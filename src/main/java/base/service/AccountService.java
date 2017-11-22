@@ -66,7 +66,7 @@ public class AccountService {
         return Optional.of(dto);
     }
 
-    public boolean doesAccountAlreadyExist(AccountAdd account) {
+    public boolean doesAccountExist(AccountAdd account) {
         Account existing = accountRepository.findByUsername(account.getUsername());
         if (null != existing) {
             return true;
@@ -158,5 +158,15 @@ public class AccountService {
         user = accountRepository.saveAndFlush(user);
         AccountDto dto = new AccountDto(user.getUsername(), user.getRoles());
         return dto;
+    }
+
+    @Transactional
+    public boolean deleteAccountByUsername(String username) {
+        Account account = accountRepository.findByUsername(username);
+        if (null == account) {
+            return false;
+        }
+        accountRepository.delete(account);
+        return true;
     }
 }
