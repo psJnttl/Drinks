@@ -1,13 +1,18 @@
 package base.controller;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Before;
@@ -28,11 +33,13 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import base.command.AccountAdd;
 import base.command.AccountMod;
 import base.domain.Account;
 import base.domain.Role;
 import base.dto.AccountDto;
 import base.repository.AccountRepository;
+import base.repository.RoleRepository;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -46,11 +53,15 @@ public class AccountControllerTest {
     private AccountRepository accountRepository;
     
     @Autowired
+    private RoleRepository roleRepository;
+    
+    @Autowired
     private PasswordEncoder passwordEncoder;
     
     private static final String PATH = "/api/account";
     private static final String PATH_ADMIN = "/api/accounts";
     private static final String USERNAME1 = "user1";
+    private static final String USERNAME2 = "user2";
     private static final String PASSWORD1 = "password";
     private static final String PASSWORD_NEW = "NewPassword";
     private static final String EMPTY_STRING = "";
@@ -74,6 +85,10 @@ public class AccountControllerTest {
     public void tearDown() throws Exception {
         accountRepository.delete(user);
         System.out.println("account count: " + accountRepository.findAll().size());
+        Account account2  = accountRepository.findByUsername(USERNAME2);
+        if (null != account2) {
+            accountRepository.delete(account2);
+        }
     }
 
     @Test
@@ -164,5 +179,54 @@ public class AccountControllerTest {
                 .andExpect(status().isForbidden()); 
     }
     
+    @Test
+    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    public void addUserByAdminWithUserAuth() throws Exception {
+        AccountAdd account = buildAccountAddCmd(USERNAME2, PASSWORD1, Arrays.asList("USER"));
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(account);
+        MvcResult result = mockMvc
+                .perform(
+                        post(PATH_ADMIN)
+                            .contentType(MediaType.APPLICATION_JSON_UTF8)
+                            .content(content))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", containsString(PATH_ADMIN + "/")))
+                .andReturn();
+        AccountDto dto = mapper.readValue(result.getResponse().getContentAsString(), AccountDto.class);
+        assertTrue("Username not correct", dto.getUsername().equals(USERNAME2));
+        assertTrue("Must have USER role", dto.getRoles().stream().filter(r -> r.getName().equals("USER")).findFirst().isPresent());
+        assertTrue("Must only have one role", dto.getRoles().size() == 1);
+    }
     
+    private AccountAdd buildAccountAddCmd(String username, String password, List<String> roles) {
+        AccountAdd acc = new AccountAdd();
+        acc.setUsername(username);
+        acc.setPassword(password);
+        List<Role> roleEntities = roles.stream().map(r -> roleRepository.findByName(r)).collect(Collectors.toList());
+        acc.setRoles(roleEntities);
+        return acc;
+    }
+
+    @Test
+    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    public void addUserByAdminWithUserAndAdminAuth() throws Exception {
+        AccountAdd account = buildAccountAddCmd(USERNAME2, PASSWORD1, Arrays.asList("USER", "ADMIN"));
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(account);
+        MvcResult result = mockMvc
+                .perform(
+                        post(PATH_ADMIN)
+                            .contentType(MediaType.APPLICATION_JSON_UTF8)
+                            .content(content))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", containsString(PATH_ADMIN + "/")))
+                .andReturn();
+        AccountDto dto = mapper.readValue(result.getResponse().getContentAsString(), AccountDto.class);
+        assertTrue("Username not correct", dto.getUsername().equals(USERNAME2));
+        assertTrue("Must have USER role", dto.getRoles().stream().filter(r -> r.getName().equals("USER")).findFirst().isPresent());
+        assertTrue("Must have ADMIN role", dto.getRoles().stream().filter(r -> r.getName().equals("ADMIN")).findFirst().isPresent());
+        assertTrue("Must have two roles", dto.getRoles().size() == 2);
+    }
+
 }

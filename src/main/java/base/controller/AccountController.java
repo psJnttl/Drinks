@@ -1,9 +1,12 @@
 package base.controller;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,11 +36,11 @@ public class AccountController {
     }
     
     @RequestMapping(value = "/api/account/signup", method = RequestMethod.POST)
-    public ResponseEntity<AccountDto> addAccount(@RequestBody AccountAdd account) {
-        Optional<AccountDto> accountDto = accountService.addUser(account);
-        if (!accountDto.isPresent()) {
+    public ResponseEntity<AccountDto> signup(@RequestBody AccountAdd account) {
+        if (accountService.doesAccountAlreadyExist(account)) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
+        Optional<AccountDto> accountDto = accountService.addUser(account);
         return new ResponseEntity<>(accountDto.get(), HttpStatus.CREATED);
     }
     
@@ -58,8 +61,23 @@ public class AccountController {
     public List<AccountDto> listAccounts() {
         return accountService.listAll();
     }
+    /**
+     * For adding an account by ADMIN. Difference to signup is that authorization is not locked to USER.
+     * @param AccountAdd
+     * @return  AccountDto, Location header doesn't have ID.
+     * @throws URISyntaxException 
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @RequestMapping(value = "/api/accounts", method = RequestMethod.POST)
+    public ResponseEntity<AccountDto> addAccount(@RequestBody AccountAdd account) throws URISyntaxException {
+        if (accountService.doesAccountAlreadyExist(account)) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+        AccountDto dto = accountService.addUserWithAuthorization(account);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(new URI("/api/accounts/") );
+        return new ResponseEntity<>(dto, headers, HttpStatus.CREATED);
+    }
+
     
-
-
-
 }

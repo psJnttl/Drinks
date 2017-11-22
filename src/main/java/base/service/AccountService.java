@@ -1,5 +1,6 @@
 package base.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -54,10 +55,6 @@ public class AccountService {
 
     @Transactional
     public Optional<AccountDto> addUser(AccountAdd account) {
-        Account existing = accountRepository.findByUsername(account.getUsername());
-        if (null != existing) {
-            return Optional.empty();
-        }
         Account user = new Account();
         user.setUsername(account.getUsername());
         user.setPassword(passwordEncoder.encode(account.getPassword()));
@@ -67,6 +64,14 @@ public class AccountService {
         AccountDto dto = new AccountDto(user.getUsername());
         dto.setRoles(user.getRoles());
         return Optional.of(dto);
+    }
+
+    public boolean doesAccountAlreadyExist(AccountAdd account) {
+        Account existing = accountRepository.findByUsername(account.getUsername());
+        if (null != existing) {
+            return true;
+        }
+        return false;
     }
 
     public boolean isRequestValid(AccountMod account) {
@@ -119,4 +124,20 @@ public class AccountService {
         return accounts.stream().map(a -> new AccountDto(a.getUsername(), a.getRoles())).collect(Collectors.toList());
     }
 
+    @Transactional
+    public AccountDto addUserWithAuthorization(AccountAdd account) {
+        Account user = new Account();
+        user.setUsername(account.getUsername());
+        user.setPassword(passwordEncoder.encode(account.getPassword()));
+        user.setRoles(getRoleEntities(account.getRoles()));
+        user = accountRepository.saveAndFlush(user);
+        AccountDto dto = new AccountDto(user.getUsername(), user.getRoles());
+        return dto;
+    }
+
+    private List<Role> getRoleEntities(List<Role> roles) {
+        return roles.stream()
+                    .map(r -> roleRepository.findByName(r.getName()))
+                    .collect(Collectors.toList());
+    }
 }
