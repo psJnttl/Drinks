@@ -5,14 +5,16 @@ import _ from 'lodash';
 import {Button, Col, Glyphicon, Pagination, Table} from 'react-bootstrap';
 import SimpleInformationModal from './SimpleInformationModal';
 import UserModal from './UserModal';
+import SimpleConfirmationModal from './SimpleConfirmationModal';
 
 class Users extends React.Component {
   constructor(props) {
     super(props);
     this.state = {accounts: [], infoModalVisible: false, infoModalData: {},
       addModalVisible: false, roles: [], editModalVisible: false, user: {},
+      delConfirmationVisible: false,
     }
-    this.fetchAccounts = this.fetchAccounts.bind(this);
+    this.fetchUsers = this.fetchUsers.bind(this);
     this.setAccountsData = this.setAccountsData.bind(this);
     this.closeInfoModal = this.closeInfoModal.bind(this);
     this.openAddModal = this.openAddModal.bind(this);
@@ -23,9 +25,12 @@ class Users extends React.Component {
     this.openEditModal = this.openEditModal.bind(this);
     this.closeEditModal = this.closeEditModal.bind(this);
     this.saveOldUser = this.saveOldUser.bind(this);
+    this.setDeleteConfirmModalVisible = this.setDeleteConfirmModalVisible.bind(this);
+    this.deleteReply = this.deleteReply.bind(this);
+    this.deleteUser = this.deleteUser.bind(this);
   }
 
-  fetchAccounts() {
+  fetchUsers() {
     const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
     axios.get('api/accounts', config)
@@ -105,7 +110,7 @@ class Users extends React.Component {
     const self = this;
     axios.post('api/accounts', command, config)
          .then(function (response) {
-              self.fetchAccounts();
+              self.fetchUsers();
          })
         .catch(function (response) {
           let info;
@@ -137,7 +142,7 @@ class Users extends React.Component {
     const self = this;
     axios.put('api/accounts', command, config)
          .then(function (response) {
-              self.fetchAccounts();
+              self.fetchUsers();
          })
         .catch(function (response) {
           self.setState({infoModalVisible: true,
@@ -156,8 +161,37 @@ class Users extends React.Component {
     this.setState({editModalVisible: false, user: {} });
   }
 
+  setDeleteConfirmModalVisible(item) {
+    this.setState({delConfirmationVisible: true, user: item});
+  }
+
+  deleteReply(answer) {
+    if (true === answer) {
+      this.deleteUser(this.state.user);
+    }
+    this.setState({delConfirmationVisible: false, user: {} });
+  }
+
+  deleteUser(user) {
+    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
+    const self = this;
+    const url = 'api/accounts/' + user.username;
+    axios.delete(url, config)
+         .then(function (response) {
+              self.fetchUsers();
+         })
+        .catch(function (response) {
+          self.setState({infoModalVisible: true,
+            infoModalData: {header:"failedModalHeader",
+            title:"Delete user failed",
+            notification: "Couldn't delete user on server!",
+            name: ""} });
+
+        });
+  }
+
   componentDidMount() {
-    this.fetchAccounts();
+    this.fetchUsers();
     this.fetchRoles();
   }
 
@@ -207,6 +241,13 @@ class Users extends React.Component {
           notification2 =""
           name={this.state.infoModalData.name}
           reply={this.closeInfoModal} />
+        <SimpleConfirmationModal
+          modalOpen={this.state.delConfirmationVisible}
+          title="Delete user"
+          question={"Are you sure you want to delete " + this.state.user.username}
+          reply={this.deleteReply}
+          header="failedModalHeader"
+        />
 
         {userModal}
 
