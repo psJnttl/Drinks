@@ -66,7 +66,7 @@ class Users extends React.Component {
 
   setRolesData(data) {
     const rolesData = data.map( item =>
-      _.assign( {}, {id: item.id, role: item.role})  );
+      _.assign( {}, {id: item.id, name: item.name})  );
       this.setState({roles: rolesData});
   }
 
