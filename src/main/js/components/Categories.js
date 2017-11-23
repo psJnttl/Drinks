@@ -174,6 +174,7 @@ class Categories extends React.Component {
             columnNames={['id','name']}
             dataTool={this.rowTool}
             parentRef={self}
+            itemsPerPageChoices={[5, 10, 20]}
           />
         </Col>
       </div>

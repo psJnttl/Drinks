@@ -39,6 +39,9 @@ class Pages extends React.Component {
     const header = this.props.columnNames.map((item, index) =>
       <th key={index}>{item}</th> );
     const dataRows = itemsOnPage.map( (row, index) => this.props.dataTool(row, index, this.props.parentRef));
+    const itemsPerPageButtons = this.props.itemsPerPageChoices.map( (item, index) =>
+      <Button bsStyle={this.state.itemsPerPage === item ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(item)}>{item}</Button>
+    );
     return (
       <div>
         <Table bordered condensed hover>
@@ -62,9 +65,7 @@ class Pages extends React.Component {
           ellipsis
           maxButtons={5}
         /> <br/>
-        <Button bsStyle={this.state.itemsPerPage === 5 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(5)}>5</Button>
-        <Button bsStyle={this.state.itemsPerPage === 10 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(10)}>10</Button>
-        <Button bsStyle={this.state.itemsPerPage === 20 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(20)}>20</Button>
+        {itemsPerPageButtons}
       </div>
     );
   }
@@ -74,6 +75,9 @@ Pages.PropTypes = {
   columnNames: PropTypes.array.isRequired,
   dataTool: PropTypes.func.isRequired,
   parentRef: PropTypes.object.isRequired,
+  itemsPerPageChoices: PropTypes.array,
 }
-Pages.defaultProps = {}
+Pages.defaultProps = {
+  itemsPerPageChoices: [10, 20, 40],
+}
 export default Pages;
