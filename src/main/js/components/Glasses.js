@@ -94,13 +94,13 @@ class Glasses extends React.Component {
     this.fetchGlasses();
   }
 
-  dataTool(item, index) {
+  rowTool(item, index, self) {
     return (<tr key={index}>
       <td>{item.id}</td>
       <td>{item.name}</td>
       <td>
-        <Button bsStyle="danger" bsSize="small" onClick={() => this.setDeleteConfirmModalVisible(item)} title="delete"><Glyphicon glyph="trash"/></Button>
-        <Button bsStyle="warning" bsSize="small" onClick={() => this.openEditModal(item)} title="edit"><Glyphicon glyph="pencil"/></Button>
+        <Button bsStyle="danger" bsSize="small" onClick={() => self.setDeleteConfirmModalVisible(item)} title="delete"><Glyphicon glyph="trash"/></Button>
+        <Button bsStyle="warning" bsSize="small" onClick={() => self.openEditModal(item)} title="edit"><Glyphicon glyph="pencil"/></Button>
       </td>
     </tr>);
   }
@@ -132,7 +132,7 @@ class Glasses extends React.Component {
     }
 
     const filtered = this.state.glasses.filter(item => item.name.toLowerCase().includes(this.state.searchName.toLowerCase()));
-
+    const self = this;
     return (
       <div>
         <SimpleInformationModal
@@ -170,7 +170,8 @@ class Glasses extends React.Component {
           <Pages
             items={filtered}
             itemToList={['id','name']}
-            dataTool={this.dataTool}
+            dataTool={this.rowTool}
+            parentRef={self}
           />
         </Col>
       </div>

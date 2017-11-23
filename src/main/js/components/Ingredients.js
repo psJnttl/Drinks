@@ -89,13 +89,13 @@ class Ingredients extends React.Component {
     this.setState({searchName: e.target.value});
   }
 
-  rowTool(item, index) {
+  rowTool(item, index, self) {
     return (<tr key={index}>
       <td>{item.id}</td>
       <td>{item.name}</td>
       <td>
-        <Button bsStyle="danger" bsSize="small" onClick={() => this.setDeleteConfirmModalVisible(item)} title="delete"><Glyphicon glyph="trash"/></Button>
-        <Button bsStyle="warning" bsSize="small" onClick={() => this.openEditModal(item)} title="edit"><Glyphicon glyph="pencil"/></Button>
+        <Button bsStyle="danger" bsSize="small" onClick={() => self.setDeleteConfirmModalVisible(item)} title="delete"><Glyphicon glyph="trash"/></Button>
+        <Button bsStyle="warning" bsSize="small" onClick={() => self.openEditModal(item)} title="edit"><Glyphicon glyph="pencil"/></Button>
       </td>
     </tr>);
   }
@@ -128,7 +128,7 @@ class Ingredients extends React.Component {
       addModal = null;
     }
     const filtered = this.state.ingredients.filter(item => item.name.toLowerCase().includes(this.state.searchName.toLowerCase()));
-
+    const self = this;
     return (
       <div>
         <SimpleInformationModal
@@ -168,6 +168,7 @@ class Ingredients extends React.Component {
             items={filtered}
             itemToList={['id','name']}
             dataTool={this.rowTool}
+            parentRef={self}
           />
         </Col>
       </div>

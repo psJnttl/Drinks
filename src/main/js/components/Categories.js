@@ -90,8 +90,7 @@ class Categories extends React.Component {
     this.setState({searchName: e.target.value});
   }
 
-  rowTool(item, index, parentRef) {
-    self = parentRef;
+  rowTool(item, index, self) {
     return (<tr key={index}>
       <td>{item.id}</td>
       <td>{item.name}</td>
