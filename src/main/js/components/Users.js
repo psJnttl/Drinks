@@ -2,10 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import _ from 'lodash';
-import {Button, Col, Glyphicon, Pagination, Table} from 'react-bootstrap';
+import {Button, Col, Glyphicon, Table} from 'react-bootstrap';
 import SimpleInformationModal from './SimpleInformationModal';
 import UserModal from './UserModal';
 import SimpleConfirmationModal from './SimpleConfirmationModal';
+import Pages from './Pages';
 
 class Users extends React.Component {
   constructor(props) {
@@ -13,7 +14,6 @@ class Users extends React.Component {
     this.state = {accounts: [], infoModalVisible: false, infoModalData: {},
       addModalVisible: false, roles: [], editModalVisible: false, user: {},
       delConfirmationVisible: false, searchName: "",
-      pgCurrentPage: 1, pgItemsPerPage: 10,
     }
     this.fetchUsers = this.fetchUsers.bind(this);
     this.setAccountsData = this.setAccountsData.bind(this);
@@ -30,9 +30,6 @@ class Users extends React.Component {
     this.deleteReply = this.deleteReply.bind(this);
     this.deleteUser = this.deleteUser.bind(this);
     this.onChangeSearchName = this.onChangeSearchName.bind(this);
-    this.setCurrentPage = this.setCurrentPage.bind(this);
-    this.setItemsPerPage = this.setItemsPerPage.bind(this);
-    this.paginate = this.paginate.bind(this);
   }
 
   fetchUsers() {
@@ -196,7 +193,7 @@ class Users extends React.Component {
   }
 
   onChangeSearchName(e) {
-    this.setState({searchName: e.target.value, pgCurrentPage: 1});
+    this.setState({searchName: e.target.value});
   }
 
   userHasRole(user, name) {
@@ -221,17 +218,17 @@ class Users extends React.Component {
     return true;
   }
 
-  setCurrentPage(pageNbr) {
-    this.setState({pgCurrentPage: pageNbr})
-  }
-
-  setItemsPerPage(nbrItems) {
-    this.setState({pgItemsPerPage: nbrItems, pgCurrentPage: 1});
-  }
-
-  paginate (item, index) {
-    return (index >= (this.state.pgCurrentPage-1) * this.state.pgItemsPerPage) &&
-      (index < (this.state.pgCurrentPage-1) * this.state.pgItemsPerPage + this.state.pgItemsPerPage);
+  rowTool(item, index, self) {
+    return (
+      <tr key={index}>
+        <td>{item.username}</td>
+        <td>{self.listRoles(item.roles)}</td>
+        <td>
+          <Button bsStyle="danger" bsSize="small" onClick={() => self.setDeleteConfirmModalVisible(item)} title="delete user"><Glyphicon glyph="trash"/></Button>
+          <Button bsStyle="warning" bsSize="small" onClick={() => self.openEditModal(item)} title="edit user"><Glyphicon glyph="pencil"/></Button>
+        </td>
+      </tr>
+    );
   }
 
   componentDidMount() {
@@ -240,6 +237,7 @@ class Users extends React.Component {
   }
 
   render() {
+    const self = this;
     let userModal;
     if (true === this.state.addModalVisible) {
       userModal =
@@ -269,19 +267,7 @@ class Users extends React.Component {
     const filteredByRole = this.state.accounts.filter(item => this.userHasRole(item, this.state.searchName.toLowerCase()));
     const concatenated = this.concatenateSearchResults(filteredByUsername, filteredByRole);
     const sorted = _.orderBy(concatenated, [function(u) { return u.username.toLowerCase(); }], ['asc']);
-    const pageAmount = Math.ceil(sorted.length / this.state.pgItemsPerPage);
-    const itemsOnPage = sorted.filter ( (item, index) => this.paginate(item, index) );
 
-    const dataRows = itemsOnPage.map( (row, index) =>
-      <tr key={index}>
-        <td>{row.username}</td>
-        <td>{this.listRoles(row.roles)}</td>
-        <td>
-          <Button bsStyle="danger" bsSize="small" onClick={() => this.setDeleteConfirmModalVisible(row)} title="delete user"><Glyphicon glyph="trash"/></Button>
-          <Button bsStyle="warning" bsSize="small" onClick={() => this.openEditModal(row)} title="edit user"><Glyphicon glyph="pencil"/></Button>
-        </td>
-      </tr>
-    );
     return (
       <div>
         <SimpleInformationModal
@@ -315,36 +301,14 @@ class Users extends React.Component {
                 onChange={ this.onChangeSearchName }
                 value={this.state.searchName}
               autoComplete="off" />
-
             </li>
           </ul>
-          <Table bordered condensed hover>
-            <thead>
-              <tr>
-                <th>username</th>
-                <th>roles</th>
-                <th>actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {dataRows}
-            </tbody>
-          </Table>
-          <Pagination
-            bsSize="medium"
-            items={ pageAmount }
-            activePage={this.state.pgCurrentPage}
-            onSelect={ this.setCurrentPage}
-            prev
-            next
-            boundaryLinks
-            ellipsis
-            maxButtons={5}
-          /><br/>
-          <Button bsStyle={this.state.pgItemsPerPage === 10 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(10)}>10</Button>
-          <Button bsStyle={this.state.pgItemsPerPage === 20 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(20)}>20</Button>
-          <Button bsStyle={this.state.pgItemsPerPage === 40 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(40)}>40</Button>
-
+          <Pages
+            items={sorted}
+            itemToList={['username','roles','actions']}
+            dataTool={this.rowTool}
+            parentRef={self}
+          />
         </Col>
       </div>
     );
