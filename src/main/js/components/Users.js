@@ -12,7 +12,7 @@ class Users extends React.Component {
     super(props);
     this.state = {accounts: [], infoModalVisible: false, infoModalData: {},
       addModalVisible: false, roles: [], editModalVisible: false, user: {},
-      delConfirmationVisible: false,
+      delConfirmationVisible: false, searchName: "",
     }
     this.fetchUsers = this.fetchUsers.bind(this);
     this.setAccountsData = this.setAccountsData.bind(this);
@@ -28,6 +28,7 @@ class Users extends React.Component {
     this.setDeleteConfirmModalVisible = this.setDeleteConfirmModalVisible.bind(this);
     this.deleteReply = this.deleteReply.bind(this);
     this.deleteUser = this.deleteUser.bind(this);
+    this.onChangeSearchName = this.onChangeSearchName.bind(this);
   }
 
   fetchUsers() {
@@ -190,6 +191,33 @@ class Users extends React.Component {
         });
   }
 
+  onChangeSearchName(e) {
+    this.setState({searchName: e.target.value});
+  }
+
+
+  userHasRole(user, name) {
+    const roleIndex = _.findIndex(user.roles, (u) => (u.name.toLowerCase().includes(name)) );
+    if (-1 === roleIndex) {
+      return false;
+    }
+    return true;
+  }
+
+  concatenateSearchResults(target, source) {
+    const result1 = source.filter( item => !this.checkDuplicate(target, item));
+    const result = _.concat(target, result1);
+    return result;
+  }
+
+  checkDuplicate(list, item) {
+    const index = _.findIndex(list, item);
+    if (-1 === index) {
+      return false;
+    }
+    return true;
+  }
+
   componentDidMount() {
     this.fetchUsers();
     this.fetchRoles();
@@ -221,7 +249,10 @@ class Users extends React.Component {
     else {
       userModal = null;
     }
-    const dataRows = this.state.accounts.map( (row, index) =>
+    const filteredByUsername = this.state.accounts.filter(item => item.username.toLowerCase().includes(this.state.searchName.toLowerCase()));
+    const filteredByRole = this.state.accounts.filter(item => this.userHasRole(item, this.state.searchName.toLowerCase()));
+    const concatenated = this.concatenateSearchResults(filteredByUsername, filteredByRole);
+    const dataRows = concatenated.map( (row, index) =>
       <tr key={index}>
         <td>{row.username}</td>
         <td>{this.listRoles(row.roles)}</td>
@@ -252,7 +283,21 @@ class Users extends React.Component {
         {userModal}
 
         <Col sm={8}>
-          <Button bsStyle="success" onClick={ () => this.openAddModal() } title="add user"><Glyphicon glyph="plus"/></Button>
+          <ul style={{'display': 'flex', 'listStyleType': 'none', 'marginTop': '10px'}}>
+            <li>
+              <Button bsStyle="success" onClick={ () => this.openAddModal() } title="add user"><Glyphicon glyph="plus"/></Button>
+            </li>
+            <li>
+              <input
+                className="searchinput"
+                type="text"
+                placeholder="search by username or role"
+                onChange={ this.onChangeSearchName }
+                value={this.state.searchName}
+              autoComplete="off" />
+
+            </li>
+          </ul>
           <Table bordered condensed hover>
             <thead>
               <tr>
