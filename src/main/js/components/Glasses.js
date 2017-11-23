@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import {Button, Col, Glyphicon, Pagination, Table} from 'react-bootstrap';
+import {Button, Col, Glyphicon, Table} from 'react-bootstrap';
 import IngredientModal from './IngredientModal';
 import SimpleConfirmationModal from './SimpleConfirmationModal';
 import SimpleInformationModal from './SimpleInformationModal';
+import Pages from './Pages';
 
 class Glasses extends React.Component {
   constructor(props) {
@@ -12,7 +13,6 @@ class Glasses extends React.Component {
     this.state = {glasses: [], infoModalVisible: false, addModalVisible: false,
         delConfirmationVisible: false, glass:{},
         editModalVisible: false, infoModalData: {},
-        pgCurrentPage: 1, pgItemsPerPage: 10,
         searchName: "",
     };
     this.fetchGlasses = this.fetchGlasses.bind(this);
@@ -27,9 +27,6 @@ class Glasses extends React.Component {
     this.openEditModal = this.openEditModal.bind(this);
     this.closeEditModal = this.closeEditModal.bind(this);
     this.modifyGlass = this.modifyGlass.bind(this);
-    this.setCurrentPage = this.setCurrentPage.bind(this);
-    this.setItemsPerPage = this.setItemsPerPage.bind(this);
-    this.paginate = this.paginate.bind(this);
     this.onChangeSearchName = this.onChangeSearchName.bind(this);
   }
 
@@ -89,25 +86,23 @@ class Glasses extends React.Component {
     this.setState({editModalVisible: false, glass: {} });
   }
 
-  setCurrentPage(pageNbr) {
-    this.setState({pgCurrentPage: pageNbr})
-  }
-
-  setItemsPerPage(nbrItems) {
-    this.setState({pgItemsPerPage: nbrItems, pgCurrentPage: 1});
-  }
-
-  paginate (item, index) {
-    return (index >= (this.state.pgCurrentPage-1) * this.state.pgItemsPerPage) &&
-      (index < (this.state.pgCurrentPage-1) * this.state.pgItemsPerPage + this.state.pgItemsPerPage);
-  }
-
   onChangeSearchName(e) {
-    this.setState({searchName: e.target.value, pgCurrentPage: 1});
+    this.setState({searchName: e.target.value});
   }
 
   componentDidMount() {
     this.fetchGlasses();
+  }
+
+  dataTool(item, index) {
+    return (<tr key={index}>
+      <td>{item.id}</td>
+      <td>{item.name}</td>
+      <td>
+        <Button bsStyle="danger" bsSize="small" onClick={() => this.setDeleteConfirmModalVisible(item)} title="delete"><Glyphicon glyph="trash"/></Button>
+        <Button bsStyle="warning" bsSize="small" onClick={() => this.openEditModal(item)} title="edit"><Glyphicon glyph="pencil"/></Button>
+      </td>
+    </tr>);
   }
 
   render() {
@@ -137,19 +132,7 @@ class Glasses extends React.Component {
     }
 
     const filtered = this.state.glasses.filter(item => item.name.toLowerCase().includes(this.state.searchName.toLowerCase()));
-    const pageAmount = Math.ceil(filtered.length / this.state.pgItemsPerPage);
-    const itemsOnPage = filtered.filter ( (item, index) => this.paginate(item, index) );
 
-    const dataRows = itemsOnPage.map( (row, index) =>
-      <tr key={index}>
-        <td>{row.id}</td>
-        <td>{row.name}</td>
-        <td>
-          <Button bsStyle="danger" bsSize="small" onClick={() => this.setDeleteConfirmModalVisible(row)} title="delete"><Glyphicon glyph="trash"/></Button>
-          <Button bsStyle="warning" bsSize="small" onClick={() => this.openEditModal(row)} title="edit"><Glyphicon glyph="pencil"/></Button>
-        </td>
-      </tr>
-    );
     return (
       <div>
         <SimpleInformationModal
@@ -184,33 +167,11 @@ class Glasses extends React.Component {
           </li>
         </ul>
         <Col sm={6}>
-          <Table bordered condensed hover>
-            <thead>
-              <tr>
-                <th>id</th>
-                <th>name</th>
-                <th>action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {dataRows}
-            </tbody>
-          </Table>
-          <Pagination
-            bsSize="medium"
-            items={ pageAmount }
-            activePage={this.state.pgCurrentPage}
-            onSelect={ this.setCurrentPage}
-            prev
-            next
-            boundaryLinks
-            ellipsis
-            maxButtons={5}
-          /> <br/>
-          <Button bsStyle={this.state.pgItemsPerPage === 5 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(5)}>5</Button>
-          <Button bsStyle={this.state.pgItemsPerPage === 10 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(10)}>10</Button>
-          <Button bsStyle={this.state.pgItemsPerPage === 20 ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(20)}>20</Button>
-
+          <Pages
+            items={filtered}
+            itemToList={['id','name']}
+            dataTool={this.dataTool}
+          />
         </Col>
       </div>
     );
