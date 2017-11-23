@@ -1,7 +1,32 @@
-﻿Käyttöönotto: 
-1. Kopioi hakemistosta (C:\Media\doc\training\React\omatAppsit\SpringReactBase) kaikki (paitsi .git/, node_modules/, target/) uuteen prj hakemistoon  
-2. prjHakemisto > npm install
-3. prjHakemisto > npm run-script watch
-4. avaa Netbeansissa projekti  prjHakemisto  ja Run Project
-TAI    prjHakemisto > mvn spring-boot:run
-5. Kun serveri on käynnissa niin web sivu on osoitteessa http://localhost:8080/
+﻿3 profiles
+- test
+  - in memory database
+  - integration tests
+- development
+  - MySQL
+- production
+  - MySQL
+  - SSL
+  - port changed automatically 8080->8443 for user
+
+Security:
+- Password encryption with BCrypt.
+- HTTP Basic logging
+- SSL in production profile
+- Users can have different authorization levels.
+- Method security to keep some areas admin only.
+
+User action logging with Aspect Oriented Programming.
+
+Front-end done with React, React-Router v4 and React-Bootstrap.
+
+How to use:
+1. install UI, in project directory run commands:
+npm install
+npm run-script watch
+2. start server (will copy UI to correct location). Run command
+mvn spring-boot:run
+3. Application is served on address: http://localhost:8080/
+
+Or import Maven project to IDE of your choosing, you know what to do with it.
+
