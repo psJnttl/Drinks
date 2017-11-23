@@ -268,8 +268,9 @@ class Users extends React.Component {
     const filteredByUsername = this.state.accounts.filter(item => item.username.toLowerCase().includes(this.state.searchName.toLowerCase()));
     const filteredByRole = this.state.accounts.filter(item => this.userHasRole(item, this.state.searchName.toLowerCase()));
     const concatenated = this.concatenateSearchResults(filteredByUsername, filteredByRole);
-    const pageAmount = Math.ceil(concatenated.length / this.state.pgItemsPerPage);
-    const itemsOnPage = concatenated.filter ( (item, index) => this.paginate(item, index) );
+    const sorted = _.orderBy(concatenated, [function(u) { return u.username.toLowerCase(); }], ['asc']);
+    const pageAmount = Math.ceil(sorted.length / this.state.pgItemsPerPage);
+    const itemsOnPage = sorted.filter ( (item, index) => this.paginate(item, index) );
 
     const dataRows = itemsOnPage.map( (row, index) =>
       <tr key={index}>
