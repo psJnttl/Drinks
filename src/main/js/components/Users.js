@@ -305,7 +305,7 @@ class Users extends React.Component {
           </ul>
           <Pages
             items={sorted}
-            itemToList={['username','roles','actions']}
+            columnNames={['username','roles','actions']}
             dataTool={this.rowTool}
             parentRef={self}
           />

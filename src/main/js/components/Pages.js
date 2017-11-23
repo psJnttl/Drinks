@@ -36,7 +36,7 @@ class Pages extends React.Component {
     const pageAmount = Math.ceil(this.props.items.length / this.state.itemsPerPage);
     const itemsOnPage = this.props.items.filter ( (item, index) => this.paginate(item, index) );
 
-    const header = this.props.itemToList.map((item, index) =>
+    const header = this.props.columnNames.map((item, index) =>
       <th key={index}>{item}</th> );
     const dataRows = itemsOnPage.map( (row, index) => this.props.dataTool(row, index, this.props.parentRef));
     return (
@@ -71,7 +71,7 @@ class Pages extends React.Component {
 }
 Pages.PropTypes = {
   items: PropTypes.array.isRequired,
-  itemToList: PropTypes.array.isRequired,
+  columnNames: PropTypes.array.isRequired,
   dataTool: PropTypes.func.isRequired,
   parentRef: PropTypes.object.isRequired,
 }

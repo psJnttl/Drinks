@@ -169,7 +169,7 @@ class Glasses extends React.Component {
         <Col sm={6}>
           <Pages
             items={filtered}
-            itemToList={['id','name']}
+            columnNames={['id','name']}
             dataTool={this.rowTool}
             parentRef={self}
           />

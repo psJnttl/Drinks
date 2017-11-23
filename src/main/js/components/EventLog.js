@@ -110,7 +110,7 @@ class EventLog extends React.Component {
 
         <Pages
           items={sorted}
-          itemToList={['id','action','date','target entity','target id','target name','username']}
+          columnNames={['id','action','date','target entity','target id','target name','username']}
           dataTool={this.rowTool}
           parentRef={self}
         />
