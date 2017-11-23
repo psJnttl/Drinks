@@ -38,7 +38,7 @@ class Pages extends React.Component {
 
     const header = this.props.itemToList.map((item, index) =>
       <th key={index}>{item}</th> );
-    const dataRows = itemsOnPage.map( (row, index) => this.props.dataTool(row, index));
+    const dataRows = itemsOnPage.map( (row, index) => this.props.dataTool(row, index, this.props.parentRef));
     return (
       <div>
         <Table bordered condensed hover>
@@ -73,6 +73,7 @@ Pages.PropTypes = {
   items: PropTypes.array.isRequired,
   itemToList: PropTypes.array.isRequired,
   dataTool: PropTypes.func.isRequired,
+  parentRef: PropTypes.object.isRequired,
 }
 Pages.defaultProps = {}
 export default Pages;
