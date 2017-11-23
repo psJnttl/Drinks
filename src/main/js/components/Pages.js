@@ -24,6 +24,14 @@ class Pages extends React.Component {
       (index < (this.state.currentPage-1) * this.state.itemsPerPage + this.state.itemsPerPage);
   }
 
+  componentWillReceiveProps(newProps) {
+    const oldLen = this.props.items.length;
+    const newLen = newProps.items.length;
+    if (oldLen !== newLen) {
+      this.setState({currentPage: 1});
+    }
+  }
+
   render() {
     const pageAmount = Math.ceil(this.props.items.length / this.state.itemsPerPage);
     const itemsOnPage = this.props.items.filter ( (item, index) => this.paginate(item, index) );
