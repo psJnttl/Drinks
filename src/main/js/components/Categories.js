@@ -132,6 +132,7 @@ class Categories extends React.Component {
     }
 
     const filtered = this.state.categories.filter(item => item.name.toLowerCase().includes(this.state.searchName.toLowerCase()));
+    const sorted = _.orderBy(filtered, [function(d) { return d.name.toLowerCase(); }], ['asc']);
     const self = this;
     return (
       <div>
@@ -170,7 +171,7 @@ class Categories extends React.Component {
         </ul>
         <Col sm={6}>
           <Pages
-            items={filtered}
+            items={sorted}
             columnNames={['id','name']}
             dataTool={this.rowTool}
             parentRef={self}
