@@ -3,16 +3,19 @@ import PropTypes from 'prop-types';
 import {Button, Table} from 'react-bootstrap';
 import axios from 'axios';
 import Pages from './Pages';
+import SimpleInformationModal from './SimpleInformationModal';
 
 class EventLog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {eventLog: [], searchName: "",
+    infoModalVisible: false, infoModalData: {},
     }
     this.fetchEventLog = this.fetchEventLog.bind(this);
     this.setEventLogList = this.setEventLogList.bind(this);
     this.parseDate = this.parseDate.bind(this);
     this.onChangeSearchName = this.onChangeSearchName.bind(this);
+    this.closeInfoModal = this.closeInfoModal.bind(this);
   }
 
   fetchEventLog() {
@@ -23,7 +26,11 @@ class EventLog extends React.Component {
             self.setEventLogList(response.data);
          })
          .catch(function (response) {
-            console.log("log fetch failed")
+           self.setState({infoModalVisible: true,
+               infoModalData: {header:"failedModalHeader",
+               title:"Fetch Event Log failed",
+              notification: "Could not get the list of events from server!",
+              name: ""} });
          });
   }
 
@@ -77,6 +84,10 @@ class EventLog extends React.Component {
       </tr> );
   }
 
+  closeInfoModal() {
+    this.setState({infoModalVisible: false, infoModalData: {}});
+  }
+
   componentDidMount() {
     this.fetchEventLog();
   }
@@ -94,6 +105,15 @@ class EventLog extends React.Component {
 
     return (
       <div>
+        <SimpleInformationModal
+          modalOpen={this.state.infoModalVisible}
+          header={this.state.infoModalData.header}
+          title={this.state.infoModalData.title}
+          notification = {this.state.infoModalData.notification}
+          notification2 =""
+          name={this.state.infoModalData.name}
+          reply={this.closeInfoModal} />
+
         <ul style={{'display': 'flex', 'listStyleType': 'none', 'marginTop': '10px'}}>
           <li>
             <input
