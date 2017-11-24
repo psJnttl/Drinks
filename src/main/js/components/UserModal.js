@@ -88,11 +88,11 @@ class UserModal extends React.Component {
           </Modal.Header>
           <Modal.Body>
             <FormGroup controlId="formInput">
-              <FormControl type="text" placeholder="username" onChange={this.onChangeUsername} value={this.state.user.username} />
+              <FormControl disabled type="text" placeholder="username" onChange={this.onChangeUsername} value={this.state.user.username} />
             </FormGroup>
             <FormGroup controlId="formInput">
               {this.props.title === "Edit user" ?
-                <FormControl type="password" placeholder="enter password only to reset it" 
+                <FormControl type="password" placeholder="enter password only to reset it"
                   onChange={this.onChangePassword} value={this.state.user.password} />
               :
               <FormControl type="password" placeholder="password" onChange={this.onChangePassword} value={this.state.user.password} />}
