@@ -8,10 +8,11 @@
   - MySQL
   - SSL
   - port changed automatically 8080->8443 for user
+  - Please note browser will warn about the certificate.
 
 Security:
 - Password encryption with BCrypt.
-- HTTP Basic logging
+- HTTP Basic login
 - SSL in production profile
 - Users can have different authorization levels.
 - Method security to keep some areas admin only.
