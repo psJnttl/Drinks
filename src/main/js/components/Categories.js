@@ -190,6 +190,11 @@ class Categories extends React.Component {
     axios.post('api/categories', command, config)
          .then(function (response) {
               self.fetchCategories();
+              self.setState({infoModalVisible: true,
+                  infoModalData: {header:"successModalHeader",
+                  title:"Add category OK",
+                 notification: "Category '" + response.data.name + "' added successfully!",
+                 name: ""} });
          })
         .catch(function (response) {
           if (response.response.status === 423) {

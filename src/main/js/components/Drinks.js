@@ -81,7 +81,11 @@ class Drinks extends React.Component {
     axios.post('api/drinks', command, config)
          .then(function (response) {
               const drnks = _.concat(self.state.drinks, response.data);
-              self.setState({drinks: drnks});
+              self.setState({drinks: drnks, infoModalVisible: true,
+                infoModalData: {header:"successModalHeader",
+                title:"Add drink OK",
+                notification: "Drink '" + response.data.name + "' added successfully!",
+                name: ""} });
          })
         .catch(function (response) {
           if (response.response.status === 423) {

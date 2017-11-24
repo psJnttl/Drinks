@@ -188,6 +188,11 @@ class Glasses extends React.Component {
     axios.post('api/glasses', command, config)
          .then(function (response) {
               self.fetchGlasses();
+              self.setState({infoModalVisible: true,
+                  infoModalData: {header:"successModalHeader",
+                  title:"Add glass OK",
+                 notification: "Glass '" + response.data.name + "' added successfully!",
+                 name: ""} });
          })
         .catch(function (response) {
           if (response.response.status === 423) {

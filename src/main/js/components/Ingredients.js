@@ -204,6 +204,11 @@ class Ingredients extends React.Component {
     axios.post('api/ingredients', command, config)
          .then(function (response) {
               self.fetchIngredients();
+              self.setState({infoModalVisible: true,
+                infoModalData: {header:"successModalHeader",
+                title:"Add ingredient OK",
+                notification: "Ingredient '" + response.data.name + "' added successfully!",
+                name: ""} });
          })
         .catch(function (response) {
           if (response.response.status === 423) {
