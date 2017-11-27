@@ -11,6 +11,7 @@ import base.command.IngredientAdd;
 import base.domain.Drink;
 import base.domain.Ingredient;
 import base.dto.IngredientDto;
+import base.repository.DrinkQueryDslRepository;
 import base.repository.IngredientRepository;
 
 @Service
@@ -74,11 +75,7 @@ public class IngredientService {
         if (null == ing) {
             return false;
         }
-        List<Drink> list = drinkService.findByIngredient(ing);
-        if (list.isEmpty()) {
-            return false;
-        }
-        return true;
+        return drinkService.isIngredientUsedInDrink(ing);
     }
 
     public boolean ingredientExistsCaseInsensitive(IngredientAdd ingredient) {
