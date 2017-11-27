@@ -15,11 +15,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import com.querydsl.core.types.Predicate;
+
 import base.command.DrinkAdd;
 import base.domain.Category;
 import base.domain.Drink;
+import base.domain.DrinkPredicates;
 import base.domain.Glass;
 import base.domain.Ingredient;
+import base.domain.QDrink;
 import base.dto.CategoryDto;
 import base.dto.DrinkComponent;
 import base.dto.DrinkDto;
@@ -27,6 +31,7 @@ import base.dto.GlassDto;
 import base.dto.IngredientDto;
 import base.repository.DrinkRepository;
 import base.repository.CategoryRepository;
+import base.repository.DrinkQueryDslRepository;
 import base.repository.GlassRepository;
 import base.repository.IngredientRepository;
 
@@ -47,6 +52,9 @@ public class DrinkService {
 
     @Autowired
     private IngredientRepository ingredientRepository;
+
+    @Autowired
+    private DrinkQueryDslRepository drinkQueryDslRepository;
 
     public List<Drink> findByIngredient(Ingredient ing) {
         List<Long> list = jdbcTemplate.query(
@@ -148,6 +156,19 @@ public class DrinkService {
             return false;
         }
         return true;
+    }
+    
+    public boolean isIngredientUsedInDrink(Ingredient ing) {
+        Predicate predicate = DrinkPredicates.hasIngredient(ing);
+        return drinkQueryDslRepository.exists(predicate);
+    }
+    
+    public List<DrinkDto> findByIngredientQD(Ingredient ing) {
+        Predicate predicate = DrinkPredicates.hasIngredient(ing);
+        Iterable<Drink> drinks = drinkQueryDslRepository.findAll(predicate);
+        List<DrinkDto> list = new ArrayList<>();
+        drinks.spliterator().forEachRemaining(d -> list.add(createDto(d)));
+        return list;
     }
 
 }
