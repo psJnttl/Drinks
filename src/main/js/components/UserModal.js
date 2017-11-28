@@ -88,7 +88,7 @@ class UserModal extends React.Component {
           </Modal.Header>
           <Modal.Body>
             <FormGroup controlId="formInput">
-              <FormControl disabled type="text" placeholder="username" onChange={this.onChangeUsername} value={this.state.user.username} />
+              <FormControl disabled={"Add new user" !== this.props.title} type="text" placeholder="username" onChange={this.onChangeUsername} value={this.state.user.username} />
             </FormGroup>
             <FormGroup controlId="formInput">
               {this.props.title === "Edit user" ?
