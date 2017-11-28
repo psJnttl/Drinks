@@ -4,6 +4,7 @@ import {Button, Table} from 'react-bootstrap';
 import axios from 'axios';
 import Pages from './Pages';
 import SimpleInformationModal from './SimpleInformationModal';
+import {concatenateSearchResults} from './util';
 
 class EventLog extends React.Component {
   constructor(props) {
@@ -57,20 +58,6 @@ class EventLog extends React.Component {
     this.setState({searchName: e.target.value});
   }
 
-  checkDuplicate(list, item) {
-    const index = _.findIndex(list, item);
-    if (-1 === index) {
-      return false;
-    }
-    return true;
-  }
-
-  concatenateSearchResults(target, source) {
-    const result1 = source.filter( item => !this.checkDuplicate(target, item));
-    const result = _.concat(target, result1);
-    return result;
-  }
-
   rowTool(item, index, self) {
     return (
       <tr key={index}>
@@ -98,9 +85,9 @@ class EventLog extends React.Component {
     const byTargetEntity = this.state.eventLog.filter(item => item.targetEntity.toLowerCase().includes(this.state.searchName.toLowerCase()));
     const byTargetName = this.state.eventLog.filter(item => item.targetName.toLowerCase().includes(this.state.searchName.toLowerCase()));
     const byUsername = this.state.eventLog.filter(item => item.username.toLowerCase().includes(this.state.searchName.toLowerCase()));
-    const concat1 = this.concatenateSearchResults(byAction, byTargetEntity);
-    const concat2 = this.concatenateSearchResults(concat1, byTargetName);
-    const concat3 = this.concatenateSearchResults(concat2, byUsername);
+    const concat1 = concatenateSearchResults(byAction, byTargetEntity);
+    const concat2 = concatenateSearchResults(concat1, byTargetName);
+    const concat3 = concatenateSearchResults(concat2, byUsername);
     const sorted = _.orderBy(concat3, [function(l) { return l.id }], ['desc']);
 
     return (

@@ -6,6 +6,7 @@ import DrinkModal from './DrinkModal';
 import _ from 'lodash';
 import SimpleInformationModal from './SimpleInformationModal';
 import SimpleConfirmationModal from './SimpleConfirmationModal';
+import {concatenateSearchResults} from './util';
 
 class Drinks extends React.Component {
   constructor(props) {
@@ -172,20 +173,6 @@ class Drinks extends React.Component {
     this.setState({searchName: e.target.value, pgCurrentPage: 1});
   }
 
-  concatenateSearchResults(target, source) {
-    const result1 = source.filter( item => !this.checkDuplicate(target, item));
-    const result = _.concat(target, result1);
-    return result;
-  }
-
-  checkDuplicate(list, item) {
-    const index = _.findIndex(list, item);
-    if (-1 === index) {
-      return false;
-    }
-    return true;
-  }
-
   drinkHasComponent(drink, name) {
     const ingredientIndex = _.findIndex(drink.components, (c) => (c.ingredient.name.toLowerCase().includes(name)) );
     if (-1 === ingredientIndex) {
@@ -231,11 +218,11 @@ class Drinks extends React.Component {
 
     const filtered = this.state.drinks.filter(item => item.name.toLowerCase().includes(this.state.searchName.toLowerCase()));
     const filteredByCat = this.state.drinks.filter(item => item.category.name.toLowerCase().includes(this.state.searchName.toLowerCase()));
-    const concat1 = this.concatenateSearchResults(filtered, filteredByCat);
+    const concat1 = concatenateSearchResults(filtered, filteredByCat);
     const filteredByGlass = this.state.drinks.filter(item => item.glass.name.toLowerCase().includes(this.state.searchName.toLowerCase()));
-    const concat2 = this.concatenateSearchResults(concat1, filteredByGlass);
+    const concat2 = concatenateSearchResults(concat1, filteredByGlass);
     const filteredByIngredient= this.state.drinks.filter(item => this.drinkHasComponent(item, this.state.searchName.toLowerCase()));
-    const concat3 = this.concatenateSearchResults(concat2, filteredByIngredient);
+    const concat3 = concatenateSearchResults(concat2, filteredByIngredient);
     const sorted = _.orderBy(concat3, [function(d) { return d.name.toLowerCase(); }], ['asc']);
 
     const pageAmount = Math.ceil(sorted.length / this.state.pgItemsPerPage);

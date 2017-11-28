@@ -7,6 +7,7 @@ import SimpleInformationModal from './SimpleInformationModal';
 import UserModal from './UserModal';
 import SimpleConfirmationModal from './SimpleConfirmationModal';
 import Pages from './Pages';
+import {concatenateSearchResults} from './util';
 
 class Users extends React.Component {
   constructor(props) {
@@ -204,20 +205,6 @@ class Users extends React.Component {
     return true;
   }
 
-  concatenateSearchResults(target, source) {
-    const result1 = source.filter( item => !this.checkDuplicate(target, item));
-    const result = _.concat(target, result1);
-    return result;
-  }
-
-  checkDuplicate(list, item) {
-    const index = _.findIndex(list, item);
-    if (-1 === index) {
-      return false;
-    }
-    return true;
-  }
-
   rowTool(item, index, self) {
     return (
       <tr key={index}>
@@ -265,7 +252,7 @@ class Users extends React.Component {
     }
     const filteredByUsername = this.state.accounts.filter(item => item.username.toLowerCase().includes(this.state.searchName.toLowerCase()));
     const filteredByRole = this.state.accounts.filter(item => this.userHasRole(item, this.state.searchName.toLowerCase()));
-    const concatenated = this.concatenateSearchResults(filteredByUsername, filteredByRole);
+    const concatenated = concatenateSearchResults(filteredByUsername, filteredByRole);
     const sorted = _.orderBy(concatenated, [function(u) { return u.username.toLowerCase(); }], ['asc']);
 
     return (
