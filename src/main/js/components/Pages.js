@@ -40,7 +40,7 @@ class Pages extends React.Component {
       <th key={index}>{item}</th> );
     const dataRows = itemsOnPage.map( (row, index) => this.props.dataTool(row, index, this.props.parentRef));
     const itemsPerPageButtons = this.props.itemsPerPageChoices.map( (item, index) =>
-      <Button bsStyle={this.state.itemsPerPage === item ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(item)}>{item}</Button>
+      <Button key={index} bsStyle={this.state.itemsPerPage === item ? "primary" : "default"} bsSize="small" onClick={() => this.setItemsPerPage(item)}>{item}</Button>
     );
     return (
       <div>
