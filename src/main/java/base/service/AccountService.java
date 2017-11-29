@@ -1,12 +1,11 @@
 package base.service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -119,6 +118,7 @@ public class AccountService {
         return Optional.of(dto);
     }
 
+    @Transactional(readOnly=true)
     public List<AccountDto> listAll() {
         List<Account> accounts = accountRepository.findAll();
         return accounts.stream().map(a -> new AccountDto(a.getUsername(), a.getRoles())).collect(Collectors.toList());

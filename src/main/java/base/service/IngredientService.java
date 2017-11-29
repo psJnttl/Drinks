@@ -8,11 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import base.command.IngredientAdd;
-import base.domain.Drink;
 import base.domain.Ingredient;
 import base.dto.IngredientDto;
-import base.repository.DrinkQueryDslRepository;
 import base.repository.IngredientRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class IngredientService {
@@ -23,6 +22,7 @@ public class IngredientService {
     @Autowired
     private DrinkService drinkService; 
     
+    @Transactional(readOnly=true)
     public List<IngredientDto> listAll() {
         List<Ingredient> list = ingredientRepository.findAll();
         return list.stream()
@@ -37,6 +37,7 @@ public class IngredientService {
         return true;
     }
 
+    @Transactional
     public IngredientDto addIngredient(IngredientAdd ingredient) {
         Ingredient ing = new Ingredient(ingredient.getName());
         ing = ingredientRepository.saveAndFlush(ing);
@@ -44,6 +45,7 @@ public class IngredientService {
         return dto;
     }
 
+    @Transactional(readOnly=true)
     public Optional<IngredientDto> findIngredient(long id) {
         Ingredient ingredient = ingredientRepository.findOne(id);
         if (null == ingredient) {
@@ -53,6 +55,7 @@ public class IngredientService {
         return Optional.of(dto);
     }
 
+    @Transactional
     public boolean deleteIngredient(long id) {
         Ingredient ingredient = ingredientRepository.findOne(id);
         if (null == ingredient) {
@@ -62,6 +65,7 @@ public class IngredientService {
         return true;
     }
 
+    @Transactional
     public IngredientDto modifyIngredient(long id, IngredientAdd ingredient) {
         Ingredient ing = ingredientRepository.findOne(id);
         ing.setName(ingredient.getName());
@@ -70,6 +74,7 @@ public class IngredientService {
         return dto;
     }
     
+    @Transactional(readOnly=true)
     public boolean isIngredientUsed(long id) {
         Ingredient ing = ingredientRepository.findOne(id);
         if (null == ing) {
@@ -78,6 +83,7 @@ public class IngredientService {
         return drinkService.isIngredientUsedInDrink(ing);
     }
 
+    @Transactional(readOnly=true)
     public boolean ingredientExistsCaseInsensitive(IngredientAdd ingredient) {
         List<Ingredient> ingredients = ingredientRepository.findByNameIgnoreCase(ingredient.getName());
         if (ingredients.isEmpty()) {

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +24,7 @@ public class GlassService {
     @Autowired
     private DrinkService drinkService;
 
+    @Transactional(readOnly=true)
     public List<GlassDto> listAll() {
         List<Glass> list = glassRepository.findAll();
         return list.stream().map(i -> new GlassDto(i.getId(), i.getName())).collect(Collectors.toList());
@@ -44,6 +45,7 @@ public class GlassService {
         return dto;
     }
 
+    @Transactional(readOnly=true)
     public Optional<GlassDto> findGlass(long id) {
         Glass glass = glassRepository.findOne(id);
         if (null == glass) {
@@ -72,6 +74,7 @@ public class GlassService {
         return dto;
     }
 
+    @Transactional(readOnly=true)
     public boolean isGlassUsed(long id) {
         Glass glass = glassRepository.findOne(id);
         if (null == glass) {
@@ -83,7 +86,8 @@ public class GlassService {
         }
         return true;
     }
-
+    
+    @Transactional(readOnly=true)
     public boolean glassExistsCaseInsensitive(GlassAdd glass) {
         List<Glass> glasses = glassRepository.findByNameIgnoreCase(glass.getName());
         if (glasses.isEmpty()) {

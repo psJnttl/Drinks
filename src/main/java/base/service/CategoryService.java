@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +24,7 @@ public class CategoryService {
     @Autowired
     private DrinkService drinkService;
 
+    @Transactional(readOnly=true)
     public List<CategoryDto> listAll() {
         List<Category> list = categoryRepository.findAll();
         return list.stream().map(i -> new CategoryDto(i.getId(), i.getName())).collect(Collectors.toList());
@@ -72,6 +73,7 @@ public class CategoryService {
         return dto;
     }
     
+    @Transactional(readOnly=true)
     public boolean isCategoryUsed(long id) {
         Category cat = categoryRepository.findOne(id);
         if (null == cat) {
@@ -84,6 +86,7 @@ public class CategoryService {
         return true;
     }
     
+    @Transactional(readOnly=true)
     public boolean categoryExistsCaseInsensitive(CategoryAdd category) {
         String nameToTest = category.getName();
         List<Category> categories = categoryRepository.findByNameIgnoreCase(nameToTest);
