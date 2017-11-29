@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -23,7 +23,6 @@ import base.domain.Drink;
 import base.domain.DrinkPredicates;
 import base.domain.Glass;
 import base.domain.Ingredient;
-import base.domain.QDrink;
 import base.dto.CategoryDto;
 import base.dto.DrinkComponent;
 import base.dto.DrinkDto;
@@ -56,6 +55,7 @@ public class DrinkService {
     @Autowired
     private DrinkQueryDslRepository drinkQueryDslRepository;
 
+    @Transactional(readOnly=true)
     public List<Drink> findByIngredient(Ingredient ing) {
         List<Long> list = jdbcTemplate.query(
                 "SELECT D.id FROM drink D, ingredient I, drink_ingredients DI "
@@ -68,10 +68,12 @@ public class DrinkService {
         return rs.getLong("id");
     }
 
+    @Transactional(readOnly=true)
     public List<Drink> findByGlass(Glass glass) {
         return drinkRepository.findByGlass(glass);
     }
 
+    @Transactional(readOnly=true)
     public List<DrinkDto> listAll() {
         List<Drink> drinks = drinkRepository.findAll();
         return drinks.stream().map(d -> createDto(d)).collect(Collectors.toList());
@@ -92,6 +94,7 @@ public class DrinkService {
         return new DrinkDto(drink.getId(), drink.getName(), catDto, glassDto, components);
     }
 
+    @Transactional(readOnly=true)
     public List<Drink> findByCategory(Category cat) {
         return drinkRepository.findByCategory(cat);
     }
@@ -117,6 +120,7 @@ public class DrinkService {
         return ingredients;
     }
 
+    @Transactional(readOnly=true)
     public Optional<DrinkDto> findDrink(long id) {
         Drink drink = drinkRepository.findOne(id);
         if (null == drink) {
@@ -150,6 +154,7 @@ public class DrinkService {
         return createDto(oldDrink);
     }
 
+    @Transactional(readOnly=true)
     public boolean drinkExistsCaseInsensitive(DrinkAdd drink) {
         List<Drink> drinks = drinkRepository.findByNameIgnoreCase(drink.getName());
         if (drinks.isEmpty()) {
@@ -157,12 +162,14 @@ public class DrinkService {
         }
         return true;
     }
-    
+
+    @Transactional(readOnly=true)
     public boolean isIngredientUsedInDrink(Ingredient ing) {
         Predicate predicate = DrinkPredicates.hasIngredient(ing);
         return drinkQueryDslRepository.exists(predicate);
     }
-    
+
+    @Transactional(readOnly=true)
     public List<DrinkDto> findByIngredientQD(Ingredient ing) {
         Predicate predicate = DrinkPredicates.hasIngredient(ing);
         Iterable<Drink> drinks = drinkQueryDslRepository.findAll(predicate);
