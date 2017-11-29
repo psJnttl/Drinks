@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import {Button, Col, Form, FormControl, FormGroup, Glyphicon, Modal, Table} from 'react-bootstrap';
+import {Button, Checkbox, Col, Form, FormControl, FormGroup, Glyphicon, Modal, Table} from 'react-bootstrap';
 import SelectEntity from './SelectEntity';
 import UserRoles from './UserRoles';
 
 class UserModal extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {user: {username: "", password: "", roles: [{id:1, name: "USER"}]}, role: {},
+    this.state = {user: {username: "", password: "", roles: [{id:1, name: "USER"}]},
+    role: {}, passwordReset: false,
     }
     this.isFormValid = this.isFormValid.bind(this);
     this.onChangeUsername = this.onChangeUsername.bind(this);
@@ -16,6 +17,7 @@ class UserModal extends React.Component {
     this.handleSelectRole = this.handleSelectRole.bind(this);
     this.handleAddRole = this.handleAddRole.bind(this);
     this.deleteRole = this.deleteRole.bind(this);
+    this.handleCheckbox = this.handleCheckbox.bind(this);
   }
 
   isFormValid() {
@@ -72,6 +74,15 @@ class UserModal extends React.Component {
     this.setState({user: newUser});
   }
 
+  handleCheckbox(e) {
+    const value = e.target.checked;
+    if (false === value) {
+      const user = _.assign({}, this.state.user, {password: ""});
+      this.setState({user: user});
+    }
+    this.setState({passwordReset: value});
+  }
+
   componentDidMount() {
     this.setState({user: this.props.user});
   }
@@ -92,8 +103,11 @@ class UserModal extends React.Component {
             </FormGroup>
             <FormGroup controlId="formInput">
               {this.props.title === "Edit user" ?
-                <FormControl type="password" placeholder="enter password only to reset it"
-                  onChange={this.onChangePassword} value={this.state.user.password} />
+                <div>
+                  <FormControl type="password" placeholder="enter password only to reset it"
+                    onChange={this.onChangePassword} value={this.state.user.password} disabled={!this.state.passwordReset}/>
+                  <Checkbox inline checked={this.state.passwordReset} onClick={this.handleCheckbox}>reset password</Checkbox>
+                </div>
               :
               <FormControl type="password" placeholder="password" onChange={this.onChangePassword} value={this.state.user.password} />}
             </FormGroup>
