@@ -24,12 +24,10 @@ public class ProductionSecurityConfiguration extends WebSecurityConfigurerAdapte
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
-        http.headers().frameOptions().sameOrigin();
         http.requiresChannel();
         http
         .httpBasic().realmName("SEC 1 test").authenticationEntryPoint(getBasicAuthEntryPoint()).and()
         .authorizeRequests()
-        .antMatchers("/h2-console/*").permitAll()
         .antMatchers("/").permitAll()
         .anyRequest().authenticated().and()
         .logout().permitAll().logoutSuccessUrl("/");
