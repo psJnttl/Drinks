@@ -150,6 +150,11 @@ public class DrinkServiceTest {
         assertEquals(3, list.size());
     }
     
+    /**
+     * This test ends with org.hibernate.LazyInitializationException. If Drink entity's ingredients is
+     * equipped with {@code@ElementCollection(fetch = FetchType.EAGER)} there's no problem.
+     * This only happens during test, not in actual use.
+     */
     @Test
     public void queryDslSolutionMustFind3withIngredient3() {
         List<DrinkDto> list = drinkService.findByIngredientQD(ing3);
