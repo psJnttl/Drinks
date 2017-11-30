@@ -31,8 +31,7 @@ public class DrinkController {
 
     @RequestMapping(value = "/api/drinks", method = RequestMethod.POST)
     public ResponseEntity<DrinkDto> addDrink(@RequestBody DrinkAdd drink) throws URISyntaxException {
-        if (null == drink || null == drink.getCategory() || null == drink.getClass() || null == drink.getName()
-                || drink.getName().isEmpty() || null == drink.getComponents() || drink.getComponents().isEmpty()) {
+        if (!drinkService.isDrinkValid(drink)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         if (drinkService.drinkExistsCaseInsensitive(drink)) {
@@ -66,6 +65,9 @@ public class DrinkController {
     public ResponseEntity<DrinkDto> modifyDrink(@PathVariable long id, @RequestBody DrinkAdd drink) {
         if (! drinkService.findDrink(id).isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (!drinkService.isDrinkValid(drink)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         DrinkDto dto = drinkService.modifyDrink(id, drink);
         return new ResponseEntity<>(dto, HttpStatus.OK);

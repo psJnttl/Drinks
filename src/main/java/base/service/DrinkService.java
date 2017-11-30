@@ -177,5 +177,13 @@ public class DrinkService {
         drinks.spliterator().forEachRemaining(d -> list.add(createDto(d)));
         return list;
     }
+    
+    public boolean isDrinkValid(DrinkAdd drink) {
+        if (null == drink || null == drink.getCategory() || null == drink.getGlass() || null == drink.getName()
+                || drink.getName().isEmpty() || null == drink.getComponents() || drink.getComponents().isEmpty()) {
+            return false;
+        }
+        return true;
+    }
 
 }
