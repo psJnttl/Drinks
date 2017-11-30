@@ -300,6 +300,28 @@ public class DrinkControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user", roles={"USER"})
+    public void modifyingDrinkWithEmptyNameFails400() throws Exception {
+        long id = drink1.getId();
+        DrinkAdd drink = new DrinkAdd("");
+        Category category = categoryRepository.findByName("Klassikko");
+        Glass glass = glassRepository.findByName("Highball");
+        drink.setCategory(new CategoryDto(category.getId(), category.getName()));
+        drink.setGlass(new GlassDto(glass.getId(), glass.getName()));
+        List<DrinkComponent> ingredients = new ArrayList<>();
+        ingredients.add(createDrinkComponent("Viski", "6 cl"));
+        drink.setComponents(ingredients);
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(drink);
+        mockMvc
+                .perform(
+                        put(PATH + "/" + id)
+                            .contentType(MediaType.APPLICATION_JSON_UTF8)
+                            .content(content))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @WithMockUser
     public void addingDrinkWithExistingNameFails() throws Exception {
         DrinkAdd drink = new DrinkAdd("Semi");
