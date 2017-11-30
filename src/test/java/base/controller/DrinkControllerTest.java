@@ -391,4 +391,40 @@ public class DrinkControllerTest {
                         .content(content))
             .andExpect(status().isLocked());
     }
+    
+    @Test
+    @WithMockUser
+    public void addingDrinkWithoutCategoryFails() throws Exception {
+        DrinkCmd drinkCmd = DrinkCmd.builder()
+                .name("drinkup")
+                .glass(new GlassDto(glassCocktail.getId(), glassCocktail.getName()))
+                .addComponent(createDrinkComponent("Viski", "4 cl"))
+                .build();
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(drinkCmd);
+        mockMvc
+            .perform(
+                    post(PATH)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(content))
+            .andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    @WithMockUser
+    public void addingDrinkWithoutGlassFails() throws Exception {
+        DrinkCmd drinkCmd = DrinkCmd.builder()
+                .name("drinkup")
+                .category(new CategoryDto(catClassic.getId(), catClassic.getName()))
+                .addComponent(createDrinkComponent("Viski", "4 cl"))
+                .build();
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(drinkCmd);
+        mockMvc
+            .perform(
+                    post(PATH)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(content))
+            .andExpect(status().isBadRequest());
+    }
 }
