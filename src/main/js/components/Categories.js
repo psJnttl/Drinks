@@ -184,16 +184,14 @@ class Categories extends React.Component {
 
   addCategory(category) {
     this.closeAddModal();
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    const command  =  _.assign({}, category);
-    axios.post('api/categories', command, config)
+    NetworkApi.post('api/categories', category)
          .then(function (response) {
               self.fetchCategories();
               self.setState({infoModalVisible: true,
                   infoModalData: {header:"successModalHeader",
                   title:"Add category OK",
-                 notification: "Category '" + response.data.name + "' added successfully!",
+                 notification: "Category '" + response.name + "' added successfully!",
                  name: ""} });
          })
         .catch(function (response) {
