@@ -195,10 +195,10 @@ class Categories extends React.Component {
                  name: ""} });
          })
         .catch(function (response) {
-          if (response.response.status === 423) {
+          if (response.status === 423) {
             self.setState({infoModalVisible: true,
               infoModalData: {header:"failedModalHeader",
-              title:"Add category failed",
+              title:"Add category '" + category.name + "' failed",
               notification: "Category with same name already exists!",
               name: ""} });
           }
@@ -206,18 +206,16 @@ class Categories extends React.Component {
   }
 
   deleteCategory(category) {
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    const url = 'api/categories/' + category.id;
-    axios.delete(url, config)
+    NetworkApi.delete('api/categories', category)
          .then(function (response) {
               self.fetchCategories();
          })
         .catch(function (response) {
-          if (response.response.status === 409) {
+          if (response.status === 409) {
             self.setState({infoModalVisible: true,
               infoModalData: {header:"failedModalHeader",
-              title:"Delete category failed",
+              title:"Delete category '" + category.name + "' failed",
               notification: "Can't delete a category that's in a Drink!",
               name: ""} });
           }

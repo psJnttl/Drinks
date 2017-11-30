@@ -10,7 +10,7 @@ export default  {
                   return response.data;
                 })
                 .catch(function (error) {
-                  throw error;
+                  throw error.response;
                 });
   },
   post(url, command) {
@@ -21,7 +21,18 @@ export default  {
                    return response.data;
                 })
                 .catch(function (error) {
-                   throw error;
+                   throw error.response;
                 });
   },
+  delete(url1, item) {
+    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
+    const url = url1 + '/' + item.id;
+    return axios.delete(url, config)
+                .then(function (response) {
+                  return response.data;
+                })
+                .catch(function (error) {
+                  throw error.response;
+                });
+  }
 }
