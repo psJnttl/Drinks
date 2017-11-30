@@ -6,6 +6,7 @@ import SimpleInformationModal from './SimpleInformationModal';
 import IngredientModal from './IngredientModal';
 import SimpleConfirmationModal from './SimpleConfirmationModal';
 import Pages from './Pages';
+import NetworkApi from './NetworkApi';
 
 class Categories extends React.Component {
   constructor(props) {
@@ -31,19 +32,18 @@ class Categories extends React.Component {
   }
 
   fetchCategories() {
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    axios.get('api/categories', config)
-         .then(function (response) {
-            self.setCategoryList(response.data);
-         })
-         .catch(function (response) {
+    NetworkApi.get('api/categories')
+        .then( function(response) {
+           self.setCategoryList(response);
+        })
+        .catch (function(error) {
            self.setState({infoModalVisible: true,
-               infoModalData: {header:"failedModalHeader",
-               title:"Fetch categories failed",
+              infoModalData: {header:"failedModalHeader",
+              title:"Fetch categories failed",
               notification: "Could not get the list of categories from server!",
               name: ""} });
-         });
+        });
   }
 
   setCategoryList(data) {
