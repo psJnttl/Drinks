@@ -313,7 +313,64 @@ public class DrinkControllerTest {
                             .content(content))
                 .andExpect(status().isBadRequest());
     }
+    
+    @Test
+    @WithMockUser(username="user", roles={"USER"})
+    public void modifyingDrinkWithoutCategoryFails400() throws Exception {
+        long id = drink1.getId();
+        DrinkCmd drinkCmd = DrinkCmd.builder()
+                .name("drinkero")
+                .glass(new GlassDto(glassHighB.getId(), glassHighB.getName()))
+                .addComponent(createDrinkComponent("Viski", "6 cl"))
+                .build();
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(drinkCmd);
+        mockMvc
+                .perform(
+                        put(PATH + "/" + id)
+                            .contentType(MediaType.APPLICATION_JSON_UTF8)
+                            .content(content))
+                .andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    @WithMockUser(username="user", roles={"USER"})
+    public void modifyingDrinkWithoutGlassFails400() throws Exception {
+        long id = drink1.getId();
+        DrinkCmd drinkCmd = DrinkCmd.builder()
+                .name("drinkero")
+                .category(new CategoryDto(catClassic.getId(), catClassic.getName()))
+                .addComponent(createDrinkComponent("Viski", "6 cl"))
+                .build();
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(drinkCmd);
+        mockMvc
+                .perform(
+                        put(PATH + "/" + id)
+                            .contentType(MediaType.APPLICATION_JSON_UTF8)
+                            .content(content))
+                .andExpect(status().isBadRequest());
+    }
 
+    @Test
+    @WithMockUser(username="user", roles={"USER"})
+    public void modifyingDrinkWithoutIngredientsFails400() throws Exception {
+        long id = drink1.getId();
+        DrinkCmd drinkCmd = DrinkCmd.builder()
+                .name("drinkero")
+                .category(new CategoryDto(catClassic.getId(), catClassic.getName()))
+                .glass(new GlassDto(glassHighB.getId(), glassHighB.getName()))
+                .build();
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(drinkCmd);
+        mockMvc
+                .perform(
+                        put(PATH + "/" + id)
+                            .contentType(MediaType.APPLICATION_JSON_UTF8)
+                            .content(content))
+                .andExpect(status().isBadRequest());
+    }
+    
     @Test
     @WithMockUser
     public void addingDrinkWithExistingNameFails() throws Exception {
