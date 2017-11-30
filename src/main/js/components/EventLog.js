@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Table} from 'react-bootstrap';
-import axios from 'axios';
 import Pages from './Pages';
 import SimpleInformationModal from './SimpleInformationModal';
 import {concatenateSearchResults} from './util';
+import NetworkApi from './NetworkApi';
 
 class EventLog extends React.Component {
   constructor(props) {
@@ -20,9 +20,8 @@ class EventLog extends React.Component {
   }
 
   fetchEventLog() {
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    axios.get('api/logentries', config)
+    NetworkApi.get('api/logentries')
          .then(function (response) {
             self.setEventLogList(response.data);
          })
