@@ -224,16 +224,13 @@ class Categories extends React.Component {
 
   modifyCategory(category) {
     this.closeEditModal();
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    const command  =  _.assign({}, category);
-    const url = 'api/categories/' + category.id;
-    axios.put(url, command, config)
+    NetworkApi.put('api/categories', category)
          .then(function (response) {
            self.fetchCategories();
          })
          .catch(function (response) {
-           if (response.response.status === 400) {
+           if (response.status === 400) {
              self.setState({infoModalVisible: true,
                infoModalData: {header:"failedModalHeader",
                title:"Modify category failed",

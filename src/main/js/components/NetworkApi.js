@@ -34,5 +34,17 @@ export default  {
                 .catch(function (error) {
                   throw error.response;
                 });
+  },
+  put(url1, command) {
+    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
+    const cmd = _.assign({}, command);
+    const url = url1 + '/' + cmd.id;
+    return axios.put(url, cmd, config)
+                .then(function (response) {
+                  return response.data;
+                })
+                .catch(function (error) {
+                  throw error.response;
+                });
   }
 }
