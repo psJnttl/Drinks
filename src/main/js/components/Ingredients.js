@@ -2,11 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import SimpleInformationModal from './SimpleInformationModal';
 import SimpleConfirmationModal from './SimpleConfirmationModal';
-import axios from 'axios';
 import _ from 'lodash';
 import {Button, Col, Glyphicon, Table} from 'react-bootstrap';
 import IngredientModal from './IngredientModal';
 import Pages from './Pages';
+import NetworkApi from './NetworkApi';
 
 class Ingredients extends React.Component {
   constructor(props) {
@@ -70,11 +70,10 @@ class Ingredients extends React.Component {
   }
 
   fetchIngredients() {
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    axios.get('api/ingredients', config)
+    NetworkApi.get('api/ingredients')
          .then(function (response) {
-            self.setIngredientList(response.data);
+            self.setIngredientList(response);
          })
         .catch(function (response) {
            self.setState({infoModalVisible: true,
@@ -178,18 +177,16 @@ class Ingredients extends React.Component {
   }
 
   deleteIngredient(ingredient) {
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    const url = 'api/ingredients/' + ingredient.id;
-    axios.delete(url, config)
+    NetworkApi.delete('api/ingredients', ingredient)
          .then(function (response) {
               self.fetchIngredients();
          })
         .catch(function (response) {
-           if (response.response.status === 409) {
+           if (response.status === 409) {
              self.setState({infoModalVisible: true,
                infoModalData: {header:"failedModalHeader",
-               title:"Delete ingredient failed",
+               title:"Delete ingredient '" + ingredient.name + "' failed",
                notification: "Can't delete an ingredient that's in a Drink!",
                name: ""} });
            }
@@ -198,23 +195,21 @@ class Ingredients extends React.Component {
 
   addIngredient(ingredient) {
     this.closeAddModal();
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    const command  =  _.assign({}, ingredient);
-    axios.post('api/ingredients', command, config)
+    NetworkApi.post('api/ingredients', ingredient)
          .then(function (response) {
               self.fetchIngredients();
               self.setState({infoModalVisible: true,
                 infoModalData: {header:"successModalHeader",
                 title:"Add ingredient OK",
-                notification: "Ingredient '" + response.data.name + "' added successfully!",
+                notification: "Ingredient '" + response.name + "' added successfully!",
                 name: ""} });
          })
         .catch(function (response) {
-          if (response.response.status === 423) {
+          if (response.status === 423) {
             self.setState({infoModalVisible: true,
               infoModalData: {header:"failedModalHeader",
-              title:"Add ingredient failed",
+              title:"Add ingredient '" + ingredient.name + "' failed",
               notification: "Ingredient with same name already exists!",
               name: ""} });
           }
@@ -223,16 +218,19 @@ class Ingredients extends React.Component {
 
   modifyIngredient(ingredient) {
     this.closeEditModal();
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    const command  =  _.assign({}, ingredient);
-    const url = 'api/ingredients/' + ingredient.id;
-    axios.put(url, command, config)
+    NetworkApi.put('api/ingredients/', ingredient)
          .then(function (response) {
               self.fetchIngredients();
          })
         .catch(function (response) {
-          console.log("modify ingredient failed");
+          if (response.status === 400) {
+            self.setState({infoModalVisible: true,
+              infoModalData: {header:"failedModalHeader",
+              title:"Modify ingredient failed",
+              notification: "Please check ingredient name next time.",
+              name: ""} });
+          }
         });
   }
 
