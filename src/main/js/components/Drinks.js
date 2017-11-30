@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import {Button, Col, Glyphicon, Pagination} from 'react-bootstrap';
 import DrinkModal from './DrinkModal';
 import _ from 'lodash';
 import SimpleInformationModal from './SimpleInformationModal';
 import SimpleConfirmationModal from './SimpleConfirmationModal';
 import {concatenateSearchResults} from './util';
+import NetworkApi from './NetworkApi';
 
 class Drinks extends React.Component {
   constructor(props) {
@@ -35,11 +35,10 @@ class Drinks extends React.Component {
   }
 
   fetchDrinks() {
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    axios.get('api/drinks', config)
+    NetworkApi.get('api/drinks')
          .then(function (response) {
-            self.setDrinkList(response.data);
+            self.setDrinkList(response);
          })
          .catch(function (response) {
            self.setState({infoModalVisible: true,
@@ -76,23 +75,21 @@ class Drinks extends React.Component {
 
   sendNewDrinkToServer(drink) {
     this.closeAddModal();
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    const command  =  _.assign({}, drink);
-    axios.post('api/drinks', command, config)
+    NetworkApi.post('api/drinks', drink)
          .then(function (response) {
-              const drnks = _.concat(self.state.drinks, response.data);
+              const drnks = _.concat(self.state.drinks, response);
               self.setState({drinks: drnks, infoModalVisible: true,
                 infoModalData: {header:"successModalHeader",
                 title:"Add drink OK",
-                notification: "Drink '" + response.data.name + "' added successfully!",
+                notification: "Drink '" + response.name + "' added successfully!",
                 name: ""} });
          })
         .catch(function (response) {
-          if (response.response.status === 423) {
+          if (response.status === 423) {
             self.setState({infoModalVisible: true,
               infoModalData: {header:"failedModalHeader",
-              title:"Add drink failed",
+              title:"Add drink '" + drink.name + "' failed",
               notification: "Drink with same name already exists!",
               name: ""} });
           }
@@ -114,16 +111,17 @@ class Drinks extends React.Component {
 
   sendOldDrinkToServer(drink) {
     this.closeEditModal();
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    const command  =  _.assign({}, drink);
-    const url = 'api/drinks/' + drink.id;
-    axios.put(url, command, config)
+    NetworkApi.put('api/drinks/', drink)
          .then(function (response) {
            self.fetchDrinks();
          })
          .catch(function (response) {
-           console.log("modify drink failed");
+           self.setState({infoModalVisible: true,
+             infoModalData: {header:"failedModalHeader",
+             title:"Modify drink '" + drink.name + "' failed",
+             notification: "Please check drink contents.",
+             name: ""} });
          });
   }
 
@@ -139,20 +137,17 @@ class Drinks extends React.Component {
   }
 
   deleteDrink(drink) {
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    const url = 'api/drinks/' + drink.id;
-    axios.delete(url, config)
+    NetworkApi.delete('api/drinks', drink)
          .then(function (response) {
               self.fetchDrinks();
          })
         .catch(function (response) {
            self.setState({infoModalVisible: true,
                infoModalData: {header:"failedModalHeader",
-               title:"Delete drink failed",
+               title:"Delete drink '" + drink.name + "' failed",
                notification: "Can't delete a Drink due to unknown reason!",
                name: ""} });
-
         });
   }
 

@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import {Button, Col, Glyphicon, Table} from 'react-bootstrap';
 import SimpleInformationModal from './SimpleInformationModal';
 import IngredientModal from './IngredientModal';
@@ -239,7 +238,6 @@ class Categories extends React.Component {
            }
          });
   }
-
 
 }
 Categories.PropTypes = {
