@@ -70,6 +70,8 @@ public class DrinkControllerTest {
     private MockMvc mockMvc;
     private long id1 = 0, id2 = 0;
     private Drink drink1, drink2;
+    private Category catClassic, catDrink;
+    private Glass glassHighB, glassCocktail;
 
     @Before
     public void setUp() throws Exception {
@@ -93,6 +95,10 @@ public class DrinkControllerTest {
 
         drink1 = insertDrink("Semi", "Drinkki", "On the Rocks", ing[0]);
         drink2 = insertDrink("Moscow mule", "Drinkki", "Highball", ing[1]);
+        catClassic = categoryRepository.findByName("Klassikko");
+        glassHighB = glassRepository.findByName("Highball");
+        catDrink = categoryRepository.findByName("Drinkki");
+        glassCocktail = glassRepository.findByName("Cocktail");
     }
 
     private void insertIngredients(List<String> ingredients) {
@@ -115,7 +121,6 @@ public class DrinkControllerTest {
             categoryRepository.saveAndFlush(cat);
         }
     }
-
 
     @After
     public void tearDown() throws Exception {
@@ -156,18 +161,16 @@ public class DrinkControllerTest {
     @Test
     @WithMockUser(username="user", roles={"USER"})
     public void addDrinkReturnsLocationHeaderAndDto() throws Exception {
-        DrinkAdd drink = new DrinkAdd("drinkero");
-        Category category = categoryRepository.findByName("Drinkki");
-        Glass glass = glassRepository.findByName("Cocktail");
-        drink.setCategory(new CategoryDto(category.getId(), category.getName()));
-        drink.setGlass(new GlassDto(glass.getId(), glass.getName()));
-        List<DrinkComponent> ingredients = new ArrayList<>();
-        ingredients.add(createDrinkComponent("Viski", "4 cl"));
-        ingredients.add(createDrinkComponent("Limemehu", "5 cl"));
-        ingredients.add(createDrinkComponent("Appelsiinimehu", "5 cl"));
-        drink.setComponents(ingredients);
+        DrinkCmd drinkCmd = DrinkCmd.builder()
+                .name("drinkero")
+                .category(new CategoryDto(catDrink.getId(), catDrink.getName()))
+                .glass(new GlassDto(glassCocktail.getId(), glassCocktail.getName()))
+                .addComponent(createDrinkComponent("Viski", "4 cl"))
+                .addComponent(createDrinkComponent("Limemehu", "5 cl"))
+                .addComponent(createDrinkComponent("Appelsiinimehu", "5 cl"))
+                .build();
         ObjectMapper mapper = new ObjectMapper();
-        String content = mapper.writeValueAsString(drink);
+        String content = mapper.writeValueAsString(drinkCmd);
         MvcResult result = mockMvc
                 .perform(
                         post(PATH)
@@ -190,18 +193,15 @@ public class DrinkControllerTest {
     @Test
     @WithMockUser(username="user", roles={"USER"})
     public void addingDrinkWithoutNameFails() throws Exception {
-        DrinkAdd drink = new DrinkAdd();
-        Category category = categoryRepository.findByName("Drinkki");
-        Glass glass = glassRepository.findByName("Cocktail");
-        drink.setCategory(new CategoryDto(category.getId(), category.getName()));
-        drink.setGlass(new GlassDto(glass.getId(), glass.getName()));
-        List<DrinkComponent> ingredients = new ArrayList<>();
-        ingredients.add(createDrinkComponent("Viski", "4 cl"));
-        ingredients.add(createDrinkComponent("Limemehu", "5 cl"));
-        ingredients.add(createDrinkComponent("Appelsiinimehu", "5 cl"));
-        drink.setComponents(ingredients);
+        DrinkCmd drinkCmd = DrinkCmd.builder()
+                .category(new CategoryDto(catDrink.getId(), catDrink.getName()))
+                .glass(new GlassDto(glassCocktail.getId(), glassCocktail.getName()))
+                .addComponent(createDrinkComponent("Viski", "4 cl"))
+                .addComponent(createDrinkComponent("Limemehu", "5 cl"))
+                .addComponent(createDrinkComponent("Appelsiinimehu", "5 cl"))
+                .build();
         ObjectMapper mapper = new ObjectMapper();
-        String content = mapper.writeValueAsString(drink);
+        String content = mapper.writeValueAsString(drinkCmd);
         mockMvc
         .perform(
                 post(PATH)
@@ -252,18 +252,15 @@ public class DrinkControllerTest {
     @WithMockUser(username="user", roles={"USER"})
     public void modifyDrinkOKandReturnsChangedContent() throws Exception {
         long id = drink1.getId();
-        DrinkAdd drink = new DrinkAdd("drinkero");
-        Category category = categoryRepository.findByName("Booli");
-        Glass glass = glassRepository.findByName("Highball");
-        drink.setCategory(new CategoryDto(category.getId(), category.getName()));
-        drink.setGlass(new GlassDto(glass.getId(), glass.getName()));
-        List<DrinkComponent> ingredients = new ArrayList<>();
-        ingredients.add(createDrinkComponent("Viski", "4 cl"));
-        ingredients.add(createDrinkComponent("Limemehu", "5 cl"));
-        ingredients.add(createDrinkComponent("Appelsiinimehu", "5 cl"));
-        drink.setComponents(ingredients);
+        DrinkCmd drinkCmd = DrinkCmd.builder()
+                .name("drinkero")
+                .category(new CategoryDto(catClassic.getId(), catClassic.getName()))
+                .glass(new GlassDto(glassHighB.getId(), glassHighB.getName()))
+                .addComponent(createDrinkComponent("Vodka", "4 cl"))
+                .addComponent(createDrinkComponent("Appelsiinimehu", "10 cl"))
+                .build();
         ObjectMapper mapper = new ObjectMapper();
-        String content = mapper.writeValueAsString(drink);
+        String content = mapper.writeValueAsString(drinkCmd);
         MvcResult result = mockMvc
                 .perform(
                         put(PATH + "/" + id)
@@ -273,7 +270,7 @@ public class DrinkControllerTest {
                 .andReturn();
         DrinkDto dto = mapper.readValue(result.getResponse().getContentAsString(), DrinkDto.class);
         assertTrue("drink name not correct", dto.getName().equals("drinkero") );
-        assertTrue("drink category not correct", dto.getCategory().getName().equals("Booli"));
+        assertTrue("drink category not correct", dto.getCategory().getName().equals("Klassikko"));
         assertTrue("drink glass not correct", dto.getGlass().getName().equals("Highball"));
     }
     
@@ -281,16 +278,14 @@ public class DrinkControllerTest {
     @WithMockUser(username="user", roles={"USER"})
     public void modifyingDrinkWithWrongIdFails404() throws Exception {
         long id = 751130;
-        DrinkAdd drink = new DrinkAdd("Whisky straight");
-        Category category = categoryRepository.findByName("Klassikko");
-        Glass glass = glassRepository.findByName("Highball");
-        drink.setCategory(new CategoryDto(category.getId(), category.getName()));
-        drink.setGlass(new GlassDto(glass.getId(), glass.getName()));
-        List<DrinkComponent> ingredients = new ArrayList<>();
-        ingredients.add(createDrinkComponent("Viski", "6 cl"));
-        drink.setComponents(ingredients);
+        DrinkCmd drinkCmd = DrinkCmd.builder()
+                .name("")
+                .category(new CategoryDto(catClassic.getId(), catClassic.getName()))
+                .glass(new GlassDto(glassHighB.getId(), glassHighB.getName()))
+                .addComponent(createDrinkComponent("Viski", "6 cl"))
+                .build();
         ObjectMapper mapper = new ObjectMapper();
-        String content = mapper.writeValueAsString(drink);
+        String content = mapper.writeValueAsString(drinkCmd);
         mockMvc
                 .perform(
                         put(PATH + "/" + id)
@@ -303,16 +298,14 @@ public class DrinkControllerTest {
     @WithMockUser(username="user", roles={"USER"})
     public void modifyingDrinkWithEmptyNameFails400() throws Exception {
         long id = drink1.getId();
-        DrinkAdd drink = new DrinkAdd("");
-        Category category = categoryRepository.findByName("Klassikko");
-        Glass glass = glassRepository.findByName("Highball");
-        drink.setCategory(new CategoryDto(category.getId(), category.getName()));
-        drink.setGlass(new GlassDto(glass.getId(), glass.getName()));
-        List<DrinkComponent> ingredients = new ArrayList<>();
-        ingredients.add(createDrinkComponent("Viski", "6 cl"));
-        drink.setComponents(ingredients);
+        DrinkCmd drinkCmd = DrinkCmd.builder()
+                .name("")
+                .category(new CategoryDto(catClassic.getId(), catClassic.getName()))
+                .glass(new GlassDto(glassHighB.getId(), glassHighB.getName()))
+                .addComponent(createDrinkComponent("Viski", "6 cl"))
+                .build();
         ObjectMapper mapper = new ObjectMapper();
-        String content = mapper.writeValueAsString(drink);
+        String content = mapper.writeValueAsString(drinkCmd);
         mockMvc
                 .perform(
                         put(PATH + "/" + id)
@@ -324,18 +317,16 @@ public class DrinkControllerTest {
     @Test
     @WithMockUser
     public void addingDrinkWithExistingNameFails() throws Exception {
-        DrinkAdd drink = new DrinkAdd("Semi");
-        Category category = categoryRepository.findByName("Klassikko");
-        Glass glass = glassRepository.findByName("Cocktail");
-        drink.setCategory(new CategoryDto(category.getId(), category.getName()));
-        drink.setGlass(new GlassDto(glass.getId(), glass.getName()));
-        List<DrinkComponent> ingredients = new ArrayList<>();
-        ingredients.add(createDrinkComponent("Viski", "4 cl"));
-        ingredients.add(createDrinkComponent("Limemehu", "5 cl"));
-        ingredients.add(createDrinkComponent("Appelsiinimehu", "5 cl"));
-        drink.setComponents(ingredients);
+        DrinkCmd drinkCmd = DrinkCmd.builder()
+                .name("Semi")
+                .category(new CategoryDto(catClassic.getId(), catClassic.getName()))
+                .glass(new GlassDto(glassCocktail.getId(), glassCocktail.getName()))
+                .addComponent(createDrinkComponent("Viski", "4 cl"))
+                .addComponent(createDrinkComponent("Limemehu", "5 cl"))
+                .addComponent(createDrinkComponent("Appelsiinimehu", "5 cl"))
+                .build();
         ObjectMapper mapper = new ObjectMapper();
-        String content = mapper.writeValueAsString(drink);
+        String content = mapper.writeValueAsString(drinkCmd);
         mockMvc
             .perform(
                     post(PATH)
