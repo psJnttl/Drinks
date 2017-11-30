@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import {Button, Col, Glyphicon, Table} from 'react-bootstrap';
 import IngredientModal from './IngredientModal';
 import SimpleConfirmationModal from './SimpleConfirmationModal';
 import SimpleInformationModal from './SimpleInformationModal';
 import Pages from './Pages';
+import NetworkApi from './NetworkApi';
 
 class Glasses extends React.Component {
   constructor(props) {
@@ -31,11 +31,10 @@ class Glasses extends React.Component {
   }
 
   fetchGlasses() {
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    axios.get('api/glasses', config)
+    NetworkApi.get('api/glasses')
          .then(function (response) {
-            self.setGlassList(response.data);
+            self.setGlassList(response);
          })
         .catch(function (response) {
           self.setState({infoModalVisible: true,
@@ -182,23 +181,21 @@ class Glasses extends React.Component {
 
   addGlass(glass) {
     this.closeAddModal();
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    const command  =  _.assign({}, glass);
-    axios.post('api/glasses', command, config)
+    NetworkApi.post('api/glasses', glass)
          .then(function (response) {
               self.fetchGlasses();
               self.setState({infoModalVisible: true,
                   infoModalData: {header:"successModalHeader",
                   title:"Add glass OK",
-                 notification: "Glass '" + response.data.name + "' added successfully!",
+                 notification: "Glass '" + response.name + "' added successfully!",
                  name: ""} });
          })
         .catch(function (response) {
-          if (response.response.status === 423) {
+          if (response.status === 423) {
             self.setState({infoModalVisible: true,
               infoModalData: {header:"failedModalHeader",
-              title:"Add glass failed",
+              title:"Add glass '" + glass.name + "' failed",
               notification: "Glass with same name already exists!",
               name: ""} });
           }
@@ -206,18 +203,16 @@ class Glasses extends React.Component {
   }
 
   deleteGlass(glass) {
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    const url = 'api/glasses/' + glass.id;
-    axios.delete(url, config)
+    NetworkApi.delete('api/glasses', glass)
          .then(function (response) {
               self.fetchGlasses();
          })
         .catch(function (response) {
-           if (response.response.status === 409) {
+           if (response.status === 409) {
              self.setState({infoModalVisible: true,
                infoModalData: {header:"failedModalHeader",
-               title:"Delete glass failed",
+               title:"Delete glass '" + glass.name + "' failed",
                notification: "Can't delete a glass holding in a Drink!",
                name: ""} });
            }
@@ -226,16 +221,19 @@ class Glasses extends React.Component {
 
   modifyGlass(glass) {
     this.closeEditModal();
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    const command  =  _.assign({}, glass);
-    const url = 'api/glasses/' + glass.id;
-    axios.put(url, command, config)
+    NetworkApi.put('api/glasses/', glass)
          .then(function (response) {
            self.fetchGlasses();
          })
          .catch(function (response) {
-           console.log("modify glass failed");
+           if (response.status === 400) {
+             self.setState({infoModalVisible: true,
+               infoModalData: {header:"failedModalHeader",
+               title:"Modify glass failed",
+               notification: "Please check glass name next time.",
+               name: ""} });
+           }
          });
   }
 
