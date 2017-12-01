@@ -40,6 +40,10 @@ public class AdminController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping(value = "/api/admin/accounts", method = RequestMethod.POST)
     public ResponseEntity<AccountDto> addAccount(@RequestBody AccountAdd account) throws URISyntaxException {
+        if (null == account || null == account.getUsername() || null == account.getPassword() ||
+                account.getUsername().isEmpty() || account.getPassword().isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         if (accountService.doesAccountExist(account)) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }

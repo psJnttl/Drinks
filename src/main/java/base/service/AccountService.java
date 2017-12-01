@@ -72,6 +72,15 @@ public class AccountService {
         }
         return false;
     }
+    
+    public Optional<AccountDto> findAccount(long id) {
+        Account account = accountRepository.findOne(id);
+        if (null == account) {
+            return Optional.empty();
+        }
+        AccountDto dto = new AccountDto(account.getUsername(), account.getRoles());
+        return Optional.of(dto);
+    }
 
     public boolean isRequestValid(AccountMod account) {
         if (null == account || null == account.getOldPassword() || null == account.getNewPassword()
@@ -168,5 +177,10 @@ public class AccountService {
         }
         accountRepository.delete(account);
         return true;
+    }
+
+    private AccountDto createDto(Account account) {
+        AccountDto dto = new AccountDto(account.getId(), account.getUsername(), account.getRoles());
+        return dto;
     }
 }
