@@ -6,6 +6,7 @@ import java.util.List;
 import base.domain.Role;
 
 public class AccountDto {
+    private long id;
     private String username;
     private String password = "";
     private List<Role> roles;
@@ -20,6 +21,20 @@ public class AccountDto {
     public AccountDto(String username, List<Role> roles) {
         this.username = username;
         this.roles = roles;
+    }
+
+    public AccountDto(long id, String username, List<Role> roles) {
+        this.id = id;
+        this.username = username;
+        this.roles = roles;
+    }
+    
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getUsername() {
