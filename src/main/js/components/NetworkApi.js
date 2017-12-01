@@ -46,5 +46,36 @@ export default  {
                 .catch(function (error) {
                   throw error.response;
                 });
+  },
+  sendLogin(username, password) {
+    const creds = "Basic " + btoa(username + ":" + password);
+    const config = {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+      'authorization': creds
+      }
+    };
+    return axios.get('api/accounts', config)
+                .then(function (response) {
+                  return response.data;
+                })
+                .catch(function (error) {
+                  throw error.response;
+                });
+  },
+  signup(username, password) {
+    const command = {username: username, password: password, roles: [{"id":1,"name":"USER"}]};
+    const config = {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    }
+    return axios.post('api/accounts/signup', command, config)
+         .then(function (response) {
+           return response.data;
+         })
+         .catch(function (error) {
+           throw error.response;
+         });
   }
 }

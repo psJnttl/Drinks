@@ -1,17 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import {Button, Col, FormGroup, Nav, NavItem, Row, Tab} from 'react-bootstrap';
 import App from './App';
 import LoginForm from './components/LoginForm';
 import SignupForm from './components/SignupForm';
 import SimpleInformationModal from './components/SimpleInformationModal';
 import _ from 'lodash';
+import NetworkApi from './components/NetworkApi';
 
 class Login extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {authState: {authenticated: false, username:"", admin: false},  loginFail: false,
+    this.state = {authState: {id: 0, authenticated: false, username:"", admin: false},  loginFail: false,
                   username: "", password: "",signupFail: false,
                   notification2:"", signupSuccess: false}
     this.setAccountData = this.setAccountData.bind(this);
@@ -26,7 +26,7 @@ class Login extends React.Component {
 
   setAccountData(data) {
     const index = _.findIndex(data.roles, function(u) { return u.name === "ADMIN" });
-    const newData = _.assign({}, {username: data.username, authenticated: true });
+    const newData = _.assign({}, {username: data.username, authenticated: true, id: data.id });
     let auth
     if (-1 === index) {
       auth = _.assign(newData, {admin: false});
@@ -43,20 +43,13 @@ class Login extends React.Component {
 
   sendLogin(username, password) {
     this.setState({username: username});
-    const creds = "Basic " + btoa(username + ":" + password);
-    const config = {
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-      'authorization': creds
-      }
-    };
     const self = this;
-    axios.get('api/account', config)
+    NetworkApi.sendLogin(username, password)
          .then(function (response) {
-              self.setAccountData(response.data);
+              self.setAccountData(response);
          })
         .catch(function (response) {
-            if (401 == response.response.status) {
+            if (401 === response.status) {
               self.eraseAuthData();
               self.setState({loginFail: true});
             }
@@ -78,22 +71,14 @@ class Login extends React.Component {
 
   sendSignup(username, password) {
     this.setState({username: username, password: password});
-    const command = {username: username, password: password, roles: [{"id":1,"name":"USER"}]};
-    const config = {
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest'
-      }
-    }
     const self = this;
-    axios.post('api/account/signup', command, config)
+    NetworkApi.signup(username, password)
          .then(function (response) {
            self.setState({signupFail: false,
              notification2: "Click OK to proceed to site.", signupSuccess: true});
-
          })
         .catch(function (response) {
-            if (409 == response.response.status) {
-              debugger;
+            if (409 === response.status) {
               self.setState({signupFail: true, notification2: "Username already taken."});
             }
         });
@@ -101,14 +86,13 @@ class Login extends React.Component {
   }
 
   componentDidMount() {
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    axios.get('api/account', config)
+    NetworkApi.get('api/accounts')
          .then(function (response) {
-              self.setAccountData(response.data);
+              self.setAccountData(response);
          })
         .catch(function (response) {
-            if (401 == response.response.status) {
+            if (401 === response.status) {
               self.eraseAuthData()
             }
         });
