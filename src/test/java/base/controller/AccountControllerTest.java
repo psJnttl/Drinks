@@ -63,6 +63,7 @@ public class AccountControllerTest {
     private PasswordEncoder passwordEncoder;
         
     private static final String PATH = "/api/accounts";
+    private static final String PATH_SIGNUP = "/api/accounts/signup";
     private static final String USERNAME1 = "user1";
     private static final String USERNAME2 = "user2";
     private static final String PASSWORD1 = "password";
@@ -105,7 +106,7 @@ public class AccountControllerTest {
         String content = mapper.writeValueAsString(account);
         MvcResult result = mockMvc
                 .perform(
-                        post(PATH)
+                        post(PATH_SIGNUP)
                             .contentType(MediaType.APPLICATION_JSON_UTF8)
                             .content(content))
                 .andExpect(status().isCreated())
@@ -127,7 +128,7 @@ public class AccountControllerTest {
         String content = mapper.writeValueAsString(account);
         mockMvc
             .perform(
-                post(PATH)
+                post(PATH_SIGNUP)
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .content(content))
             .andExpect(status().isBadRequest());
@@ -145,7 +146,7 @@ public class AccountControllerTest {
         String content = mapper.writeValueAsString(account);
         mockMvc
             .perform(
-                post(PATH)
+                post(PATH_SIGNUP)
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .content(content))
             .andExpect(status().isBadRequest());

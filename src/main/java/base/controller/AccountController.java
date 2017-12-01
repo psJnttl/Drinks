@@ -36,7 +36,7 @@ public class AccountController {
         return new ResponseEntity<>(accountDto.get(), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/api/accounts", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/accounts/signup", method = RequestMethod.POST)
     public ResponseEntity<AccountDto> signup(@RequestBody AccountAdd account) throws URISyntaxException {
         if (!accountService.isSignupValid(account)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
