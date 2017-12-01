@@ -23,7 +23,7 @@ class EventLog extends React.Component {
     const self = this;
     NetworkApi.get('api/logentries')
          .then(function (response) {
-            self.setEventLogList(response.data);
+            self.setEventLogList(response);
          })
          .catch(function (response) {
            self.setState({infoModalVisible: true,
