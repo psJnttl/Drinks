@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, Col, Form, FormControl, FormGroup} from 'react-bootstrap';
-import axios from 'axios';
 import SimpleInformationModal from './SimpleInformationModal';
 import _ from 'lodash';
 import NetworkApi from './NetworkApi';

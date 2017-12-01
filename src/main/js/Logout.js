@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import SimpleConfirmationModal from './components/SimpleConfirmationModal';
+import NetworkApi from './components/NetworkApi';
 
 class Logout extends React.Component {
   constructor(props) {
@@ -15,7 +15,7 @@ class Logout extends React.Component {
   render() {
     const self = this;
     if (this.props.authenticated && this.state.logout) {
-      axios.get('/logout')
+      NetworkApi.get('/logout')
            .then(function (response) {
              self.props.history.push("/");
              self.props.changeAuthState(false);
