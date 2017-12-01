@@ -20,7 +20,7 @@ public class RoleController {
     private RoleRepository roleRepository;
     
     @PreAuthorize("hasAuthority('ADMIN')")
-    @RequestMapping(value = "/api/roles", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/admin/roles", method = RequestMethod.GET)
     public List<RoleDto> listRoles() {
         List<Role> list = roleRepository.findAll();
         return list.stream()
