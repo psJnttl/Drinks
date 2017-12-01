@@ -39,8 +39,7 @@ public class AccountService {
             return Optional.empty();
         }
         Account account = accountRepository.findByUsername(authentication.getName());
-        AccountDto dto = new AccountDto(account.getUsername());
-        dto.setRoles(account.getRoles());
+        AccountDto dto = createDto(account);
         return Optional.of(dto);
     }
 
@@ -60,8 +59,7 @@ public class AccountService {
         Role userRole = roleRepository.findByName("USER");
         user.setRoles(Arrays.asList(userRole));
         user = accountRepository.saveAndFlush(user);
-        AccountDto dto = new AccountDto(user.getUsername());
-        dto.setRoles(user.getRoles());
+        AccountDto dto = createDto(user);
         return Optional.of(dto);
     }
 
@@ -122,8 +120,7 @@ public class AccountService {
         }
         accountToMod.setPassword(passwordEncoder.encode(account.getNewPassword()));
         accountToMod = accountRepository.saveAndFlush(accountToMod);
-        AccountDto dto = new AccountDto(accountToMod.getUsername());
-        dto.setRoles(accountToMod.getRoles());
+        AccountDto dto = createDto(accountToMod);
         return Optional.of(dto);
     }
 
@@ -140,7 +137,7 @@ public class AccountService {
         user.setPassword(passwordEncoder.encode(account.getPassword()));
         user.setRoles(getRoleEntities(account.getRoles()));
         user = accountRepository.saveAndFlush(user);
-        AccountDto dto = new AccountDto(user.getUsername(), user.getRoles());
+        AccountDto dto = createDto(user);
         return dto;
     }
 
@@ -165,7 +162,7 @@ public class AccountService {
             user.setRoles(getRoleEntities(account.getRoles()));
         }
         user = accountRepository.saveAndFlush(user);
-        AccountDto dto = new AccountDto(user.getUsername(), user.getRoles());
+        AccountDto dto = createDto(user);
         return dto;
     }
 
@@ -194,4 +191,14 @@ public class AccountService {
         AccountDto dto = new AccountDto(account.getId(), account.getUsername(), account.getRoles());
         return dto;
     }
+    
+    public boolean isSignupValid(AccountAdd account) {
+        if (null == account || null == account.getUsername() || null == account.getPassword() || 
+            null == account.getRoles() || account.getUsername().isEmpty() || 
+            account.getPassword().isEmpty() || account.getRoles().isEmpty()) {
+                return false;
+        }
+        return true;
+    }
+
 }

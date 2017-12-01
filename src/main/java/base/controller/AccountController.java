@@ -26,8 +26,8 @@ public class AccountController {
 
     @Autowired
     private AccountService accountService;
-    
-    @RequestMapping(value = "/api/accounts/logged", method = RequestMethod.GET)
+
+    @RequestMapping(value = "/api/accounts", method = RequestMethod.GET)
     public ResponseEntity<AccountDto> getAccount() {
         Optional<AccountDto> accountDto = accountService.getUser();
         if (!accountDto.isPresent()) {
@@ -35,16 +35,21 @@ public class AccountController {
         }
         return new ResponseEntity<>(accountDto.get(), HttpStatus.OK);
     }
-    
-    @RequestMapping(value = "/api/accounts/signup", method = RequestMethod.POST)
-    public ResponseEntity<AccountDto> signup(@RequestBody AccountAdd account) {
+
+    @RequestMapping(value = "/api/accounts", method = RequestMethod.POST)
+    public ResponseEntity<AccountDto> signup(@RequestBody AccountAdd account) throws URISyntaxException {
+        if (!accountService.isSignupValid(account)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         if (accountService.doesAccountExist(account)) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         Optional<AccountDto> accountDto = accountService.addUser(account);
-        return new ResponseEntity<>(accountDto.get(), HttpStatus.CREATED);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(new URI("/api/accounts/" + accountDto.get().getId()));
+        return new ResponseEntity<>(accountDto.get(), headers, HttpStatus.CREATED);
     }
-    
+
     @RequestMapping(value = "/api/accounts/{id}", method = RequestMethod.PUT)
     public ResponseEntity<AccountDto> changePassword(@PathVariable long id, @RequestBody AccountMod account) {
         if (!accountService.isRequestValid(account)) {
