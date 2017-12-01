@@ -2,6 +2,7 @@ package base.controller;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -61,6 +62,7 @@ public class AdminControllerTest {
     private static final String PASSWORD1 = "password";
     private static final String PASSWORD_NEW = "NewPassword";
     private static final String EMPTY_STRING = "";
+    private static final long RANDOM_ID = 58540863L;
     
     private MockMvc mockMvc;
     private Account user;
@@ -169,6 +171,24 @@ public class AdminControllerTest {
             .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    public void deleteAccountOk() throws Exception {
+        System.out.println("deleteAccountOk");
+        System.out.println(PATH + "/" + this.user.getId());
+        mockMvc
+            .perform(delete(PATH + "/" + this.user.getId()))
+            .andExpect(status().isOk());
+    }
+    
+    @Test
+    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    public void deleteAccountWithWrongIdFails() throws Exception {
+        mockMvc
+            .perform(delete(PATH + "/" + RANDOM_ID))
+            .andExpect(status().isNotFound());
+    }
+    
     private List<Role> createUserRole() {
         Role role = roleRepository.findByName("USER");
         return Arrays.asList(role);

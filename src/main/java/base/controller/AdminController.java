@@ -70,8 +70,8 @@ public class AdminController {
     
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping(value = "/api/admin/accounts/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<AccountDto> deleteAccount(@PathVariable long id, @PathVariable String username) {
-        if (! accountService.deleteAccountByUsername(username)) {
+    public ResponseEntity<AccountDto> deleteAccount(@PathVariable long id) {
+        if (! accountService.deleteAccount(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(HttpStatus.OK);

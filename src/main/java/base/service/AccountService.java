@@ -178,6 +178,17 @@ public class AccountService {
         accountRepository.delete(account);
         return true;
     }
+    
+    @Transactional
+    public boolean deleteAccount(long id) {
+        Account account = accountRepository.findOne(id);
+        if (null == account) {
+            return false;
+        }
+        accountRepository.delete(account);
+        return true;
+
+    }
 
     private AccountDto createDto(Account account) {
         AccountDto dto = new AccountDto(account.getId(), account.getUsername(), account.getRoles());
