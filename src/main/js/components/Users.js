@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import _ from 'lodash';
 import {Button, Col, Glyphicon, Table} from 'react-bootstrap';
 import SimpleInformationModal from './SimpleInformationModal';
@@ -8,6 +7,7 @@ import UserModal from './UserModal';
 import SimpleConfirmationModal from './SimpleConfirmationModal';
 import Pages from './Pages';
 import {concatenateSearchResults} from './util';
+import NetworkApi from './NetworkApi';
 
 class Users extends React.Component {
   constructor(props) {
@@ -34,11 +34,10 @@ class Users extends React.Component {
   }
 
   fetchUsers() {
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    axios.get('api/accounts', config)
+    NetworkApi.get('api/admin/accounts')
          .then(function (response) {
-              self.setAccountsData(response.data);
+              self.setAccountsData(response);
          })
         .catch(function (response) {
           self.setState({infoModalVisible: true,
@@ -50,19 +49,18 @@ class Users extends React.Component {
   }
 
   fetchRoles() {
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    axios.get('api/roles', config)
+    NetworkApi.get('api/admin/roles')
          .then(function (response) {
-              self.setRolesData(response.data);
+            self.setRolesData(response);
          })
-        .catch(function (response) {
-          self.setState({infoModalVisible: true,
+         .catch(function (response) {
+            self.setState({infoModalVisible: true,
               infoModalData: {header:"failedModalHeader",
               title:"Fetch roles failed",
-             notification: "Could not get the list of roles from server!",
-             name: ""} });
-        });
+              notification: "Could not get the list of roles from server!",
+              name: ""} });
+         });
   }
 
   setAccountsData(data) {
@@ -71,6 +69,7 @@ class Users extends React.Component {
          username: item.username,
          password: "",
          roles: _.concat([], item.roles),
+         id: item.id,
        }) );
        this.setState({accounts: accountData});
   }
@@ -104,30 +103,34 @@ class Users extends React.Component {
 
   saveNewUser(user) {
     this.closeAddModal();
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const command = {
       username: user.username,
       password: user.password,
       roles: _.concat([], user.roles)
     };
     const self = this;
-    axios.post('api/accounts', command, config)
+    NetworkApi.post('api/admin/accounts', command)
          .then(function (response) {
               self.fetchUsers();
+              self.setState({infoModalVisible: true,
+                infoModalData: {header:"successModalHeader",
+                title:"Add user OK",
+                notification: "User '" + user.username + "'added successfully!",
+                name: ""} });
          })
         .catch(function (response) {
           let info;
-          if (409 === response.response.status) {
+          if (409 === response.status) {
             info = {header:"failedModalHeader",
             title:"Add user failed",
-           notification: "User with same username exists!",
-           name: ""}
+            notification: "User with same username exists!",
+            name: ""}
           }
           else {
             info = {header:"failedModalHeader",
-            title:"Add user failed",
-           notification: "Could not get add new user!",
-           name: ""}
+            title:"Add user '" + user.username + "' failed",
+            notification: "Could not get add new user!",
+            name: ""}
           }
           self.setState({infoModalVisible: true,
               infoModalData: info });
@@ -136,14 +139,14 @@ class Users extends React.Component {
 
   saveOldUser(user) {
     this.closeEditModal();
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const command = {
+      id: user.id,
       username: user.username,
       newPassword: user.password,
       roles: _.concat([], user.roles)
     };
     const self = this;
-    axios.put('api/accounts', command, config)
+    NetworkApi.put('api/admin/accounts', command)
          .then(function (response) {
               self.fetchUsers();
          })
@@ -176,10 +179,8 @@ class Users extends React.Component {
   }
 
   deleteUser(user) {
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    const url = 'api/accounts/' + user.username;
-    axios.delete(url, config)
+    NetworkApi.delete('api/admin/accounts', user)
          .then(function (response) {
               self.fetchUsers();
          })
@@ -189,7 +190,6 @@ class Users extends React.Component {
             title:"Delete user failed",
             notification: "Couldn't delete user on server!",
             name: ""} });
-
         });
   }
 
