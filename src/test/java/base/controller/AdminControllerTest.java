@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,6 +34,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import base.command.AccountAdd;
+import base.command.AccountMod;
 import base.domain.Account;
 import base.domain.Role;
 import base.dto.AccountDto;
@@ -174,8 +176,6 @@ public class AdminControllerTest {
     @Test
     @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
     public void deleteAccountOk() throws Exception {
-        System.out.println("deleteAccountOk");
-        System.out.println(PATH + "/" + this.user.getId());
         mockMvc
             .perform(delete(PATH + "/" + this.user.getId()))
             .andExpect(status().isOk());
@@ -186,6 +186,58 @@ public class AdminControllerTest {
     public void deleteAccountWithWrongIdFails() throws Exception {
         mockMvc
             .perform(delete(PATH + "/" + RANDOM_ID))
+            .andExpect(status().isNotFound());
+    }
+    
+    @Test
+    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    public void modifyAccountPasswordOk() throws Exception {
+        AccountMod account = new AccountMod();
+        account.setUsername(USERNAME1);
+        account.setNewPassword(PASSWORD_NEW);
+        account.setRoles(createUserRole());
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(account);
+        MvcResult result = mockMvc
+            .perform(put(PATH + "/" + user.getId())
+            .contentType(MediaType.APPLICATION_JSON_UTF8).content(content))
+            .andExpect(status().isOk())
+            .andReturn();
+        AccountDto dto = mapper.readValue(result.getResponse().getContentAsString(), AccountDto.class);
+        assertTrue("Username not correct", dto.getUsername().equals(USERNAME1));
+    }
+    
+    @Test
+    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    public void modifyAccountAddRoleAdminOk() throws Exception {
+        AccountMod account = new AccountMod();
+        account.setUsername(USERNAME1);
+        account.setRoles(createUserAndAdminRole());
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(account);
+        MvcResult result = mockMvc
+            .perform(put(PATH + "/" + user.getId())
+            .contentType(MediaType.APPLICATION_JSON_UTF8).content(content))
+            .andExpect(status().isOk())
+            .andReturn();
+        AccountDto dto = mapper.readValue(result.getResponse().getContentAsString(), AccountDto.class);
+        assertEquals("Wrong number of roles",2 ,dto.getRoles().stream()
+                           .filter(r -> r.getName().equals("USER") || r.getName().equals("ADMIN"))
+                           .count());
+    }
+    
+    @Test
+    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    public void modifyAccountWithWrongIdFails() throws Exception {
+        AccountMod account = new AccountMod();
+        account.setUsername(USERNAME1);
+        account.setNewPassword(PASSWORD_NEW);
+        account.setRoles(createUserRole());
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(account);
+        mockMvc
+            .perform(put(PATH + "/" + RANDOM_ID)
+            .contentType(MediaType.APPLICATION_JSON_UTF8).content(content))
             .andExpect(status().isNotFound());
     }
     
