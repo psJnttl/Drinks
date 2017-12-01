@@ -127,7 +127,7 @@ public class AccountService {
     @Transactional(readOnly=true)
     public List<AccountDto> listAll() {
         List<Account> accounts = accountRepository.findAll();
-        return accounts.stream().map(a -> new AccountDto(a.getUsername(), a.getRoles())).collect(Collectors.toList());
+        return accounts.stream().map(a -> createDto(a) ).collect(Collectors.toList());
     }
 
     @Transactional
