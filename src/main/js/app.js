@@ -12,7 +12,7 @@ import Drinks from './components/Drinks';
 import Account from './components/Account';
 import Admin from './components/Admin';
 import _ from 'lodash';
-import axios from 'axios';
+import NetworkApi from './components/NetworkApi';
 
 const About = () => (
   <div>
@@ -43,13 +43,12 @@ class App extends React.Component {
   }
 
   fetchItems(entity, listNo) {
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    axios.get('api/' + entity, config)
+    NetworkApi.get('api/' + entity)
          .then(function (response) {
-            self.setList(listNo, response.data);
+            self.setList(listNo, response);
          })
-         .catch(function (response) {
+         .catch(function (error) {
 
          });
   }

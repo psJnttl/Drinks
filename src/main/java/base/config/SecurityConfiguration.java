@@ -31,7 +31,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
         .antMatchers("/h2-console/*").permitAll()
         .antMatchers("/").permitAll()
-        .antMatchers("/api/account/signup").permitAll()
+        .antMatchers("/api/accounts/signup").permitAll()
         .anyRequest().authenticated().and()
         .logout().permitAll().logoutSuccessUrl("/").deleteCookies("JSESSIONID");
     }

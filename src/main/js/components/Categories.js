@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import {Button, Col, Glyphicon, Table} from 'react-bootstrap';
 import SimpleInformationModal from './SimpleInformationModal';
 import IngredientModal from './IngredientModal';
 import SimpleConfirmationModal from './SimpleConfirmationModal';
 import Pages from './Pages';
+import NetworkApi from './NetworkApi';
 
 class Categories extends React.Component {
   constructor(props) {
@@ -31,19 +31,18 @@ class Categories extends React.Component {
   }
 
   fetchCategories() {
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    axios.get('api/categories', config)
-         .then(function (response) {
-            self.setCategoryList(response.data);
-         })
-         .catch(function (response) {
+    NetworkApi.get('api/categories')
+        .then( function(response) {
+           self.setCategoryList(response);
+        })
+        .catch (function(error) {
            self.setState({infoModalVisible: true,
-               infoModalData: {header:"failedModalHeader",
-               title:"Fetch categories failed",
+              infoModalData: {header:"failedModalHeader",
+              title:"Fetch categories failed",
               notification: "Could not get the list of categories from server!",
               name: ""} });
-         });
+        });
   }
 
   setCategoryList(data) {
@@ -184,23 +183,21 @@ class Categories extends React.Component {
 
   addCategory(category) {
     this.closeAddModal();
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    const command  =  _.assign({}, category);
-    axios.post('api/categories', command, config)
+    NetworkApi.post('api/categories', category)
          .then(function (response) {
               self.fetchCategories();
               self.setState({infoModalVisible: true,
                   infoModalData: {header:"successModalHeader",
                   title:"Add category OK",
-                 notification: "Category '" + response.data.name + "' added successfully!",
+                 notification: "Category '" + response.name + "' added successfully!",
                  name: ""} });
          })
         .catch(function (response) {
-          if (response.response.status === 423) {
+          if (response.status === 423) {
             self.setState({infoModalVisible: true,
               infoModalData: {header:"failedModalHeader",
-              title:"Add category failed",
+              title:"Add category '" + category.name + "' failed",
               notification: "Category with same name already exists!",
               name: ""} });
           }
@@ -208,18 +205,16 @@ class Categories extends React.Component {
   }
 
   deleteCategory(category) {
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    const url = 'api/categories/' + category.id;
-    axios.delete(url, config)
+    NetworkApi.delete('api/categories', category)
          .then(function (response) {
               self.fetchCategories();
          })
         .catch(function (response) {
-          if (response.response.status === 409) {
+          if (response.status === 409) {
             self.setState({infoModalVisible: true,
               infoModalData: {header:"failedModalHeader",
-              title:"Delete category failed",
+              title:"Delete category '" + category.name + "' failed",
               notification: "Can't delete a category that's in a Drink!",
               name: ""} });
           }
@@ -228,16 +223,13 @@ class Categories extends React.Component {
 
   modifyCategory(category) {
     this.closeEditModal();
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const self = this;
-    const command  =  _.assign({}, category);
-    const url = 'api/categories/' + category.id;
-    axios.put(url, command, config)
+    NetworkApi.put('api/categories', category)
          .then(function (response) {
            self.fetchCategories();
          })
          .catch(function (response) {
-           if (response.response.status === 400) {
+           if (response.status === 400) {
              self.setState({infoModalVisible: true,
                infoModalData: {header:"failedModalHeader",
                title:"Modify category failed",
@@ -246,7 +238,6 @@ class Categories extends React.Component {
            }
          });
   }
-
 
 }
 Categories.PropTypes = {

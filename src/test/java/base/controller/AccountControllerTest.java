@@ -61,12 +61,9 @@ public class AccountControllerTest {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-    
-    private static final String PATH = "/api/account";
-    private static final String PATH_ADMIN = "/api/accounts";
+        
+    private static final String PATH = "/api/accounts";
+    private static final String PATH_SIGNUP = "/api/accounts/signup";
     private static final String USERNAME1 = "user1";
     private static final String USERNAME2 = "user2";
     private static final String PASSWORD1 = "password";
@@ -91,11 +88,68 @@ public class AccountControllerTest {
     @After
     public void tearDown() throws Exception {
         accountRepository.delete(user);
-        System.out.println("account count: " + accountRepository.findAll().size());
         Account account2  = accountRepository.findByUsername(USERNAME2);
         if (null != account2) {
             accountRepository.delete(account2);
         }
+    }
+    
+    @Test
+    @WithMockUser(username=USERNAME1, roles={"USER"})
+    public void signupOk() throws Exception {
+        AccountAdd account = new AccountAdd();
+        account.setUsername(USERNAME2);
+        account.setPassword(PASSWORD1);
+        Role user = roleRepository.findByName("USER");
+        account.setRoles(Arrays.asList(user));
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(account);
+        MvcResult result = mockMvc
+                .perform(
+                        post(PATH_SIGNUP)
+                            .contentType(MediaType.APPLICATION_JSON_UTF8)
+                            .content(content))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", containsString(PATH + "/")))
+                .andReturn();
+        AccountDto dto = mapper.readValue(result.getResponse().getContentAsString(), AccountDto.class);
+        assertTrue("Username not correct", dto.getUsername().equals(USERNAME2));
+    }
+
+    @Test
+    @WithMockUser(username=USERNAME1, roles={"USER"})
+    public void signupWithEmptyUsernameFails() throws Exception {
+        AccountAdd account = new AccountAdd();
+        account.setUsername(EMPTY_STRING);
+        account.setPassword(PASSWORD1);
+        Role user = roleRepository.findByName("USER");
+        account.setRoles(Arrays.asList(user));
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(account);
+        mockMvc
+            .perform(
+                post(PATH_SIGNUP)
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .content(content))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username=USERNAME1, roles={"USER"})
+    public void signupWithEmptyPasswordFails() throws Exception {
+        AccountAdd account = new AccountAdd();
+        account.setUsername(USERNAME2);
+        account.setPassword(EMPTY_STRING);
+        Role user = roleRepository.findByName("USER");
+        account.setRoles(Arrays.asList(user));
+        ObjectMapper mapper = new ObjectMapper();
+        String content = mapper.writeValueAsString(account);
+        mockMvc
+            .perform(
+                post(PATH_SIGNUP)
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .content(content))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -106,7 +160,7 @@ public class AccountControllerTest {
         String content = mapper.writeValueAsString(accMod);
         MvcResult result = mockMvc
                 .perform(
-                        put(PATH)
+                        put(PATH + "/" + this.user.getId())
                             .contentType(MediaType.APPLICATION_JSON_UTF8)
                             .content(content))
                 .andExpect(status().isOk())
@@ -135,7 +189,7 @@ public class AccountControllerTest {
         String content = mapper.writeValueAsString(accMod);
         mockMvc
             .perform(
-                    put(PATH)
+                    put(PATH + "/" + this.user.getId())
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(content))
             .andExpect(status().isForbidden());
@@ -149,7 +203,7 @@ public class AccountControllerTest {
         String content = mapper.writeValueAsString(accMod);
         mockMvc
             .perform(
-                    put(PATH)
+                    put(PATH + "/" + this.user.getId())
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(content))
             .andExpect(status().isBadRequest());
@@ -163,123 +217,12 @@ public class AccountControllerTest {
         String content = mapper.writeValueAsString(accMod);
         mockMvc
             .perform(
-                    put(PATH)
+                    put(PATH + "/" + this.user.getId())
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(content))
             .andExpect(status().isBadRequest());
     }
     
-    @Test
-    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
-    public void listAllAccounts() throws Exception {
-        mockMvc
-            .perform(get(PATH_ADMIN))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
-    }
     
-    @Test
-    @WithMockUser(username=USERNAME1, authorities={"USER"})
-    public void listAllAccountsNotAdminFails() throws Exception {
-        thrown.expect(NestedServletException.class);
-        thrown.expectMessage(containsString("org.springframework.security.access.AccessDeniedException"));
-        mockMvc
-            .perform(get(PATH_ADMIN))
-                .andExpect(status().isForbidden());
-    }
-    
-    @Test
-    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
-    public void addUserByAdminWithUserAuth() throws Exception {
-        AccountAdd account = buildAccountAddCmd(USERNAME2, PASSWORD1, Arrays.asList("USER"));
-        ObjectMapper mapper = new ObjectMapper();
-        String content = mapper.writeValueAsString(account);
-        MvcResult result = mockMvc
-                .perform(
-                        post(PATH_ADMIN)
-                            .contentType(MediaType.APPLICATION_JSON_UTF8)
-                            .content(content))
-                .andExpect(status().isCreated())
-                .andExpect(header().string("Location", containsString(PATH_ADMIN + "/")))
-                .andReturn();
-        AccountDto dto = mapper.readValue(result.getResponse().getContentAsString(), AccountDto.class);
-        assertTrue("Username not correct", dto.getUsername().equals(USERNAME2));
-        assertTrue("Must have USER role", dto.getRoles().stream().filter(r -> r.getName().equals("USER")).findFirst().isPresent());
-        assertTrue("Must only have one role", dto.getRoles().size() == 1);
-    }
-    
-    private AccountAdd buildAccountAddCmd(String username, String password, List<String> roles) {
-        AccountAdd acc = new AccountAdd();
-        acc.setUsername(username);
-        acc.setPassword(password);
-        List<Role> roleEntities = roles.stream().map(r -> roleRepository.findByName(r)).collect(Collectors.toList());
-        acc.setRoles(roleEntities);
-        return acc;
-    }
 
-    @Test
-    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
-    public void addUserByAdminWithUserAndAdminAuth() throws Exception {
-        AccountAdd account = buildAccountAddCmd(USERNAME2, PASSWORD1, Arrays.asList("USER", "ADMIN"));
-        ObjectMapper mapper = new ObjectMapper();
-        String content = mapper.writeValueAsString(account);
-        MvcResult result = mockMvc
-                .perform(
-                        post(PATH_ADMIN)
-                            .contentType(MediaType.APPLICATION_JSON_UTF8)
-                            .content(content))
-                .andExpect(status().isCreated())
-                .andExpect(header().string("Location", containsString(PATH_ADMIN + "/")))
-                .andReturn();
-        AccountDto dto = mapper.readValue(result.getResponse().getContentAsString(), AccountDto.class);
-        assertTrue("Username not correct", dto.getUsername().equals(USERNAME2));
-        assertTrue("Must have USER role", dto.getRoles().stream().filter(r -> r.getName().equals("USER")).findFirst().isPresent());
-        assertTrue("Must have ADMIN role", dto.getRoles().stream().filter(r -> r.getName().equals("ADMIN")).findFirst().isPresent());
-        assertTrue("Must have two roles", dto.getRoles().size() == 2);
-    }
-
-    @Test
-    @WithMockUser(username="admin", authorities={"USER", "ADMIN"})
-    public void modifyUserByAdminAddAdminAuthority() throws Exception {
-        AccountMod account = buildAccountModCmd(USERNAME1, EMPTY_STRING, Arrays.asList("USER", "ADMIN"));
-        ObjectMapper mapper = new ObjectMapper();
-        String content = mapper.writeValueAsString(account);
-        MvcResult result = mockMvc
-                .perform(
-                        put(PATH_ADMIN)
-                            .contentType(MediaType.APPLICATION_JSON_UTF8)
-                            .content(content))
-                .andExpect(status().isOk())
-                .andReturn();
-        AccountDto dto = mapper.readValue(result.getResponse().getContentAsString(), AccountDto.class);
-        assertTrue("Username not correct", dto.getUsername().equals(USERNAME1));
-        assertTrue("Must have USER role", dto.getRoles().stream().filter(r -> r.getName().equals("USER")).findFirst().isPresent());
-        assertTrue("Must have ADMIN role", dto.getRoles().stream().filter(r -> r.getName().equals("ADMIN")).findFirst().isPresent());
-        assertTrue("Must have two roles", dto.getRoles().size() == 2);
-    }
-
-    private AccountMod buildAccountModCmd(String username, String password, List<String> roles) {
-        AccountMod acc = new AccountMod();
-        acc.setUsername(username);
-        acc.setNewPassword(password);
-        List<Role> roleEntities = roles.stream().map(r -> roleRepository.findByName(r)).collect(Collectors.toList());
-        acc.setRoles(roleEntities);
-        return acc;
-    }
-    
-    @Test
-    @WithMockUser(username="admin", authorities={"USER", "ADMIN"})
-    public void deleteUserByAdminOK() throws Exception {
-        mockMvc.perform(
-                delete(PATH_ADMIN + "/" + USERNAME1))
-                .andExpect(status().isOk());
-    }
-    
-    @Test
-    @WithMockUser(username="admin", authorities={"USER", "ADMIN"})
-    public void deleteUserByAdminFails404() throws Exception {
-        mockMvc.perform(
-                delete(PATH_ADMIN + "/" + USERNAME2))
-                .andExpect(status().isNotFound());
-    }
 }
