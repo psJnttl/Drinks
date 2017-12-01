@@ -4,6 +4,7 @@ import {Button, Col, Form, FormControl, FormGroup} from 'react-bootstrap';
 import axios from 'axios';
 import SimpleInformationModal from './SimpleInformationModal';
 import _ from 'lodash';
+import NetworkApi from './NetworkApi';
 
 class Account extends React.Component {
   constructor(props) {
@@ -44,17 +45,16 @@ class Account extends React.Component {
   }
 
   changePassword() {
-    const config = {headers: {'X-Requested-With': 'XMLHttpRequest'}};
     const command = {
+      id: this.props.authState.id,
       username: this.props.authState.username,
       oldPassword: this.state.oldPasswd,
       newPassword: this.state.newPasswd,
       roles: [{id:0, role: "dummy"}]
     };
     const self = this;
-    axios.put('/api/account', command, config)
+    NetworkApi.put('/api/accounts', command)
          .then(function (response) {
-           console.log("Password changed successfully.")
            self.setState({infoModalVisible: true,
                infoModalData: {header:"successModalHeader",
                title:"Password changed",
@@ -73,7 +73,6 @@ class Account extends React.Component {
            }
            self.setState({infoModalVisible: true, infoModalData: infoData });
          });
-    return
   }
 
   clearFormFields() {
