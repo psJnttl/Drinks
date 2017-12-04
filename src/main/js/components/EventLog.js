@@ -5,18 +5,23 @@ import Pages from './Pages';
 import SimpleInformationModal from './SimpleInformationModal';
 import {concatenateSearchResults} from './util';
 import NetworkApi from './NetworkApi';
+import _ from 'lodash';
 
 class EventLog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {eventLog: [], searchName: "",
     infoModalVisible: false, infoModalData: {},
+    dateStartStr: "", dateStart: null,
+    dateEndStr: "", dateEnd: null,
     }
     this.fetchEventLog = this.fetchEventLog.bind(this);
     this.setEventLogList = this.setEventLogList.bind(this);
     this.parseDate = this.parseDate.bind(this);
     this.onChangeSearchName = this.onChangeSearchName.bind(this);
     this.closeInfoModal = this.closeInfoModal.bind(this);
+    this.onChangeDateStart = this.onChangeDateStart.bind(this);
+    this.onChangeDateEnd = this.onChangeDateEnd.bind(this);
   }
 
   fetchEventLog() {
@@ -43,13 +48,15 @@ class EventLog extends React.Component {
     const second = java8LocalDateTime.second;
     const millis = java8LocalDateTime.nano / 1000000;
     const timeStamp = new Date(year, month, day, hour, minute, second, millis);
-    return timeStamp.toString();
+    return timeStamp;
   }
 
   setEventLogList(data) {
     const theList = data.map( item =>
-       _.assign({}, {id: item.id, date: this.parseDate(item.date), action: item.action, targetEntity: item.targetEntity,
-                targetId: item.targetId, targetName: item.targetName, username: item.username }) );
+       _.assign({}, {id: item.id, dateStr: this.parseDate(item.date).toString(),
+                date: this.parseDate(item.date), action: item.action,
+                targetEntity: item.targetEntity, targetId: item.targetId,
+                targetName: item.targetName, username: item.username }) );
     this.setState({eventLog: theList});
   }
 
@@ -62,7 +69,7 @@ class EventLog extends React.Component {
       <tr key={index}>
         <td>{item.id}</td>
         <td>{item.action}</td>
-        <td>{item.date}</td>
+        <td>{item.dateStr}</td>
         <td>{item.targetEntity}</td>
         <td>{item.targetId}</td>
         <td>{item.targetName}</td>
@@ -72,6 +79,63 @@ class EventLog extends React.Component {
 
   closeInfoModal() {
     this.setState({infoModalVisible: false, infoModalData: {}});
+  }
+
+  onChangeDateStart(e) {
+    let dateStart = null;
+    const startDateReady = new RegExp("^[0-9]{4}-[0-9]{2}-[0-9]{2}$");
+    if (true === startDateReady.test(e.target.value) ) {
+      console.log("we have valid start date")
+      dateStart = new Date(e.target.value);
+    }
+    this.setState({dateStartStr: e.target.value, dateStart: dateStart});
+  }
+
+  onChangeDateEnd(e) {
+    let dateEnd = null;
+    const endDateReady = new RegExp("^[0-9]{4}-[0-9]{2}-[0-9]{2}$");
+    if (true === endDateReady.test(e.target.value) ) {
+      console.log("we have valid end date")
+      dateEnd = new Date(e.target.value);
+    }
+    this.setState({dateEndStr: e.target.value, dateEnd: dateEnd});
+  }
+
+  filterByDates(itemArray) {
+    if (null !== this.state.dateStart && null === this.state.dateEnd ) {
+      const result = itemArray.filter(item => item.date >= this.state.dateStart);
+      return result;
+    }
+    else if (null === this.state.dateStart && null !== this.state.dateEnd ) {
+      const result = itemArray.filter(item => item.date <= this.state.dateEnd);
+      return result;
+    }
+    else if (null !== this.state.dateStart && null !== this.state.dateEnd ) {
+      const result = itemArray.filter(item => (item.date >= this.state.dateStart && item.date <= this.state.dateEnd));
+      return result;
+    }
+    return itemArray;
+  }
+
+  filterByDates2(itemArray) {
+    let startPred;
+    if (null !== this.state.dateStart) {
+      const start = this.state.dateStart;
+      startPred = function(item) { return item.date >= start};
+    }
+    else {
+      startPred = function(item) { return true};
+    }
+    let endPred;
+    if (null !== this.state.dateEnd) {
+      const end = this.state.dateEnd;
+      endPred = function(item) { return item.date <= end};
+    }
+    else {
+      endPred = function(item) { return true};
+    }
+    const result = itemArray.filter(item => (startPred(item) && endPred(item)));
+    return result;
   }
 
   componentDidMount() {
@@ -87,7 +151,8 @@ class EventLog extends React.Component {
     const concat1 = concatenateSearchResults(byAction, byTargetEntity);
     const concat2 = concatenateSearchResults(concat1, byTargetName);
     const concat3 = concatenateSearchResults(concat2, byUsername);
-    const sorted = _.orderBy(concat3, [function(l) { return l.id }], ['desc']);
+    const dateFiltered = this.filterByDates(concat3);
+    const sorted = _.orderBy(dateFiltered, [function(l) { return l.id }], ['desc']);
 
     return (
       <div>
@@ -110,6 +175,28 @@ class EventLog extends React.Component {
               value={this.state.searchName}
               autoComplete="off"
               title="by action, target entity, target name or or username"
+            />
+          </li>
+          <li>
+            <input
+              className="searchinput"
+              type="text"
+              placeholder="YYYY-MM-DD"
+              onChange={this.onChangeDateStart}
+              value={this.state.dateStartStr}
+              autoComplete="off"
+              title="date starting from"
+            />
+          </li>
+          <li>
+            <input
+              className="searchinput"
+              type="text"
+              placeholder="YYYY-MM-DD"
+              onChange={this.onChangeDateEnd}
+              value={this.state.dateEndStr}
+              autoComplete="off"
+              title="date ending to"
             />
           </li>
         </ul>
