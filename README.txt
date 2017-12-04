@@ -13,7 +13,7 @@
 Security:
 - Password encryption with BCrypt.
 - HTTP Basic login
-- SSL in production profile
+- SSL and CSRF in production profile
 - Users can have different authorization levels.
 - Method security to keep some areas admin only.
 
