@@ -97,15 +97,21 @@ export default  {
       const headers = response.headers;
       if (undefined !== headers['x-csrf-header'] && undefined !== headers['x-csrf-token']) {
         const token = headers['x-csrf-token'];
+        const headerName = headers['x-csrf-header'];
         this.csrfToken = token;
+        if (this.csrfHeaderName !== headerName) {
+          this.csrfHeaderName = headerName;
+        }
       }
     }
   },
   csrfToken: "",
+  csrfHeaderName: "X-CSRF-TOKEN",
   insertCsrfToken(config) {
     if ("" !== this.csrfToken) {
-      const oldHeaders = _.assign({}, config.headers);
-      const newHeaders = _.assign({}, oldHeaders, {'x-csrf-token': this.csrfToken});
+      const headerName = this.csrfHeaderName;
+      const newHeaders = _.assign({}, config.headers);
+      newHeaders[headerName] = this.csrfToken;
       const newConfig = _.assign({}, config, {headers: newHeaders});
       return newConfig;
     }
