@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.csrf.CsrfFilter;
 
 @Profile("production")
 @Configuration
@@ -23,14 +24,15 @@ public class ProductionSecurityConfiguration extends WebSecurityConfigurerAdapte
     
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
+        http.addFilterAfter(new CsrfHeaderFilter(), CsrfFilter.class);
         http.requiresChannel();
         http
-        .httpBasic().realmName("SEC 1 test").authenticationEntryPoint(getBasicAuthEntryPoint()).and()
+        .httpBasic().realmName("Drinks").authenticationEntryPoint(getBasicAuthEntryPoint()).and()
         .authorizeRequests()
         .antMatchers("/").permitAll()
+        .antMatchers("/api/accounts/signup").permitAll()
         .anyRequest().authenticated().and()
-        .logout().permitAll().logoutSuccessUrl("/");
+        .logout().permitAll().logoutSuccessUrl("/").deleteCookies("JSESSIONID");
     }
 
     @Override

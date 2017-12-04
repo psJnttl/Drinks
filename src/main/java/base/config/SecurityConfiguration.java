@@ -26,7 +26,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.addFilterAfter(new CsrfHeaderFilter(), CsrfFilter.class);
+        http.csrf().disable();
         http.headers().frameOptions().sameOrigin();
         http.httpBasic().realmName("Drinks").authenticationEntryPoint(getBasicAuthEntryPoint()).and()
         .authorizeRequests()
