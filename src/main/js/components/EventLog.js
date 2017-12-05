@@ -107,11 +107,15 @@ class EventLog extends React.Component {
       return result;
     }
     else if (null === this.state.dateStart && null !== this.state.dateEnd ) {
-      const result = itemArray.filter(item => item.date <= this.state.dateEnd);
+      const adjusted = this.state.dateEnd.getTime() + 86400000;
+      const dateEnd = new Date(adjusted);
+      const result = itemArray.filter(item => item.date <= dateEnd);
       return result;
     }
     else if (null !== this.state.dateStart && null !== this.state.dateEnd ) {
-      const result = itemArray.filter(item => (item.date >= this.state.dateStart && item.date <= this.state.dateEnd));
+      const adjusted = this.state.dateEnd.getTime() + 86400000;
+      const dateEnd = new Date(adjusted);
+      const result = itemArray.filter(item => (item.date >= this.state.dateStart && item.date <= dateEnd));
       return result;
     }
     return itemArray;
@@ -177,7 +181,7 @@ class EventLog extends React.Component {
               title="by action, target entity, target name or or username"
             />
           </li>
-          <li>
+          <li style={{'marginLeft': '4px'}}>
             <input
               className="searchinput"
               type="text"
@@ -188,7 +192,7 @@ class EventLog extends React.Component {
               title="date starting from"
             />
           </li>
-          <li>
+          <li style={{'marginLeft': '4px'}}>
             <input
               className="searchinput"
               type="text"
