@@ -24,6 +24,8 @@ class EventLog extends React.Component {
     this.closeInfoModal = this.closeInfoModal.bind(this);
     this.onChangeDateStart = this.onChangeDateStart.bind(this);
     this.onChangeDateEnd = this.onChangeDateEnd.bind(this);
+    this.isValidStartDate = this.isValidStartDate.bind(this);
+    this.isValidEndDate = this.isValidEndDate.bind(this);
   }
 
   fetchEventLog() {
@@ -126,6 +128,22 @@ class EventLog extends React.Component {
     return result;
   }
 
+  isValidStartDate(current, chosen) {
+    const end = this.state.dateEndMoment;
+    if (null !== end) {
+      return moment(end).isSameOrAfter(current);
+    }
+    return true;
+  }
+
+  isValidEndDate(current, chosen) {
+    const start = this.state.dateStartMoment;
+    if (null !== start) {
+      return moment(start).isSameOrBefore(current);
+    }
+    return true;
+  }
+
   componentDidMount() {
     this.fetchEventLog();
   }
@@ -173,6 +191,7 @@ class EventLog extends React.Component {
               closeOnSelect={true}
               timeFormat={false}
               inputProps={{placeholder:"DD.MM.YYYY", title: "date starting from"}}
+              isValidDate={this.isValidStartDate}
             />
           </li>
           <li style={{'marginLeft': '4px'}}>
@@ -183,6 +202,7 @@ class EventLog extends React.Component {
               closeOnSelect={true}
               timeFormat={false}
               inputProps={{placeholder: "DD.MM.YYYY" ,title: "date ending to"}}
+              isValidDate={this.isValidEndDate}
             />
           </li>
         </ul>
