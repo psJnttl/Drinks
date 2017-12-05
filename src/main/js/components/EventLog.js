@@ -100,7 +100,11 @@ class EventLog extends React.Component {
 
   onChangeDateEnd(e) {
     if (true === moment.isMoment(e)) {
-      this.setState({dateEndMoment: e});
+      let startDate = this.state.dateStartMoment;
+      if (null === startDate || moment(startDate).isAfter(e)) {
+        startDate = e;
+      }
+      this.setState({dateEndMoment: e, dateStartMoment: startDate});
     }
     else {
       this.setState({dateEndMoment: null});
