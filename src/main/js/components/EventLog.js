@@ -55,10 +55,26 @@ class EventLog extends React.Component {
     return timeStamp;
   }
 
+  parseToMoment(java8LocalDateTime) {
+    var mnmt = moment()
+                  .year(java8LocalDateTime.year)
+                  .month(java8LocalDateTime.monthValue-1)
+                  .date(java8LocalDateTime.dayOfMonth)
+                  .hour(java8LocalDateTime.hour)
+                  .minute(java8LocalDateTime.minute)
+                  .second(java8LocalDateTime.second);
+    return mnmt;
+  }
+
+  formatMoment(mnmt) {
+    var formatted = mnmt.format("DD-MM-YYYY HH:mm:ss");
+    return formatted;
+  }
+
   setEventLogList(data) {
     const theList = data.map( item =>
-       _.assign({}, {id: item.id, dateStr: this.parseDate(item.date).toString(),
-                date: moment(this.parseDate(item.date).toString()), action: item.action,
+       _.assign({}, {id: item.id, dateStr: this.formatMoment(this.parseToMoment(item.date)),
+                date: this.parseToMoment(item.date), action: item.action,
                 targetEntity: item.targetEntity, targetId: item.targetId,
                 targetName: item.targetName, username: item.username }) );
     this.setState({eventLog: theList});
