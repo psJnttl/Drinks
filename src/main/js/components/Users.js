@@ -280,14 +280,16 @@ class Users extends React.Component {
             <li>
               <Button bsStyle="success" onClick={ () => this.openAddModal() } title="add user"><Glyphicon glyph="plus"/></Button>
             </li>
-            <li>
+            <li style={{'marginLeft': '10px'}}>
               <input
                 className="searchinput"
                 type="text"
-                placeholder="search by username or role"
+                placeholder="search"
                 onChange={ this.onChangeSearchName }
                 value={this.state.searchName}
-              autoComplete="off" />
+                autoComplete="off"
+                title="by username or role"
+              />
             </li>
           </ul>
           <Pages

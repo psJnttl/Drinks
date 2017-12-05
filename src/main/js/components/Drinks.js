@@ -265,7 +265,7 @@ class Drinks extends React.Component {
           <li>
             <Button bsStyle="success" onClick={ () => this.openAddModal() } title="add Drink"><Glyphicon glyph="plus"/></Button>
           </li>
-          <li>
+          <li style={{'marginLeft': '10px'}}>
             <input
               className="searchinput"
               type="text"
