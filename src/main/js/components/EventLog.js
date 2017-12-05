@@ -6,15 +6,17 @@ import SimpleInformationModal from './SimpleInformationModal';
 import {concatenateSearchResults} from './util';
 import NetworkApi from './NetworkApi';
 import _ from 'lodash';
+import Datetime from 'react-datetime';
+import moment from 'moment';
 
 class EventLog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {eventLog: [], searchName: "",
     infoModalVisible: false, infoModalData: {},
-    dateStartStr: "", dateStart: null,
-    dateEndStr: "", dateEnd: null,
+    dateStartMoment: null, dateEndMoment: null,
     }
+    moment.locale('fi');
     this.fetchEventLog = this.fetchEventLog.bind(this);
     this.setEventLogList = this.setEventLogList.bind(this);
     this.parseDate = this.parseDate.bind(this);
@@ -54,7 +56,7 @@ class EventLog extends React.Component {
   setEventLogList(data) {
     const theList = data.map( item =>
        _.assign({}, {id: item.id, dateStr: this.parseDate(item.date).toString(),
-                date: this.parseDate(item.date), action: item.action,
+                date: moment(this.parseDate(item.date).toString()), action: item.action,
                 targetEntity: item.targetEntity, targetId: item.targetId,
                 targetName: item.targetName, username: item.username }) );
     this.setState({eventLog: theList});
@@ -82,58 +84,36 @@ class EventLog extends React.Component {
   }
 
   onChangeDateStart(e) {
-    let dateStart = null;
-    const startDateReady = new RegExp("^[0-9]{4}-[0-9]{2}-[0-9]{2}$");
-    if (true === startDateReady.test(e.target.value) ) {
-      console.log("we have valid start date")
-      dateStart = new Date(e.target.value);
+    if (true === moment.isMoment(e)) {
+      this.setState({dateStartMoment: e});
     }
-    this.setState({dateStartStr: e.target.value, dateStart: dateStart});
+    else {
+      this.setState({dateStartMoment: null});
+    }
   }
 
   onChangeDateEnd(e) {
-    let dateEnd = null;
-    const endDateReady = new RegExp("^[0-9]{4}-[0-9]{2}-[0-9]{2}$");
-    if (true === endDateReady.test(e.target.value) ) {
-      console.log("we have valid end date")
-      dateEnd = new Date(e.target.value);
+    if (true === moment.isMoment(e)) {
+      this.setState({dateEndMoment: e});
     }
-    this.setState({dateEndStr: e.target.value, dateEnd: dateEnd});
-  }
-
-  filterByDates(itemArray) {
-    if (null !== this.state.dateStart && null === this.state.dateEnd ) {
-      const result = itemArray.filter(item => item.date >= this.state.dateStart);
-      return result;
+    else {
+      this.setState({dateEndMoment: null});
     }
-    else if (null === this.state.dateStart && null !== this.state.dateEnd ) {
-      const adjusted = this.state.dateEnd.getTime() + 86400000;
-      const dateEnd = new Date(adjusted);
-      const result = itemArray.filter(item => item.date <= dateEnd);
-      return result;
-    }
-    else if (null !== this.state.dateStart && null !== this.state.dateEnd ) {
-      const adjusted = this.state.dateEnd.getTime() + 86400000;
-      const dateEnd = new Date(adjusted);
-      const result = itemArray.filter(item => (item.date >= this.state.dateStart && item.date <= dateEnd));
-      return result;
-    }
-    return itemArray;
   }
 
   filterByDates2(itemArray) {
     let startPred;
-    if (null !== this.state.dateStart) {
-      const start = this.state.dateStart;
-      startPred = function(item) { return item.date >= start};
+    if (null !== this.state.dateStartMoment) {
+      const start = this.state.dateStartMoment;
+      startPred = function(item) { return moment(item.date).isSameOrAfter(start)};
     }
     else {
       startPred = function(item) { return true};
     }
     let endPred;
-    if (null !== this.state.dateEnd) {
-      const end = this.state.dateEnd;
-      endPred = function(item) { return item.date <= end};
+    if (null !== this.state.dateEndMoment) {
+      const end = moment(this.state.dateEndMoment).add(1, 'd');
+      endPred = function(item) { return moment(item.date).isSameOrBefore(end)};
     }
     else {
       endPred = function(item) { return true};
@@ -155,7 +135,7 @@ class EventLog extends React.Component {
     const concat1 = concatenateSearchResults(byAction, byTargetEntity);
     const concat2 = concatenateSearchResults(concat1, byTargetName);
     const concat3 = concatenateSearchResults(concat2, byUsername);
-    const dateFiltered = this.filterByDates(concat3);
+    const dateFiltered = this.filterByDates2(concat3);
     const sorted = _.orderBy(dateFiltered, [function(l) { return l.id }], ['desc']);
 
     return (
@@ -182,25 +162,23 @@ class EventLog extends React.Component {
             />
           </li>
           <li style={{'marginLeft': '4px'}}>
-            <input
-              className="searchinput"
-              type="text"
-              placeholder="YYYY-MM-DD"
+            <Datetime
               onChange={this.onChangeDateStart}
-              value={this.state.dateStartStr}
-              autoComplete="off"
-              title="date starting from"
+              value={this.state.dateStartMoment}
+              input={true}
+              closeOnSelect={true}
+              timeFormat={false}
+              inputProps={{placeholder:"DD.MM.YYYY", title: "date starting from"}}
             />
           </li>
           <li style={{'marginLeft': '4px'}}>
-            <input
-              className="searchinput"
-              type="text"
-              placeholder="YYYY-MM-DD"
+            <Datetime
               onChange={this.onChangeDateEnd}
-              value={this.state.dateEndStr}
-              autoComplete="off"
-              title="date ending to"
+              value={this.state.dateEndMoment}
+              input={true}
+              closeOnSelect={true}
+              timeFormat={false}
+              inputProps={{placeholder: "DD.MM.YYYY" ,title: "date ending to"}}
             />
           </li>
         </ul>
