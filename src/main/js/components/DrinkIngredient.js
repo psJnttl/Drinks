@@ -49,7 +49,11 @@ class DrinkIngredient extends React.Component {
 
   selected(item) {
     console.log(item);
-    if (undefined !== item.value) {
+    if (null === item) {
+      this.setState({ingredient: {value: {id:0, name:""}, label: ""}},
+      () => this.buildComponentAndSave() );
+    }
+    else if (undefined !== item.value) {
       this.setState({ingredient: item}, () => this.buildComponentAndSave());
     }
   }
@@ -77,7 +81,7 @@ class DrinkIngredient extends React.Component {
             options={options}
             onChange={this.selected}
             autosize={false}
-            clearable={false}
+            clearable={true}
             placeholder="search ingredients"
           />
         </td><td>
