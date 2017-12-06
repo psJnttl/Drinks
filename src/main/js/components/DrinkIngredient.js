@@ -35,7 +35,7 @@ class DrinkIngredient extends React.Component {
   }
 
   buildComponentAndSave() {
-    const component = _.assign({}, 
+    const component = _.assign({},
       {ingredient: this.state.ingredient.value},
       {value: this.state.amount}, {index: this.props.index});
     this.props.handleIngredient(component);
@@ -76,10 +76,8 @@ class DrinkIngredient extends React.Component {
             value={this.state.ingredient}
             options={options}
             onChange={this.selected}
-            filterOption={this.filterItem}
             autosize={false}
             clearable={false}
-            noResultsText={false}
             placeholder="search ingredients"
           />
         </td><td>
