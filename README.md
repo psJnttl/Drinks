@@ -23,8 +23,9 @@
 ##### Front-end
 - React
 - React-Router v4
-- React-Bootstrap.
+- React-Bootstrap
 - [react-datetime](https://github.com/arqex/react-datetime)
+- [react-select](https://jedwatson.github.io/react-select)
 
 ###### How to use:
 1. install UI, in project directory run commands:
