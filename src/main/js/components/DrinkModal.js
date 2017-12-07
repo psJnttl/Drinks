@@ -92,6 +92,9 @@ class DrinkModal extends React.Component {
     if (false === this.props.modalOpen || false === this.state.mounted ) {
       return null;
     }
+    const sortedCategories = _.orderBy(this.props.categories, [function(c) { return c.name.toLowerCase(); }], ['asc']);
+    const sortedGlasses = _.orderBy(this.props.glasses, [function(g) { return g.name.toLowerCase(); }], ['asc']);
+    const sortedIngredients = _.orderBy(this.props.ingredients, [function(i) { return i.name.toLowerCase(); }], ['asc']);
     return (
       <div>
         <Modal bsSize="large" show={this.props.modalOpen} onHide={() => this.props.close()}>
@@ -105,7 +108,7 @@ class DrinkModal extends React.Component {
             <FormGroup controlId="formSelect">
               <SelectEntity
                 title="Category"
-                entityList={this.props.categories}
+                entityList={sortedCategories}
                 onSelect={this.handleSelectCategory}
                 value={this.state.drink.category}
               />
@@ -113,14 +116,14 @@ class DrinkModal extends React.Component {
             <FormGroup controlId="formSelect">
               <SelectEntity
                 title="Glass"
-                entityList={this.props.glasses}
+                entityList={sortedGlasses}
                 onSelect={this.handleSelectGlass}
                 value={this.state.drink.glass}
               />
             </FormGroup>
             <FormGroup controlId="formSelect">
               <DrinkIngredients
-                ingredients={this.props.ingredients}
+                ingredients={sortedIngredients}
                 value={this.state.drink.components}
                 handleIngredient={this.handleDrinkIngredient}
                 addIngredient={this.addIngredient}
