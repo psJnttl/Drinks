@@ -28,10 +28,8 @@ import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
-import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.filter.CompositeFilter;
-
-import oaut2tutorial.ClientResources;
 
 @Profile({"development", "test"})
 @Configuration
@@ -55,7 +53,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .antMatchers("/").permitAll()
         .antMatchers("/api/accounts/signup").permitAll()
         .anyRequest().authenticated().and()
-        .logout().permitAll().logoutSuccessUrl("/").deleteCookies("JSESSIONID");
+        .logout().permitAll().logoutSuccessUrl("/").deleteCookies("JSESSIONID").and()
+        .addFilterBefore(ssoFilter(), BasicAuthenticationFilter.class);
     }
 
     @Override
@@ -91,7 +90,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private Filter ssoFilter() {
         CompositeFilter filter = new CompositeFilter();
         List<Filter> filters = new ArrayList<>();
-        filters.add(ssoFilter(github(), "/login/github"));
+        filters.add(ssoFilter(github(), "/api/login/github"));
         filter.setFilters(filters);
         return filter;
     }
