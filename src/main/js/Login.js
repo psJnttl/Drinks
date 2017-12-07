@@ -22,6 +22,7 @@ class Login extends React.Component {
     this.closeSignupFailModal = this.closeSignupFailModal.bind(this);
     this.closeSignupSuccessModal = this.closeSignupSuccessModal.bind(this);
     this.handleAuthenticationState = this.handleAuthenticationState.bind(this);
+    this.loginViaGithub = this.loginViaGithub.bind(this);
   }
 
   setAccountData(data) {
@@ -83,6 +84,17 @@ class Login extends React.Component {
             }
         });
 
+  }
+
+  loginViaGithub() {
+    const self = this;
+    NetworkApi.get("/api/login/github")
+        .then(function (response) {
+          console.log(" OAUTH2 OK!");
+        })
+        .catch(function (response) {
+          console.log(" OAUTH2 FAILURE!");
+        });
   }
 
   componentDidMount() {
@@ -157,6 +169,7 @@ class Login extends React.Component {
         notification2 = {this.state.notification2}
         name={this.state.username}
         reply={this.closeSignupSuccessModal} />
+      <Button bsStyle="primary" onClick={ () => this.loginViaGithub() }>github</Button>
     </div>;
     const state = this.state;
     const aState = this.state.authState.authenticated;
