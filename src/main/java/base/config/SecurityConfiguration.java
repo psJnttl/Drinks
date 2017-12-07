@@ -64,4 +64,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public CustomBasicAuthenticationEntryPoint getBasicAuthEntryPoint() {
         return new CustomBasicAuthenticationEntryPoint();
     }
+    
+    @Bean
+    public FilterRegistrationBean oauth2ClientFilterRegistration(OAuth2ClientContextFilter filter) {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(filter);
+        registration.setOrder(-100);
+        return registration;
+    }
 }
