@@ -1,6 +1,7 @@
 package base.service;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,9 +40,24 @@ public class AccountService {
         if (null == authentication) {
             return Optional.empty();
         }
+        Collection <? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         Account account = accountRepository.findByUsername(authentication.getName());
-        AccountDto dto = createDto(account);
-        return Optional.of(dto);
+        if (null != account) {
+            AccountDto dto = createDto(account);
+            return Optional.of(dto);
+        }
+        else { // oauth2
+            Optional<? extends GrantedAuthority> roleAuth = authorities
+                                                                .stream()
+                                                                .filter(a -> a.getAuthority().contains("USER"))
+                                                                .findFirst();
+            if (!roleAuth.isPresent()) {
+                return Optional.empty();
+            }
+            Role role = new Role(roleAuth.get().getAuthority());
+            AccountDto dto = new AccountDto(-1, authentication.getName(), Arrays.asList(role));
+            return Optional.of(dto);
+        }
     }
 
     /**
