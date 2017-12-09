@@ -88,7 +88,7 @@ class Login extends React.Component {
 
   loginViaGithub() {
     const self = this;
-    NetworkApi.get("/api/login/github")
+    NetworkApi.githubLogin('/api/login/github')
         .then(function (response) {
           console.log(" OAUTH2 OK!");
         })
@@ -170,6 +170,7 @@ class Login extends React.Component {
         name={this.state.username}
         reply={this.closeSignupSuccessModal} />
       <Button bsStyle="primary" onClick={ () => this.loginViaGithub() }>github</Button>
+      <a href="/api/login/github">login via Github</a>
     </div>;
     const state = this.state;
     const aState = this.state.authState.authenticated;

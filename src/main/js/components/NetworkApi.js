@@ -116,5 +116,22 @@ export default  {
       return newConfig;
     }
     return config;
+  },
+  githubLogin(url) {
+    const config = {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      }
+    };
+    const self = this;
+    return axios.get(url, config)
+                .then(function (response) {
+                  self.csrfCatchToken(response);
+                  return response.data;
+                })
+                .catch(function (error) {
+                  self.csrfCatchToken(error.response);
+                  throw error.response;
+                });
   }
 }
