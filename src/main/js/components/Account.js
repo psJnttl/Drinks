@@ -85,6 +85,7 @@ class Account extends React.Component {
 
   render() {
     const username = this.props.authState.username;
+    const isGithub = -1 === this.props.authState.id ? true : false;
     return (
       <div>
         <h5>Change password for {username}</h5>
@@ -98,6 +99,7 @@ class Account extends React.Component {
                 onChange={ this.onChangeOldPasswd }
                 value={this.state.oldPasswd}
                 autoComplete="off"
+                disabled={isGithub}
               />
             </FormGroup>
             <FormGroup controlId="formInput">
@@ -108,6 +110,7 @@ class Account extends React.Component {
                 onChange={ this.onChangeNewPasswd }
                 value={this.state.newPasswd}
                 autoComplete="off"
+                disabled={isGithub}
               />
             </FormGroup>
             <FormGroup controlId="formInput">
@@ -118,12 +121,16 @@ class Account extends React.Component {
                 onChange={ this.onChangeNewPasswd2 }
                 value={this.state.newPasswd2}
                 autoComplete="off"
+                disabled={isGithub}
               />
             </FormGroup>
             <FormGroup controlId="buttons">
               <Button bsStyle="success" disabled={!this.isFormValid()} onClick={ () => this.changePassword() }>Change password</Button>
             </FormGroup>
           </Form>
+          {isGithub &&
+            <div>Please change password on github.</div>
+          }
         </Col>
         <SimpleInformationModal
           modalOpen={this.state.infoModalVisible}
