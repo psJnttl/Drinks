@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import base.command.IngredientAdd;
+import base.config.UserIdentification;
 import base.domain.Ingredient;
 import base.domain.LogEntry;
 import base.dto.IngredientDto;
@@ -26,11 +27,13 @@ public class IngredientAspect {
 
     @Autowired
     private LogEntryRepository logEntryRepository;
+    
+    @Autowired
+    private UserIdentification userIdentification;
 
     @Before("execution(* base.service.IngredientService.deleteIngredient(..))")
     private void deleteIngredient(JoinPoint joinPoint) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        String username = userIdentification.getNameForLog();
         long id = (long) joinPoint.getArgs()[0];
         Ingredient ing = ingredientRepository.findOne(id);
         LogEntry logEntry = LogEntry.builder()
@@ -47,8 +50,7 @@ public class IngredientAspect {
     @AfterReturning( pointcut = "execution(* base.service.IngredientService.addIngredient(..))",
             returning = "result")
     private void addIngredient(JoinPoint joinPoint, Object result) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        String username = userIdentification.getNameForLog();
         IngredientDto dto = (IngredientDto) result;
         LogEntry logEntry = LogEntry.builder()
                 .date(LocalDateTime.now())
@@ -63,8 +65,7 @@ public class IngredientAspect {
 
     @Before("execution(* base.service.IngredientService.modifyIngredient(..))")
     private void modifyIngredient(JoinPoint joinPoint) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        String username = userIdentification.getNameForLog();
         long id = (long) joinPoint.getArgs()[0];
         IngredientAdd ingredientMod = (IngredientAdd) joinPoint.getArgs()[1];
         LogEntry after = LogEntry.builder()

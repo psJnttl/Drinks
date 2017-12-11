@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import base.command.CategoryAdd;
+import base.config.UserIdentification;
 import base.domain.Category;
 import base.domain.LogEntry;
 import base.dto.CategoryDto;
@@ -26,11 +27,13 @@ public class CategoryAspect {
     
     @Autowired
     private LogEntryRepository logEntryRepository;
+    
+    @Autowired
+    private UserIdentification userIdentification;
 
     @Before("execution(* base.service.CategoryService.deleteCategory(..))")
     private void deleteCategory(JoinPoint joinPoint) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        String username = userIdentification.getNameForLog();
         long id = (long) joinPoint.getArgs()[0];
         Category cat = categoryRepository.findOne(id);
         LogEntry logEntry = LogEntry.builder()
@@ -47,8 +50,7 @@ public class CategoryAspect {
     @AfterReturning( pointcut = "execution(* base.service.CategoryService.addCategory(..))",
             returning = "result")
     private void addCategory(JoinPoint joinPoint, Object result) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        String username = userIdentification.getNameForLog();
         CategoryDto dto = (CategoryDto) result;
         LogEntry logEntry = LogEntry.builder()
                 .date(LocalDateTime.now())
@@ -63,8 +65,7 @@ public class CategoryAspect {
 
     @Before("execution(* base.service.CategoryService.modifyCategory(..))")
     private void modifyCategory(JoinPoint joinPoint) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        String username = userIdentification.getNameForLog();
         long id = (long) joinPoint.getArgs()[0];
         CategoryAdd categoryMod = (CategoryAdd) joinPoint.getArgs()[1];
         LogEntry after = LogEntry.builder()

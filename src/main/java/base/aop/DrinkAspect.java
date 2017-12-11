@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import base.command.DrinkAdd;
+import base.config.UserIdentification;
 import base.domain.Drink;
 import base.domain.LogEntry;
 import base.dto.DrinkDto;
@@ -27,10 +28,12 @@ public class DrinkAspect {
     @Autowired
     private LogEntryRepository logEntryRepository;
     
+    @Autowired
+    private UserIdentification userIdentification;
+    
     @Before("execution(* base.service.DrinkService.deleteDrink(..))")
     private void deleteDrink(JoinPoint joinPoint) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        String username = userIdentification.getNameForLog();
         long id = (long) joinPoint.getArgs()[0];
         Drink drink = drinkRepository.findOne(id);
         LogEntry logEntry = LogEntry.builder()
@@ -47,8 +50,7 @@ public class DrinkAspect {
     @AfterReturning( pointcut = "execution(* base.service.DrinkService.addDrink(..))",
                      returning = "result")
     private void addDrink(JoinPoint joinPoint, Object result) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        String username = userIdentification.getNameForLog();
         DrinkDto drink = (DrinkDto) result;
         LogEntry logEntry = LogEntry.builder()
                 .date(LocalDateTime.now())
@@ -63,8 +65,7 @@ public class DrinkAspect {
     
     @Before("execution(* base.service.DrinkService.modifyDrink(..))")
     private void modifyDrink(JoinPoint joinPoint) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        String username = userIdentification.getNameForLog();
         long id = (long) joinPoint.getArgs()[0];
         DrinkAdd drink = (DrinkAdd) joinPoint.getArgs()[1];
         LogEntry logEntry = LogEntry.builder()

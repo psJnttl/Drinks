@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import base.command.GlassAdd;
+import base.config.UserIdentification;
 import base.domain.Glass;
 import base.domain.LogEntry;
 import base.dto.GlassDto;
@@ -29,13 +30,15 @@ public class GlassAspect {
     
     @Autowired
     private LogEntryRepository logEntryRepository;
+    
+    @Autowired
+    private UserIdentification userIdentification;
 
     private Log log = LogFactory.getLog(this.getClass());
 
     @Before("execution(* base.service.GlassService.deleteGlass(..))")
     private void deleteGlass(JoinPoint joinPoint) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        String username = userIdentification.getNameForLog();
         long id = (long) joinPoint.getArgs()[0];
         Glass glass = glassRepository.findOne(id);
         log.info(username + " DELETE glass id: " + id + ", name: " + glass.getName());
@@ -53,8 +56,7 @@ public class GlassAspect {
     @AfterReturning( pointcut = "execution(* base.service.GlassService.addGlass(..))",
                      returning = "result")
     private void addGlass(JoinPoint joinPoint, Object result) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        String username = userIdentification.getNameForLog();
         GlassDto dto = (GlassDto) result;
         LogEntry logEntry = LogEntry.builder()
                 .date(LocalDateTime.now())
@@ -69,8 +71,7 @@ public class GlassAspect {
     
     @Before("execution(* base.service.GlassService.modifyGlass(..))")
     private void modifyGlass(JoinPoint joinPoint) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        String username = userIdentification.getNameForLog();
         long id = (long) joinPoint.getArgs()[0];
         GlassAdd glassMod = (GlassAdd) joinPoint.getArgs()[1];
         LocalDateTime now = LocalDateTime.now();
