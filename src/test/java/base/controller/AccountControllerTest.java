@@ -80,7 +80,7 @@ public class AccountControllerTest {
         user.setUsername(USERNAME1);
         user.setPassword(passwordEncoder.encode(PASSWORD1));
         List<Role> roles = new ArrayList<>();
-        Role userRole = new Role("USER");
+        Role userRole = new Role("ROLE_USER");
         roles.add(userRole);
         user = accountRepository.saveAndFlush(user);
     }
@@ -100,7 +100,7 @@ public class AccountControllerTest {
         AccountAdd account = new AccountAdd();
         account.setUsername(USERNAME2);
         account.setPassword(PASSWORD1);
-        Role user = roleRepository.findByName("USER");
+        Role user = roleRepository.findByName("ROLE_USER");
         account.setRoles(Arrays.asList(user));
         ObjectMapper mapper = new ObjectMapper();
         String content = mapper.writeValueAsString(account);
@@ -122,7 +122,7 @@ public class AccountControllerTest {
         AccountAdd account = new AccountAdd();
         account.setUsername(EMPTY_STRING);
         account.setPassword(PASSWORD1);
-        Role user = roleRepository.findByName("USER");
+        Role user = roleRepository.findByName("ROLE_USER");
         account.setRoles(Arrays.asList(user));
         ObjectMapper mapper = new ObjectMapper();
         String content = mapper.writeValueAsString(account);
@@ -140,7 +140,7 @@ public class AccountControllerTest {
         AccountAdd account = new AccountAdd();
         account.setUsername(USERNAME2);
         account.setPassword(EMPTY_STRING);
-        Role user = roleRepository.findByName("USER");
+        Role user = roleRepository.findByName("ROLE_USER");
         account.setRoles(Arrays.asList(user));
         ObjectMapper mapper = new ObjectMapper();
         String content = mapper.writeValueAsString(account);
@@ -175,7 +175,7 @@ public class AccountControllerTest {
         accMod.setNewPassword(newPassword);
         accMod.setOldPassword(oldPassword);
         List<Role> roles = new ArrayList<>();
-        Role userRole = new Role("USER");
+        Role userRole = new Role("ROLE_USER");
         roles.add(userRole);
         accMod.setRoles(roles);
         return accMod;

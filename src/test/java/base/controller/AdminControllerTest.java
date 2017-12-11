@@ -82,7 +82,7 @@ public class AdminControllerTest {
         user.setUsername(USERNAME1);
         user.setPassword(passwordEncoder.encode(PASSWORD1));
         List<Role> roles = new ArrayList<>();
-        Role userRole = new Role("USER");
+        Role userRole = new Role("ROLE_USER");
         roles.add(userRole);
         user = accountRepository.saveAndFlush(user);
     }
@@ -97,7 +97,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    @WithMockUser(username=USERNAME1, authorities={"ROLE_USER", "ROLE_ADMIN"})
     public void listAllAccounts() throws Exception {
         mockMvc
             .perform(get(PATH))
@@ -106,7 +106,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    @WithMockUser(username=USERNAME1, authorities={"ROLE_USER", "ROLE_ADMIN"})
     public void listMustNotBeEmpty() throws Exception {
         MvcResult result = mockMvc
                                .perform(get(PATH))
@@ -116,7 +116,7 @@ public class AdminControllerTest {
     }
     
     @Test
-    @WithMockUser(username=USERNAME1, authorities={"USER"})
+    @WithMockUser(username=USERNAME1, authorities={"ROLE_USER"})
     public void listAllAccountsNotAdminFails() throws Exception {
         thrown.expect(NestedServletException.class);
         thrown.expectMessage(containsString("org.springframework.security.access.AccessDeniedException"));
@@ -126,7 +126,7 @@ public class AdminControllerTest {
     }
     
     @Test
-    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    @WithMockUser(username=USERNAME1, authorities={"ROLE_USER", "ROLE_ADMIN"})
     public void addingAccountReturnsLocationHeaderAndDto() throws Exception {
         AccountAdd account = new AccountAdd();
         account.setUsername(USERNAME2);
@@ -145,7 +145,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    @WithMockUser(username=USERNAME1, authorities={"ROLE_USER", "ROLE_ADMIN"})
     public void addingAccountWithExistingUsernameFails() throws Exception {
         AccountAdd account = new AccountAdd();
         account.setUsername(USERNAME1);
@@ -160,7 +160,7 @@ public class AdminControllerTest {
     }
     
     @Test
-    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    @WithMockUser(username=USERNAME1, authorities={"ROLE_USER", "ROLE_ADMIN"})
     public void addingAccountWithEmptyUsernameFails() throws Exception {
         AccountAdd account = new AccountAdd();
         account.setUsername(EMPTY_STRING);
@@ -175,7 +175,7 @@ public class AdminControllerTest {
     }
     
     @Test
-    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    @WithMockUser(username=USERNAME1, authorities={"ROLE_USER", "ROLE_ADMIN"})
     public void addingAccountWithEmptyPasswordFails() throws Exception {
         AccountAdd account = new AccountAdd();
         account.setUsername(USERNAME2);
@@ -190,7 +190,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    @WithMockUser(username=USERNAME1, authorities={"ROLE_USER", "ROLE_ADMIN"})
     public void deleteAccountOk() throws Exception {
         mockMvc
             .perform(delete(PATH + "/" + this.user.getId()))
@@ -198,7 +198,7 @@ public class AdminControllerTest {
     }
     
     @Test
-    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    @WithMockUser(username=USERNAME1, authorities={"ROLE_USER", "ROLE_ADMIN"})
     public void deleteAccountWithWrongIdFails() throws Exception {
         mockMvc
             .perform(delete(PATH + "/" + RANDOM_ID))
@@ -206,7 +206,7 @@ public class AdminControllerTest {
     }
     
     @Test
-    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    @WithMockUser(username=USERNAME1, authorities={"ROLE_USER", "ROLE_ADMIN"})
     public void modifyAccountPasswordOk() throws Exception {
         AccountMod account = new AccountMod();
         account.setUsername(USERNAME1);
@@ -224,7 +224,7 @@ public class AdminControllerTest {
     }
     
     @Test
-    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    @WithMockUser(username=USERNAME1, authorities={"ROLE_USER", "ROLE_ADMIN"})
     public void modifyAccountAddRoleAdminOk() throws Exception {
         AccountMod account = new AccountMod();
         account.setUsername(USERNAME1);
@@ -238,12 +238,12 @@ public class AdminControllerTest {
             .andReturn();
         AccountDto dto = mapper.readValue(result.getResponse().getContentAsString(), AccountDto.class);
         assertEquals("Wrong number of roles",2 ,dto.getRoles().stream()
-                           .filter(r -> r.getName().equals("USER") || r.getName().equals("ADMIN"))
+                           .filter(r -> r.getName().equals("ROLE_USER") || r.getName().equals("ROLE_ADMIN"))
                            .count());
     }
     
     @Test
-    @WithMockUser(username=USERNAME1, authorities={"USER", "ADMIN"})
+    @WithMockUser(username=USERNAME1, authorities={"ROLE_USER", "ROLE_ADMIN"})
     public void modifyAccountWithWrongIdFails() throws Exception {
         AccountMod account = new AccountMod();
         account.setUsername(USERNAME1);
@@ -258,13 +258,13 @@ public class AdminControllerTest {
     }
     
     private List<Role> createUserRole() {
-        Role role = roleRepository.findByName("USER");
+        Role role = roleRepository.findByName("ROLE_USER");
         return Arrays.asList(role);
     }
     
     private List<Role> createUserAndAdminRole() {
-        Role user = roleRepository.findByName("USER");
-        Role admin = roleRepository.findByName("ADMIN");
+        Role user = roleRepository.findByName("ROLE_USER");
+        Role admin = roleRepository.findByName("ROLE_ADMIN");
         return Arrays.asList(user, admin);
     }
 }
