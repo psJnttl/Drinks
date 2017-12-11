@@ -13,13 +13,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 
 import base.command.AccountAdd;
 import base.command.AccountMod;
+import base.config.UserIdentification;
 import base.domain.Account;
 import base.domain.Role;
 import base.dto.AccountDto;
+import base.dto.RoleDto;
 import base.repository.AccountRepository;
 import base.repository.RoleRepository;
 
@@ -34,30 +37,31 @@ public class AccountService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private UserIdentification userIdentification;
 
     public Optional<AccountDto> getUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (null == authentication) {
+        if (!userIdentification.isUserLogged()) {
             return Optional.empty();
         }
-        Collection <? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        Account account = accountRepository.findByUsername(authentication.getName());
-        if (null != account) {
-            AccountDto dto = createDto(account);
-            return Optional.of(dto);
+        if (!userIdentification.isOAuth2()) {
+            Account account = accountRepository.findByUsername(userIdentification.getName());
+            if (null != account) {
+                AccountDto dto = createDto(account);
+                return Optional.of(dto);
+            }
+            return Optional.empty();
         }
-        else { // oauth2
-            Optional<? extends GrantedAuthority> roleAuth = authorities
-                                                                .stream()
-                                                                .filter(a -> a.getAuthority().contains("USER"))
-                                                                .findFirst();
-            if (!roleAuth.isPresent()) {
+        else {
+            List<Role> roles = userIdentification.getRoles();
+            if (roles.isEmpty()) {
                 return Optional.empty();
             }
-            Role role = new Role(roleAuth.get().getAuthority());
-            AccountDto dto = new AccountDto(-1, authentication.getName(), Arrays.asList(role));
+            AccountDto dto = new AccountDto(-1, userIdentification.getName(), roles);
             return Optional.of(dto);
         }
+
     }
 
     /**
