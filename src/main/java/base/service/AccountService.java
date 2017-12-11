@@ -73,7 +73,7 @@ public class AccountService {
         Account user = new Account();
         user.setUsername(account.getUsername());
         user.setPassword(passwordEncoder.encode(account.getPassword()));
-        Role userRole = roleRepository.findByName("USER");
+        Role userRole = roleRepository.findByName("ROLE_USER");
         user.setRoles(Arrays.asList(userRole));
         user = accountRepository.saveAndFlush(user);
         AccountDto dto = createDto(user);

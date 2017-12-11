@@ -8,7 +8,7 @@ import UserRoles from './UserRoles';
 class UserModal extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {user: {username: "", password: "", roles: [{id:1, name: "USER"}]},
+    this.state = {user: {username: "", password: "", roles: [{id:1, name: "ROLE_USER"}]},
     role: {}, passwordReset: false,
     }
     this.isFormValid = this.isFormValid.bind(this);
@@ -158,6 +158,6 @@ UserModal.PropTypes = {
 UserModal.defaultProps = {
   title: "Add an user",
   header: "successModalHeader",
-  user: {username: "", password: "", roles: [{id:1, name: "USER"}]}
+  user: {username: "", password: "", roles: [{id:1, name: "ROLE_USER"}]}
 }
 export default UserModal;

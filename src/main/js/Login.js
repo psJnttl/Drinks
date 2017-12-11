@@ -26,7 +26,7 @@ class Login extends React.Component {
   }
 
   setAccountData(data) {
-    const index = _.findIndex(data.roles, function(u) { return u.name === "ADMIN" });
+    const index = _.findIndex(data.roles, function(u) { return u.name === "ROLE_ADMIN" });
     const newData = _.assign({}, {username: data.username, authenticated: true, id: data.id });
     let auth
     if (-1 === index) {

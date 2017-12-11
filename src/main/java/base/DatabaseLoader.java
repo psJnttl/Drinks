@@ -57,29 +57,29 @@ public class DatabaseLoader implements CommandLineRunner {
         if (null != accountRepository.findByUsername("user")) {
             return;
         }
-        if (null == roleRepository.findByName("USER")) {
-            Role role = new Role("USER");
+        if (null == roleRepository.findByName("ROLE_USER")) {
+            Role role = new Role("ROLE_USER");
             role = roleRepository.saveAndFlush(role);
         }
         if (null == accountRepository.findByUsername("user")) {
             Account userAccount = new Account();
             userAccount.setUsername("user");
             userAccount.setPassword(passwordEncoder.encode("password"));
-            Role role = roleRepository.findByName("USER");
+            Role role = roleRepository.findByName("ROLE_USER");
             userAccount.addRole(role);
             userAccount = accountRepository.saveAndFlush(userAccount);
         }
-        if (null == roleRepository.findByName("ADMIN")) {
-            Role admin = new Role("ADMIN");
+        if (null == roleRepository.findByName("ROLE_ADMIN")) {
+            Role admin = new Role("ROLE_ADMIN");
             admin = roleRepository.saveAndFlush(admin);
         }
         if (null == accountRepository.findByUsername("admin")) {
             Account adminAccount = new Account();
             adminAccount.setUsername("admin");
             adminAccount.setPassword(passwordEncoder.encode(("admin")));
-            Role user = roleRepository.findByName("USER");
+            Role user = roleRepository.findByName("ROLE_USER");
             adminAccount.addRole(user);
-            Role admin = roleRepository.findByName("ADMIN");
+            Role admin = roleRepository.findByName("ROLE_ADMIN");
             adminAccount.addRole(admin);
             adminAccount = accountRepository.saveAndFlush(adminAccount);
         }

@@ -26,7 +26,7 @@ public class AdminController {
     @Autowired
     private AccountService accountService;
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @RequestMapping(value = "/api/admin/accounts", method = RequestMethod.GET)
     public List<AccountDto> listAccounts() {
         return accountService.listAll();
@@ -37,7 +37,7 @@ public class AdminController {
      * @return  AccountDto, Location header doesn't have ID.
      * @throws URISyntaxException 
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @RequestMapping(value = "/api/admin/accounts", method = RequestMethod.POST)
     public ResponseEntity<AccountDto> addAccount(@RequestBody AccountAdd account) throws URISyntaxException {
         if (null == account || null == account.getUsername() || null == account.getPassword() ||
@@ -58,7 +58,7 @@ public class AdminController {
      * @param AccountMod
      * @return AccountDto
      */
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @RequestMapping(value = "/api/admin/accounts/{id}", method = RequestMethod.PUT)
     public ResponseEntity<AccountDto> modifyAccount(@PathVariable long id, @RequestBody AccountMod account) {
         if (!accountService.findAccount(id).isPresent()) {
@@ -68,7 +68,7 @@ public class AdminController {
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
     
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @RequestMapping(value = "/api/admin/accounts/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<AccountDto> deleteAccount(@PathVariable long id) {
         if (! accountService.deleteAccount(id)) {

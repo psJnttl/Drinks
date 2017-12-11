@@ -19,7 +19,7 @@ public class LogEntryController {
     @Autowired
     private LogEntryRepository logEntryRepository;
     
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @RequestMapping(value = "/api/logentries", method = RequestMethod.GET)
     public List<LogEntryDto> listAll() {
         List<LogEntry> logEntries = logEntryRepository.findAll();
