@@ -52,5 +52,14 @@ public class UserIdentificationImpl implements UserIdentification {
         return SecurityContextHolder.getContext().getAuthentication();
     }
 
+    @Override
+    public String getNameForLog() {
+        String name = getName();
+        if (isOAuth2()) {
+            name += "+oa2";
+        }
+        return name;
+    }
+
     
 }

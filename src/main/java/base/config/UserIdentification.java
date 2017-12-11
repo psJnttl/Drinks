@@ -12,4 +12,5 @@ public interface UserIdentification {
     String getName();
     boolean isOAuth2();
     List<Role> getRoles();
+    String getNameForLog();
 }
