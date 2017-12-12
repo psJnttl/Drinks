@@ -169,8 +169,6 @@ class Login extends React.Component {
         notification2 = {this.state.notification2}
         name={this.state.username}
         reply={this.closeSignupSuccessModal} />
-      <Button bsStyle="primary" onClick={ () => this.loginViaGithub() }>github</Button>
-      <a href="/api/login/github">login via Github</a>
     </div>;
     const state = this.state;
     const aState = this.state.authState.authenticated;

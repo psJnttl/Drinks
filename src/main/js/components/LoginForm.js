@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, FormGroup} from 'react-bootstrap';
+import GitHubButton from './GitHubButton';
 
 class LoginForm extends React.Component {
   constructor(props) {
@@ -44,7 +45,12 @@ class LoginForm extends React.Component {
               value={this.state.password}
             autoComplete="off" />
           </FormGroup>
-          <Button bsStyle="success" disabled={!this.state.name || !this.state.password} onClick={ () => this.submit() }>Login</Button>
+          <FormGroup>
+            <Button bsStyle="success" disabled={!this.state.name || !this.state.password} onClick={ () => this.submit() }>Login</Button>
+          </FormGroup>
+          <FormGroup>
+            <GitHubButton />
+          </FormGroup>
         </form>
       </div>
     );
