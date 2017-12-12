@@ -88,7 +88,9 @@ class Account extends React.Component {
     const isGithub = -1 === this.props.authState.id ? true : false;
     return (
       <div>
-        <h5>Change password for {username}</h5>
+        {!isGithub && <h5>Change password for {username}</h5>}
+        {isGithub && <h5>Please change password for {username} on github.</h5>}
+
         <Col sm={4}>
           <Form>
             <FormGroup controlId="formInput">
@@ -128,9 +130,6 @@ class Account extends React.Component {
               <Button bsStyle="success" disabled={!this.isFormValid()} onClick={ () => this.changePassword() }>Change password</Button>
             </FormGroup>
           </Form>
-          {isGithub &&
-            <div>Please change password on github.</div>
-          }
         </Col>
         <SimpleInformationModal
           modalOpen={this.state.infoModalVisible}
