@@ -17,7 +17,7 @@ import org.springframework.web.servlet.resource.ResourceResolverChain;
 class StaticPathResolver implements ResourceResolver {
 
     private Resource indexHtml = new ClassPathResource("/templates/index.html");
-    private List<String> handledExtensions = Arrays.asList("css", "html", "ico", "js", "map", "woff2");
+    private List<String> handledExtensions = Arrays.asList("css", "html", "ico", "js", "map", "woff2", "png");
     private List<String> ignoredPaths = Arrays.asList("api");
 
     /**

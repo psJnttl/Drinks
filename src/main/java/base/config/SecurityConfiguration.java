@@ -45,7 +45,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
       web
         .ignoring()
-           .antMatchers("/built/**", "/css/**");
+           .antMatchers("/built/**", "/css/**", "/images/**");
     }
 
     @Autowired
