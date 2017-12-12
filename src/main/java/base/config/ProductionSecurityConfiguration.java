@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
 
 @Profile("production")
@@ -22,6 +23,9 @@ public class ProductionSecurityConfiguration extends WebSecurityConfigurerAdapte
     @Autowired
     private UserDetailsService userDetailsService;
     
+    @Autowired
+    private Oauth2Configuration oauth2Configuration;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.addFilterAfter(new CsrfHeaderFilter(), CsrfFilter.class);
@@ -32,6 +36,7 @@ public class ProductionSecurityConfiguration extends WebSecurityConfigurerAdapte
         .antMatchers("/").permitAll()
         .antMatchers("/api/accounts/signup").permitAll()
         .anyRequest().authenticated().and()
+        .addFilterBefore(oauth2Configuration.ssoFilter(), BasicAuthenticationFilter.class)
         .logout().permitAll().logoutSuccessUrl("/").deleteCookies("JSESSIONID");
     }
 
